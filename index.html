@@ -1,49 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <title>Hung ML Blog</title>
-<link rel="stylesheet" href="./css/style.css">
+
+<link rel="stylesheet" href="css/style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
 
-<header>
-<h1>Hung Nguyen Tech Blog</h1>
-<p>Machine Learning | Deep Learning | Cybersecurity</p>
-</header>
+<!-- NAVBAR -->
 
-<section>
+<nav class="navbar">
 
-<h2>Latest Posts</h2>
+<div class="nav-left">
 
-<ul>
+<h2 class="logo">HungML</h2>
 
-<li>
-<a href="posts/transformer.html">
-Understanding Transformer
-</a>
-</li>
+<a href="#">Trang chủ</a>
+<a href="#">Danh mục</a>
+<a href="#">About</a>
 
-<li>
-<a href="posts/focal-loss.html">
-Focal Loss Explained
-</a>
-</li>
+</div>
 
-<li>
-<a href="posts/sql-injection.html">
-SQL Injection Attack
-</a>
-</li>
+<div class="nav-right">
 
-</ul>
+<input class="search" placeholder="Search blog...">
+
+<button class="login">Login</button>
+
+</div>
+
+</nav>
+
+
+<!-- TITLE -->
+
+<section class="title">
+
+<h1>BÀI VIẾT NỔI BẬT</h1>
 
 </section>
 
-<footer>
-<p>Github: https://github.com/yourname</p>
-</footer>
+
+<!-- TAGS -->
+
+<div class="tags">
+
+<span>#machine learning</span>
+<span>#deep learning</span>
+<span>#transformer</span>
+<span>#ai agent</span>
+<span>#cybersecurity</span>
+
+</div>
+
+
+<!-- POSTS -->
+
+<main class="posts">
+
+<div class="card">
+
+<img src="images/post1.jpg">
+
+<div class="card-content">
+
+<h3>Understanding Transformer</h3>
+
+<p>How transformer architecture works in modern AI models.</p>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<img src="images/post2.jpg">
+
+<div class="card-content">
+
+<h3>Focal Loss Explained</h3>
+
+<p>Handling class imbalance in deep learning.</p>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<img src="images/post3.jpg">
+
+<div class="card-content">
+
+<h3>SQL Injection Attack</h3>
+
+<p>How attackers exploit database vulnerabilities.</p>
+
+</div>
+
+</div>
+
+</main>
 
 </body>
 </html>
