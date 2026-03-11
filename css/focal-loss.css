@@ -1,0 +1,328 @@
+/* ===== FOCAL LOSS PAGE STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: #222;
+    background: #f5f6f8;  /* Màu nền giống trang chủ */
+    min-height: 100vh;
+}
+
+/* Blog Post Container */
+.blog-post {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.post-container {
+    background: white;  /* Nền trắng giống card ở trang chủ */
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+    padding: 2.5rem;
+    border: 1px solid #ddd;
+}
+
+/* Post Header */
+.post-header {
+    margin-bottom: 2rem;
+    text-align: left;  /* Căn trái giống trang chủ */
+}
+
+.post-header h1 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #222;  /* Màu chữ đen giống trang chủ */
+    margin-bottom: 1rem;
+    letter-spacing: normal;
+    text-transform: none;
+    background: none;
+    -webkit-text-fill-color: #222;
+}
+
+.post-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.post-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+}
+
+.post-meta span::before {
+    content: "•";
+    margin-right: 0.3rem;
+    color: #007bff;
+}
+
+.post-meta span:first-child::before {
+    content: "";
+    margin-right: 0;
+}
+
+/* Tags */
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.post-tags span {
+    background: white;
+    color: #555;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    transition: all 0.2s;
+}
+
+.post-tags span:hover {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+}
+
+/* Post Image */
+.post-image {
+    margin: 2rem 0;
+    text-align: center;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.post-image img {
+    width: 100%;
+    max-width: 800px;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.post-image:hover img {
+    transform: scale(1.02);
+}
+
+/* Post Content */
+.post-content {
+    color: #333;
+    font-size: 1rem;
+}
+
+.post-content h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #222;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eee;
+    border-left: none;
+    padding-left: 0;
+}
+
+.post-content h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin: 1.5rem 0 1rem;
+}
+
+.post-content p {
+    margin-bottom: 1.2rem;
+    line-height: 1.7;
+    color: #444;
+}
+
+.post-content strong {
+    color: #007bff;  /* Màu xanh giống hover ở trang chủ */
+    font-weight: 600;
+    background: none;
+    padding: 0;
+}
+
+/* Formula Box */
+.formula {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.formula p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #222;
+    margin: 0;
+    font-family: 'Courier New', monospace;
+}
+
+/* Lists */
+.post-content ul {
+    margin: 1rem 0 1.5rem;
+    padding-left: 1.5rem;
+    list-style-type: disc;
+}
+
+.post-content li {
+    margin-bottom: 0.5rem;
+    color: #444;
+    padding-left: 0;
+}
+
+.post-content li::before {
+    display: none;
+}
+
+.post-content li::marker {
+    color: #007bff;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+th {
+    background: #f0f0f0;
+    color: #333;
+    font-weight: 600;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+}
+
+td {
+    padding: 10px 12px;
+    border: 1px solid #eee;
+}
+
+tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Navigation */
+.post-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ddd;
+}
+
+.back-home, .next-post {
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.back-home {
+    background: white;
+    color: #444;
+    border: 1px solid #ddd;
+}
+
+.back-home:hover {
+    background: #f5f5f5;
+    transform: translateX(-3px);
+}
+
+.next-post {
+    background: white;
+    color: #444;
+    border: 1px solid #ddd;
+}
+
+.next-post:hover {
+    background: #f5f5f5;
+    transform: translateX(3px);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 3rem;
+    border-top: 1px solid #ddd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .post-container {
+        padding: 1.5rem;
+    }
+    
+    .post-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .formula p {
+        font-size: 1.2rem;
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    th, td {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-post {
+        padding: 0 1rem;
+    }
+    
+    .post-container {
+        padding: 1rem;
+    }
+    
+    .post-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .post-tags span {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+}
