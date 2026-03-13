@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mean Absolute Error (MAE) - Hung Blog</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/focal-loss.css" />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="nav-left">
+                <h2 class="logo">nghung-Blog</h2>
+                <a href="../index.html">Trang chủ</a>
+            </div>
+        </nav>
+
+        <main class="blog-post">
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Mean Absolute Error (MAE) - L1 Loss</h1>
+                    <div class="post-meta">
+                        <span class="post-date">Ngày đăng: 15/03/2026</span>
+                        <span class="post-category">Chuyên mục: Machine Learning cơ bản</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <p><strong>Mean Absolute Error (MAE)</strong>, còn được gọi là <strong>L1 Loss</strong>, là một trong những hàm mất mát phổ biến nhất trong các bài toán hồi quy (regression). Nó đo lường độ lệch trung bình tuyệt đối giữa giá trị dự đoán và giá trị thực tế. Bài viết này sẽ đi sâu vào định nghĩa, tính chất, cách sử dụng và so sánh MAE với các hàm mất mát khác.</p>
+
+                    <h2>1. Định nghĩa và công thức toán học</h2>
+                    <p>Giả sử chúng ta có một tập dữ liệu gồm \(n\) mẫu, với \(y_i\) là giá trị thực tế và \(\hat{y}_i\) là giá trị dự đoán từ mô hình. Khi đó, MAE được tính bằng công thức:</p>
+                    <div class="formula" style="background-color: #f9f9f9; padding: 20px; text-align: center; border-radius: 10px;">
+                        $$MAE = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|$$
+                    </div>
+                    <p>Trong đó, \(|y_i - \hat{y}_i|\) là giá trị tuyệt đối của sai số. MAE có cùng đơn vị với biến mục tiêu, giúp việc diễn giải kết quả trở nên trực quan: "Trung bình, dự đoán của mô hình lệch khoảng MAE đơn vị so với giá trị thực."</p>
+
+                    <h2>2. Đặc điểm quan trọng của MAE</h2>
+                    <h3>2.1. Tính bền vững với giá trị ngoại lệ (Robustness to Outliers)</h3>
+                    <p>Không giống như Mean Squared Error (MSE) – bình phương sai số và do đó phạt rất nặng các sai số lớn – MAE chỉ lấy trị tuyệt đối. Điều này làm cho MAE ít nhạy cảm hơn với các giá trị ngoại lệ (outliers). Nếu dữ liệu có nhiễu hoặc các điểm bất thường, MAE sẽ không cho phép chúng chi phối quá trình huấn luyện mô hình.</p>
+
+                    <h3>2.2. Đạo hàm và ảnh hưởng đến tối ưu hóa</h3>
+                    <p>Đạo hàm của MAE theo \(\hat{y}_i\) (hay tham số mô hình) rất đơn giản:</p>
+                    <div class="formula" style="background-color: #f9f9f9; padding: 10px; text-align: center;">
+                        $$ \frac{\partial MAE}{\partial \hat{y}_i} = 
+                        \begin{cases} 
+                            +1 & \text{nếu } \hat{y}_i < y_i \\
+                            -1 & \text{nếu } \hat{y}_i > y_i \\
+                            \text{không xác định} & \text{nếu } \hat{y}_i = y_i 
+                        \end{cases} $$
+                    </div>
+                    <p>Đạo hàm là hằng số ±1 (trừ tại điểm chính xác). Điều này có nghĩa là trong quá trình gradient descent, mỗi mẫu đóng góp một lực cập nhật có độ lớn không đổi, bất kể sai số lớn hay nhỏ. Hệ quả là:</p>
+                    <ul>
+                        <li><strong>Thuận lợi:</strong> Không bị thổi phồng gradient bởi outlier.</li>
+                        <li><strong>Bất lợi:</strong> Khi mô hình gần tối ưu (sai số nhỏ), gradient vẫn giữ nguyên độ lớn, có thể gây ra dao động quanh điểm tối ưu và khó hội tụ hơn so với MSE (nơi gradient tỷ lệ với sai số).</li>
+                    </ul>
+
+                    <h3>2.3. Tính không khả vi tại điểm 0</h3>
+                    <p>Hàm trị tuyệt đối không khả vi tại 0. Trong thực tế, khi \(\hat{y}_i = y_i\), ta có thể gán đạo hàm bằng 0 hoặc bỏ qua mẫu đó. Các thư viện machine learning thường xử lý điểm này một cách mặc định.</p>
+
+                    <h2>3. So sánh MAE với các hàm mất mát phổ biến khác</h2>
+                    <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+                        <thead>
+                            <tr style="background-color:#f2f2f2;">
+                                <th style="border:1px solid #ddd; padding:8px;">Hàm mất mát</th>
+                                <th style="border:1px solid #ddd; padding:8px;">Công thức</th>
+                                <th style="border:1px solid #ddd; padding:8px;">Ưu điểm</th>
+                                <th style="border:1px solid #ddd; padding:8px;">Nhược điểm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border:1px solid #ddd; padding:8px;"><strong>MAE (L1)</strong></td>
+                                <td style="border:1px solid #ddd; padding:8px;">\(\frac{1}{n}\sum |y_i - \hat{y}_i|\)</td>
+                                <td style="border:1px solid #ddd; padding:8px;">Bền vững với outlier, dễ diễn giải.</td>
+                                <td style="border:1px solid #ddd; padding:8px;">Không khả vi tại 0, khó hội tụ khi sai số nhỏ.</td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ddd; padding:8px;"><strong>MSE (L2)</strong></td>
+                                <td style="border:1px solid #ddd; padding:8px;">\(\frac{1}{n}\sum (y_i - \hat{y}_i)^2\)</td>
+                                <td style="border:1px solid #ddd; padding:8px;">Khả vi mọi nơi, hội tụ nhanh, phạt mạnh sai số lớn.</td>
+                                <td style="border:1px solid #ddd; padding:8px;">Nhạy cảm với outlier, đơn vị khác với biến gốc.</td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ddd; padding:8px;"><strong>Huber Loss</strong></td>
+                                <td style="border:1px solid #ddd; padding:8px;">Kết hợp L1 và L2</td>
+                                <td style="border:1px solid #ddd; padding:8px;">Dung hòa: L2 khi sai số nhỏ, L1 khi sai số lớn.</td>
+                                <td style="border:1px solid #ddd; padding:8px;">Cần chọn ngưỡng \(\delta\) phù hợp.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>4. Ví dụ minh họa bằng số</h2>
+                    <p>Giả sử chúng ta có 5 mẫu với giá trị thực và dự đoán như sau:</p>
+                    <ul>
+                        <li>Mẫu 1: \(y = 10\), \(\hat{y} = 12\) → sai số tuyệt đối = 2</li>
+                        <li>Mẫu 2: \(y = 15\), \(\hat{y} = 14\) → sai số tuyệt đối = 1</li>
+                        <li>Mẫu 3: \(y = 20\), \(\hat{y} = 25\) → sai số tuyệt đối = 5</li>
+                        <li>Mẫu 4: \(y = 30\), \(\hat{y} = 30\) → sai số tuyệt đối = 0</li>
+                        <li>Mẫu 5: \(y = 50\), \(\hat{y} = 100\) → sai số tuyệt đối = 50 (outlier)</li>
+                    </ul>
+                    <p>MAE = (2 + 1 + 5 + 0 + 50)/5 = 58/5 = 11.6.</p>
+                    <p>Trong khi đó, MSE = (4 + 1 + 25 + 0 + 2500)/5 = 2530/5 = 506. Rõ ràng, outlier đã làm MSE tăng vọt, phản ánh sự nhạy cảm của nó. MAE cho thấy mức độ ảnh hưởng vừa phải hơn.</p>
+
+                    <h2>5. Ứng dụng thực tế của MAE</h2>
+                    <p>MAE được sử dụng rộng rãi trong nhiều lĩnh vực, đặc biệt khi:</p>
+                    <ul>
+                        <li><strong>Dữ liệu tài chính:</strong> Giá cổ phiếu, bất động sản thường có nhiều biến động bất thường.</li>
+                        <li><strong>Dự báo thời tiết:</strong> Nhiệt độ, lượng mưa có thể có sai số lớn do yếu tố ngẫu nhiên.</li>
+                        <li><strong>Hệ thống gợi ý:</strong> Đánh giá chất lượng dự đoán điểm số của người dùng.</li>
+                        <li><strong>Xử lý ảnh, tín hiệu:</strong> Khi nhiễu không có phân phối chuẩn.</li>
+                    </ul>
+
+                    <h2>6. Cài đặt MAE trong Python (tự viết và dùng thư viện)</h2>
+                    <p>Dưới đây là cách tự tính MAE bằng NumPy và sử dụng scikit-learn:</p>
+                    <pre style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; overflow-x: auto;">
+import numpy as np
+from sklearn.metrics import mean_absolute_error
+
+# Dữ liệu giả
+y_true = np.array([10, 15, 20, 30, 50])
+y_pred = np.array([12, 14, 25, 30, 100])
+
+# Tự tính
+mae_manual = np.mean(np.abs(y_true - y_pred))
+print("MAE tự tính:", mae_manual)
+
+# Dùng sklearn
+mae_sklearn = mean_absolute_error(y_true, y_pred)
+print("MAE từ sklearn:", mae_sklearn)
+                    </pre>
+                    <p>Kết quả: MAE = 11.6.</p>
+
+                    <h2>7. Lưu ý khi sử dụng MAE làm hàm mất mát</h2>
+                    <ul>
+                        <li>Nếu mô hình của bạn sử dụng gradient descent và dữ liệu có nhiều outlier, MAE là lựa chọn tốt. Tuy nhiên, nếu dữ liệu sạch và bạn muốn hội tụ nhanh, MSE có thể phù hợp hơn.</li>
+                        <li>Trong các bài toán mà sai số lớn cần được tránh tuyệt đối (ví dụ an toàn), MSE sẽ phạt nặng hơn, buộc mô hình phải chính xác cao.</li>
+                        <li>MAE thường được dùng làm thước đo đánh giá (evaluation metric) bên cạnh quá trình huấn luyện, ngay cả khi hàm mất mát huấn luyện là MSE.</li>
+                        <li>Huber loss là sự kết hợp thông minh: nó mang tính khả vi và bền vững, nhưng cần điều chỉnh tham số.</li>
+                    </ul>
+
+                    <div style="background-color: #d4edda; border-left: 5px solid #28a745; padding: 15px; margin-top: 20px;">
+                        <strong>Tóm tắt:</strong> MAE là hàm mất mát đơn giản, trực quan, đặc biệt hữu ích khi làm việc với dữ liệu có nhiễu hoặc outlier. Hiểu rõ đặc điểm của nó giúp bạn lựa chọn đúng hàm mất mát cho bài toán cụ thể.
+                    </div>
+                </div>
+            </article>
+        </main>
+    </body>
+</html>

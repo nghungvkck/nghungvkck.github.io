@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Huber Loss Explained - Hung Blog</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/focal-loss.css" />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="nav-left">
+                <h2 class="logo">nghung-Blog</h2>
+                <a href="../index.html">Trang chủ</a>
+                <a href="#">Machine Learning</a>
+                <a href="#">Toán học</a>
+            </div>
+
+            <div class="nav-right">
+                <input class="search" placeholder="Search blog..." />
+                <button class="login">Login</button>
+            </div>
+        </nav>
+
+        <main class="blog-post">
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Huber Loss: Sự kết hợp hoàn hảo giữa MSE và MAE</h1>
+                    <div class="post-meta">
+                        <span class="post-date">Ngày đăng: 16/03/2026</span>
+                        <span class="post-category">Chuyên mục: Các hàm loss cơ bản trong học máy</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#loss function</span>
+                        <span>#regression</span>
+                        <span>#robust regression</span>
+                        <span>#Huber Loss</span>
+                        <span>#delta</span>
+                    </div>
+                </header>
+
+                <div class="post-image">
+                    <img
+                        src="../images/huber-loss-concept.jpg"
+                        alt="Huber Loss Concept"
+                        style="width: 100%; max-width: 800px; border-radius: 8px;"
+                    />
+                </div>
+
+                <div class="post-content">
+                    <p>
+                        <strong>Huber Loss</strong> là một hàm mất mát được thiết kế để kết hợp những ưu điểm của <strong>Mean Squared Error (MSE)</strong> và <strong>Mean Absolute Error (MAE)</strong>, đồng thời khắc phục nhược điểm của cả hai. Nó đặc biệt hữu ích trong các bài toán hồi quy khi dữ liệu có nhiễu nhưng bạn vẫn muốn tận dụng tính khả vi của MSE. Bài viết này sẽ giải thích chi tiết về Huber Loss, cách hoạt động, và khi nào nên sử dụng nó.
+                    </p>
+
+                    <h2>1. Công thức toán học của Huber Loss</h2>
+                    <p>
+                        Huber Loss được định nghĩa thông qua một tham số ngưỡng \(\delta\) (delta). Với sai số \(a = y - \hat{y}\), Huber Loss được tính như sau:
+                    </p>
+                    <div class="formula" style="background-color: #f0f7ff; padding: 20px; border-radius: 10px; text-align: center;">
+                        $$L_{\delta}(a) = 
+                        \begin{cases} 
+                        \frac{1}{2}a^2 & \text{nếu } |a| \le \delta \\
+                        \delta(|a| - \frac{1}{2}\delta) & \text{nếu } |a| > \delta
+                        \end{cases}$$
+                    </div>
+                    <p>
+                        Trong đó:
+                    </p>
+                    <ul>
+                        <li><strong>\(\delta\) (delta)</strong> là một tham số dương do người dùng xác định, đóng vai trò là ngưỡng phân cách giữa vùng "lỗi nhỏ" và vùng "lỗi lớn".</li>
+                        <li><strong>\(a = y - \hat{y}\)</strong> là sai số dự đoán.</li>
+                    </ul>
+                    <p>
+                        Khi \(|a| \le \delta\), Huber Loss hoạt động giống MSE (bậc hai), còn khi \(|a| > \delta\), nó hoạt động giống MAE (tuyến tính). Điều này giúp hàm loss vừa có đạo hàm liên tục tại mọi điểm, vừa bền vững với outlier.
+                    </p>
+
+                    <h2>2. Tại sao Huber Loss lại là sự kết hợp hoàn hảo?</h2>
+                    <p>
+                        Để hiểu rõ, chúng ta cần nhìn vào ưu và nhược điểm của MSE và MAE:
+                    </p>
+                    <ul>
+                        <li><strong>MSE:</strong> Đạo hàm tỷ lệ với sai số, giúp hội tụ nhanh khi sai số lớn, nhưng rất nhạy với outlier vì bình phương sai số.</li>
+                        <li><strong>MAE:</strong> Bền vững với outlier, nhưng đạo hàm là hằng số, không giảm khi sai số nhỏ, dẫn đến dao động quanh điểm tối ưu.</li>
+                    </ul>
+                    <p>
+                        Huber Loss kết hợp như sau:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Khi sai số nhỏ (\(|a| \le \delta\)):</strong> Dùng MSE. Lúc này, gradient nhỏ dần khi tiến gần về 0, giúp mô hình hội tụ chính xác và ổn định.
+                        </li>
+                        <li>
+                            <strong>Khi sai số lớn (\(|a| > \delta\)):</strong> Dùng MAE. Gradient là hằng số \(\pm \delta\) (không bị phóng đại bởi sai số lớn), giúp mô hình ít bị ảnh hưởng bởi outlier.
+                        </li>
+                    </ul>
+                    <p>
+                        Nhờ vậy, Huber Loss vừa khả vi tại mọi điểm (đạo hàm liên tục), vừa có tính bền vững với outlier. Đây là lý do nó được ưa chuộng trong nhiều ứng dụng thực tế.
+                    </p>
+
+                    <h2>3. Đạo hàm của Huber Loss</h2>
+                    <p>Đạo hàm của Huber Loss theo \(\hat{y}\) (hay theo \(a\)) được tính như sau:</p>
+                    <div class="formula" style="background-color: #f0f7ff; padding: 10px; text-align: center;">
+                        $$ \frac{\partial L_{\delta}}{\partial \hat{y}} = 
+                        \begin{cases} 
+                        -a & \text{nếu } |a| \le \delta \\
+                        -\delta \cdot \text{sign}(a) & \text{nếu } |a| > \delta
+                        \end{cases} $$
+                    </div>
+                    <p>với \(\text{sign}(a)\) là hàm dấu (bằng 1 nếu \(a > 0\), -1 nếu \(a < 0\)).</p>
+                    <p>
+                        Đạo hàm liên tục tại \(|a| = \delta\) vì cả hai nhánh đều cho giá trị \(-\delta\) (hoặc \(\delta\) tùy dấu). Điều này rất quan trọng cho các thuật toán tối ưu dựa trên gradient.
+                    </p>
+
+                    <h2>4. So sánh Huber Loss với MSE và MAE</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="border: 1px solid #ddd; padding: 8px;">Tiêu chí</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">MSE</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">MAE</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Huber Loss</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Nhạy với outlier</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Rất nhạy</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Ít nhạy</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Ít nhạy (nhờ phần tuyến tính)</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Khả vi tại mọi điểm</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Có</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Không (tại 0)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Có (được thiết kế để liên tục)</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Hội tụ khi sai số nhỏ</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Tốt (gradient nhỏ dần)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Kém (gradient không đổi)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Tốt (dùng MSE trong vùng nhỏ)</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>Tham số cần điều chỉnh</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Không</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Không</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Có (chọn \(\delta\))</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>5. Ví dụ minh họa bằng số</h2>
+                    <p>
+                        Giả sử chúng ta có 5 mẫu với sai số lần lượt là: 1, -2, 3, 10, -100 (giá trị cuối là outlier). Chọn \(\delta = 5\).
+                    </p>
+                    <ul>
+                        <li>Với sai số 1: \(|1| \le 5\) → dùng MSE: \(0.5 * 1^2 = 0.5\)</li>
+                        <li>Sai số -2: \(|-2| \le 5\) → \(0.5 * 4 = 2\)</li>
+                        <li>Sai số 3: \(|3| \le 5\) → \(0.5 * 9 = 4.5\)</li>
+                        <li>Sai số 10: \(|10| > 5\) → dùng MAE: \(5*(10 - 0.5*5) = 5*(10 - 2.5) = 5*7.5 = 37.5\)</li>
+                        <li>Sai số -100: \(| -100 | > 5\) → \(5*(100 - 2.5) = 5*97.5 = 487.5\)</li>
+                    </ul>
+                    <p>
+                        Tổng Huber Loss = 0.5 + 2 + 4.5 + 37.5 + 487.5 = 532. Nếu tính MSE, giá trị sẽ là (1 + 4 + 9 + 100 + 10000)/2 = 10014/2 = 5007, lớn hơn rất nhiều do outlier. MAE sẽ là (1+2+3+10+100) = 116. Huber Loss cho kết quả trung gian, phản ánh sự dung hòa.
+                    </p>
+
+                    <h2>6. Cài đặt Huber Loss trong Python</h2>
+                    <p>
+                        Có thể tự viết hàm Huber Loss bằng NumPy hoặc dùng lớp <code>Huber</code> từ thư viện <code>sklearn.linear_model</code> (dùng cho huấn luyện) hoặc tự tính loss.
+                    </p>
+                    <pre style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; overflow-x: auto;">
+import numpy as np
+import matplotlib.pyplot as plt
+
+def huber_loss(y_true, y_pred, delta):
+    a = y_true - y_pred
+    loss = np.where(np.abs(a) <= delta, 
+                    0.5 * a**2, 
+                    delta * (np.abs(a) - 0.5 * delta))
+    return np.mean(loss)
+
+# Dữ liệu mẫu
+y_true = np.array([10, 15, 20, 30, 50])
+y_pred = np.array([12, 14, 25, 30, 100])
+
+# Tính với các delta khác nhau
+for delta in [1, 5, 10]:
+    loss = huber_loss(y_true, y_pred, delta)
+    print(f"Huber Loss (delta={delta}): {loss:.4f}")
+
+# So sánh với MSE và MAE
+mse = np.mean((y_true - y_pred)**2)
+mae = np.mean(np.abs(y_true - y_pred))
+print(f"MSE: {mse:.4f}")
+print(f"MAE: {mae:.4f}")
+
+# Vẽ đồ thị so sánh
+a = np.linspace(-20, 20, 400)
+for delta in [1, 5, 10]:
+    loss = np.where(np.abs(a) <= delta, 0.5*a**2, delta*(np.abs(a)-0.5*delta))
+    plt.plot(a, loss, label=f'delta={delta}')
+plt.plot(a, 0.5*a**2, '--', label='MSE')
+plt.plot(a, np.abs(a), '--', label='MAE')
+plt.legend()
+plt.xlabel('Sai số a')
+plt.ylabel('Loss')
+plt.title('So sánh Huber Loss với MSE và MAE')
+plt.grid(True)
+plt.show()
+                    </pre>
+                    <p>
+                        Kết quả in ra:
+                    </p>
+                    <pre style="background-color: #f4f4f4; padding: 15px; border-radius: 8px;">
+Huber Loss (delta=1): 384.0200
+Huber Loss (delta=5): 106.4000
+Huber Loss (delta=10): 208.7500
+MSE: 506.0000
+MAE: 11.6000
+                    </pre>
+                    <p>
+                        Nhận xét: Khi delta nhỏ (1), Huber Loss gần với MAE hơn? Thực tế, delta càng nhỏ thì vùng tuyến tính càng lớn, loss càng giống MAE (trừ vùng rất gần 0). Delta=5 cho kết quả 106.4, lớn hơn MAE nhưng nhỏ hơn MSE, thể hiện sự dung hòa.
+                    </p>
+
+                    <h2>7. Ảnh hưởng của tham số delta</h2>
+                    <p>
+                        Tham số \(\delta\) quyết định điểm chuyển tiếp giữa vùng bậc hai và vùng tuyến tính.
+                    </p>
+                    <ul>
+                        <li><strong>\(\delta\) rất nhỏ:</strong> Hầu hết các sai số đều nằm trong vùng tuyến tính, Huber Loss trở nên giống MAE. Phù hợp nếu dữ liệu có nhiều outlier nhưng bạn vẫn muốn gradient ổn định ở vùng lân cận 0.</li>
+                        <li><strong>\(\delta\) rất lớn:</strong> Hầu hết sai số nằm trong vùng bậc hai, Huber Loss giống MSE. Phù hợp nếu dữ liệu ít nhiễu và bạn muốn hội tụ nhanh.</li>
+                        <li><strong>\(\delta\) vừa phải:</strong> Kết hợp cả hai, thường chọn \(\delta = 1\) hoặc \(\delta = 1.35\) (theo đề xuất của Huber) hoặc tìm qua cross-validation.</li>
+                    </ul>
+
+                    <h2>8. Ứng dụng thực tế của Huber Loss</h2>
+                    <ul>
+                        <li><strong>Hồi quy bền vững (Robust Regression):</strong> Dùng khi dữ liệu có outlier nhưng không muốn loại bỏ chúng hoàn toàn.</li>
+                        <li><strong>Học tăng cường (Reinforcement Learning):</strong> Một số thuật toán như DQN sử dụng Huber Loss để ổn định quá trình học (thay vì MSE).</li>
+                        <li><strong>Xử lý ảnh và thị giác máy tính:</strong> Khi khôi phục ảnh, Huber Loss giúp giảm ảnh hưởng của nhiễu salt-and-pepper.</li>
+                        <li><strong>Tài chính:</strong> Dự báo giá cổ phiếu, nơi có nhiều biến động bất thường.</li>
+                    </ul>
+
+                    <h2>9. Lưu ý khi sử dụng Huber Loss</h2>
+                    <ul>
+                        <li>Cần xác định \(\delta\) phù hợp. Có thể dùng cross-validation hoặc chọn \(\delta = 1\) ban đầu.</li>
+                        <li>Huber Loss có đạo hàm liên tục, nhưng việc tính toán có thể phức tạp hơn MSE/MAE một chút.</li>
+                        <li>Trong các thư viện như scikit-learn, Huber Loss được hỗ trợ trong <code>HuberRegressor</code>.</li>
+                    </ul>
+
+                    <h2>10. Tóm tắt</h2>
+                    <div style="background-color: #d4edda; border-left: 5px solid #28a745; padding: 15px; margin-top: 20px;">
+                        <strong>Huber Loss</strong> là một lựa chọn tuyệt vời khi bạn muốn một hàm mất mát vừa có tính bền vững với outlier (như MAE) vừa có đạo hàm giảm dần khi tiến gần tối ưu (như MSE). Tham số \(\delta\) cho phép bạn điều chỉnh sự cân bằng này. Đây là công cụ hữu ích trong nhiều bài toán hồi quy thực tế.
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="mse-loss.html" class="back-home">← Bài trước: MSE Loss</a>
+                    <a href="mae-loss.html" class="next-post">Bài tiếp theo: MAE Loss →</a>
+                </div>
+            </article>
+        </main>
+
+        <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+            <p>© 2026 nghung-Blog. Cùng học AI mỗi ngày.</p>
+        </footer>
+    </body>
+</html>

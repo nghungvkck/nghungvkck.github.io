@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Focal Loss Explained - Hung Blog</title>
+
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/focal-loss.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+
+    <body>
+        <!-- NAVBAR -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <h2 class="logo">nghung-Blog</h2>
+                <a href="../index.html">Trang chủ</a>
+                <a href="#">Danh mục</a>
+                <a href="#">About</a>
+            </div>
+
+            <div class="nav-right">
+                <input class="search" placeholder="Search blog..." />
+                <button class="login">Login</button>
+            </div>
+        </nav>
+
+        <!-- BLOG POST CONTENT -->
+        <main class="blog-post">
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Focal Loss Explained</h1>
+                    <div class="post-meta">
+                        <span class="post-date">Ngày đăng: 11/03/2026</span>
+                        <span class="post-category">Chuyên mục: Các hàm loss cơ bản trong học máy(Machine learning)</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#deep learning</span>
+                        <span>#focal loss</span>
+                        <span>#class imbalance</span>
+                        <span>#object detection</span>
+                    </div>
+                </header>
+
+                <div class="post-image">
+                    <img
+                        src="../images/post2.jpg"
+                        alt="Focal Loss Concept"
+                        style="width: 100%; max-width: 800px; border-radius: 8px;"
+                    />
+                </div>
+
+                <div class="post-content">
+                    <p>
+                        <strong>Focal Loss</strong> là hàm loss được thiết kế để giải quyết bài toán mất cân bằng dữ liệu (class imbalance), đặc biệt phổ biến trong các bài toán object detection như RetinaNet.
+                    </p>
+
+                    <h2>Vấn đề với Cross-Entropy truyền thống</h2>
+                    <p>
+                        Trong các bài toán phân loại, cross-entropy loss thường được sử dụng. Tuy nhiên, khi có sự mất cân bằng dữ liệu nghiêm trọng (ví dụ: 99% background, 1% object), model sẽ bị "lấn át" bởi các easy samples (mẫu dễ phân loại) và không học được các hard samples (mẫu khó).
+                    </p>
+
+                    <h2>Công thức Focal Loss</h2>
+                    <div class="formula">
+                        <p><strong>FL(p) = -(1 - p)^γ log(p)</strong></p>
+                    </div>
+
+                    <h3>Trong đó:</h3>
+                    <ul>
+                        <li>
+                            <strong>p</strong> là xác suất dự đoán của model cho class đúng
+                        </li>
+                        <li>
+                            <strong>γ (gamma)</strong> là focusing parameter, thường được đặt từ 0.5 đến 5.0
+                        </li>
+                        <li>
+                            <strong>(1 - p)^γ</strong> là modulating factor giúp giảm trọng số của các easy samples
+                        </li>
+                    </ul>
+
+                    <h3>Cách hoạt động:</h3>
+                    <ul>
+                        <li>
+                            Khi mẫu bị phân loại sai (p nhỏ), modulating factor ~ 1, loss không thay đổi nhiều
+                        </li>
+                        <li>
+                            Khi mẫu được phân loại đúng với p gần 1, modulating factor tiến về 0, loss giảm mạnh
+                        </li>
+                        <li>
+                            Gamma càng lớn, sự giảm trọng số cho easy samples càng mạnh
+                        </li>
+                    </ul>
+
+                    <h2>Phiên bản có α-balancing</h2>
+                    <p>Trong thực tế, focal loss thường được kết hợp với α-balancing:</p>
+                    <div class="formula">
+                        <p><strong>FL(p) = -α(1 - p)^γ log(p)</strong></p>
+                    </div>
+                    <p>
+                        Trong đó α là weight parameter giúp cân bằng giữa positive và negative samples.
+                    </p>
+
+                    <h2>Ứng dụng chính</h2>
+                    <ul>
+                        <li>RetinaNet (One-stage object detection)</li>
+                        <li>Phân loại ảnh với dữ liệu mất cân bằng</li>
+                        <li>Phát hiện bất thường (anomaly detection)</li>
+                        <li>Xử lý dữ liệu y tế</li>
+                    </ul>
+
+                    <h2>Ví dụ minh họa</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr style="background-color: #f2f2f2;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">p (xác suất)</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">CE Loss</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Focal Loss (γ=2)</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">0.9 (easy sample)</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">0.105</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">0.001</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">0.5</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">0.693</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">0.173</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">0.1 (hard sample)</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">2.302</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">1.863</td>
+                        </tr>
+                    </table>
+                    <p><em>Nhận xét: Focal Loss giảm mạnh loss của easy samples nhưng vẫn giữ loss cao cho hard samples.</em></p>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="../index.html" class="back-home">← Quay lại trang chủ</a>
+                    <a href="#" class="next-post">Bài tiếp theo →</a>
+                </div>
+            </article>
+        </main>
+
+        <!-- FOOTER -->
+        <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+            <p>© 2026 nghung-Blog. All rights reserved.</p>
+        </footer>
+    </body>
+</html>

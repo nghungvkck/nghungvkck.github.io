@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mean Squared Error (MSE) - Hung Blog</title>
+
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/focal-loss.css" />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+
+    <body>
+        <nav class="navbar">
+            <div class="nav-left">
+                <h2 class="logo">nghung-Blog</h2>
+                <a href="../index.html">Trang chủ</a>
+                <a href="#">Machine Learning</a>
+                <a href="#">Toán học</a>
+            </div>
+
+            <div class="nav-right">
+                <input class="search" placeholder="Search blog..." />
+                <button class="login">Login</button>
+            </div>
+        </nav>
+
+        <main class="blog-post">
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Mean Squared Error (MSE) - L2 Loss</h1>
+                    <div class="post-meta">
+                        <span class="post-date">Ngày đăng: 14/03/2026</span>
+                        <span class="post-category">Chuyên mục: Các hàm loss cơ bản trong học máy</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#loss function</span>
+                        <span>#regression</span>
+                        <span>#machine learning</span>
+                        <span>#MSE</span>
+                        <span>#L2Loss</span>
+                    </div>
+                </header>
+
+                <div class="post-image">
+                    <img
+                        src="../images/mse-concept.jpg"
+                        alt="MSE Loss Concept"
+                        style="width: 100%; max-width: 800px; border-radius: 8px;"
+                    />
+                </div>
+
+                <div class="post-content">
+                    <p>
+                        <strong>Mean Squared Error (MSE)</strong>, hay còn gọi là <strong>L2 Loss</strong>, là một trong những hàm mất mát phổ biến và quan trọng nhất trong học máy, đặc biệt cho các bài toán <strong>hồi quy (regression)</strong>. Bài viết này sẽ giúp bạn hiểu sâu về MSE: từ công thức, ý nghĩa hình học, tính chất toán học, đến cách sử dụng trong thực tế và so sánh với các hàm mất mát khác.
+                    </p>
+
+                    <h2>1. Công thức toán học và ý nghĩa</h2>
+                    <p>Giả sử chúng ta có một tập dữ liệu gồm \(n\) mẫu, với \(y_i\) là giá trị thực tế và \(\hat{y}_i\) là giá trị dự đoán từ mô hình. MSE được định nghĩa như sau:</p>
+                    <div class="formula" style="background-color: #f9f9f9; padding: 20px; text-align: center; border-radius: 10px; border: 1px solid #eee; font-size: 1.2rem;">
+                        $$ \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 $$
+                    </div>
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li><strong>n</strong>: số lượng mẫu dữ liệu.</li>
+                        <li><strong>yᵢ</strong>: giá trị thực tế (ground truth).</li>
+                        <li><strong>ŷᵢ</strong>: giá trị dự đoán.</li>
+                    </ul>
+                    <p>MSE đại diện cho trung bình của bình phương các sai số. Nó có cùng đơn vị với bình phương của biến mục tiêu, do đó đôi khi người ta dùng căn bậc hai của nó (RMSE) để dễ diễn giải hơn.</p>
+
+                    <h2>2. Tại sao lại dùng bình phương?</h2>
+                    <p>Việc bình phương sai số mang lại hai đặc tính quan trọng:</p>
+                    <ul>
+                        <li>
+                            <strong>Triệt tiêu dấu âm:</strong> Sai số có thể dương hoặc âm, nếu cộng trực tiếp sẽ triệt tiêu lẫn nhau. Bình phương giúp mọi sai số đều đóng góp dương vào tổng.
+                        </li>
+                        <li>
+                            <strong>Phạt nặng các sai số lớn:</strong> Vì là hàm bậc hai, nếu sai số càng lớn, MSE tăng rất nhanh. Điều này buộc mô hình phải ưu tiên giảm những sai số lớn nhất, giúp dự đoán tổng thể chính xác hơn.
+                        </li>
+                    </ul>
+
+                    <h2>3. Đạo hàm của MSE và ảnh hưởng đến tối ưu hóa</h2>
+                    <p>Đạo hàm của MSE theo \(\hat{y}_i\) (hay theo tham số mô hình) rất đơn giản, là điều kiện lý tưởng cho các thuật toán gradient descent:</p>
+                    <div class="formula" style="background-color: #f9f9f9; padding: 10px; text-align: center;">
+                        $$ \frac{\partial \text{MSE}}{\partial \hat{y}_i} = \frac{2}{n} ( \hat{y}_i - y_i ) $$
+                    </div>
+                    <p>Nhận xét:</p>
+                    <ul>
+                        <li>Đạo hàm tỷ lệ thuận với sai số \(( \hat{y}_i - y_i )\). Khi sai số lớn, gradient lớn, mô hình cập nhật mạnh; khi sai số nhỏ, gradient nhỏ, mô hình cập nhật yếu. Điều này giúp quá trình học hội tụ ổn định và nhanh chóng.</li>
+                        <li>Hàm MSE là hàm lồi (convex) đối với các tham số trong mô hình tuyến tính, nghĩa là nó có một điểm tối ưu duy nhất và gradient descent sẽ tìm được toàn cục.</li>
+                    </ul>
+
+                    <h2>4. Ưu điểm và nhược điểm của MSE</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr style="background-color: #4CAF50; color: white;">
+                            <th style="padding: 12px; border: 1px solid #ddd;">Ưu điểm</th>
+                            <th style="padding: 12px; border: 1px solid #ddd;">Nhược điểm</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Dễ tính đạo hàm, thuận lợi cho tối ưu hóa.</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Rất nhạy cảm với các giá trị ngoại lệ (outliers). Một outlier có thể làm MSE tăng vọt và chi phối quá trình huấn luyện.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Có một điểm tối ưu duy nhất (hàm lồi).</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Đơn vị của MSE là bình phương đơn vị gốc, gây khó khăn trong việc diễn giải ý nghĩa thực tế (thường dùng RMSE để khắc phục).</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Phạt mạnh sai số lớn, khuyến khích mô hình chính xác cao.</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">Giả định ngầm rằng nhiễu (noise) có phân phối chuẩn. Nếu nhiễu không chuẩn, MSE có thể không tối ưu.</td>
+                        </tr>
+                    </table>
+
+                    <h2>5. So sánh MSE với các hàm mất mát khác</h2>
+                    <p>Dưới đây là bảng so sánh chi tiết giữa MSE, MAE, RMSE, và R-squared:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="border: 1px solid #ddd; padding: 8px;">Hàm</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Công thức</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Đặc điểm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>MSE</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">\(\frac{1}{n}\sum (y_i - \hat{y}_i)^2\)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Nhạy với outlier, khả vi, dùng phổ biến.</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>MAE</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">\(\frac{1}{n}\sum |y_i - \hat{y}_i|\)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Bền vững với outlier, không khả vi tại 0.</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>RMSE</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">\(\sqrt{\frac{1}{n}\sum (y_i - \hat{y}_i)^2}\)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Cùng đơn vị với y, dễ diễn giải hơn MSE.</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;"><strong>R-squared</strong></td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">\(1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2}\)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Đo lường mức độ phù hợp của mô hình, không phải hàm loss.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>6. Ví dụ minh họa bằng số</h2>
+                    <p>Xét 5 mẫu với giá trị thực và dự đoán:</p>
+                    <ul>
+                        <li>Mẫu 1: y = 10, ŷ = 12 → sai số = 2, bình phương = 4</li>
+                        <li>Mẫu 2: y = 15, ŷ = 14 → sai số = -1, bình phương = 1</li>
+                        <li>Mẫu 3: y = 20, ŷ = 25 → sai số = 5, bình phương = 25</li>
+                        <li>Mẫu 4: y = 30, ŷ = 30 → sai số = 0, bình phương = 0</li>
+                        <li>Mẫu 5: y = 50, ŷ = 100 → sai số = 50, bình phương = 2500 (outlier)</li>
+                    </ul>
+                    <p>Tổng bình phương = 4 + 1 + 25 + 0 + 2500 = 2530. MSE = 2530 / 5 = 506. RMSE = √506 ≈ 22.49. Trong khi đó MAE = (2 + 1 + 5 + 0 + 50)/5 = 11.6. Rõ ràng outlier đã làm MSE tăng rất cao so với MAE, phản ánh độ nhạy của MSE.</p>
+
+                    <h2>7. Cài đặt MSE trong Python</h2>
+                    <p>Có thể tự tính MSE bằng NumPy hoặc dùng hàm có sẵn trong scikit-learn:</p>
+                    <pre style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; overflow-x: auto;">
+import numpy as np
+from sklearn.metrics import mean_squared_error
+
+# Dữ liệu mẫu
+y_true = np.array([10, 15, 20, 30, 50])
+y_pred = np.array([12, 14, 25, 30, 100])
+
+# Tự tính
+mse_manual = np.mean((y_true - y_pred) ** 2)
+print("MSE tự tính:", mse_manual)
+
+# Dùng sklearn
+mse_sklearn = mean_squared_error(y_true, y_pred)
+print("MSE từ sklearn:", mse_sklearn)
+
+# RMSE
+rmse = np.sqrt(mse_sklearn)
+print("RMSE:", rmse)
+                    </pre>
+                    <p>Kết quả: MSE = 506, RMSE ≈ 22.49.</p>
+
+                    <h2>8. Ứng dụng thực tế của MSE</h2>
+                    <ul>
+                        <li><strong>Hồi quy tuyến tính, hồi quy đa thức:</strong> MSE là hàm mất mát mặc định.</li>
+                        <li><strong>Mạng nơ-ron cho bài toán hồi quy:</strong> Thường dùng MSE làm loss function.</li>
+                        <li><strong>Đánh giá mô hình dự báo chuỗi thời gian:</strong> Dùng MSE hoặc RMSE để so sánh độ chính xác.</li>
+                        <li><strong>Xử lý ảnh:</strong> MSE dùng để đo chất lượng khôi phục ảnh (như PSNR dựa trên MSE).</li>
+                    </ul>
+
+                    <h2>9. Khi nào nên dùng MSE?</h2>
+                    <p>MSE phù hợp khi:</p>
+                    <ul>
+                        <li>Dữ liệu ít nhiễu, ít outlier.</li>
+                        <li>Bạn muốn mô hình tránh các sai số lớn một cách nghiêm ngặt.</li>
+                        <li>Bạn cần hàm loss khả vi, thuận tiện cho gradient descent.</li>
+                        <li>Giả định nhiễu có phân phối chuẩn (khi đó MSE tương đương với ước lượng hợp lý cực đại).</li>
+                    </ul>
+                    <p>Nếu dữ liệu có nhiều outlier, hãy cân nhắc dùng MAE hoặc Huber Loss.</p>
+
+                    <div style="background-color: #e7f3fe; border-left: 6px solid #2196F3; padding: 15px; margin: 20px 0;">
+                        <strong>Tóm tắt:</strong> MSE là hàm mất mát nền tảng trong hồi quy, dễ sử dụng và hiệu quả khi dữ liệu sạch. Hiểu rõ ưu nhược điểm của nó giúp bạn lựa chọn đúng công cụ cho bài toán cụ thể.
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="focal-loss.html" class="back-home">← Bài trước: Focal Loss</a>
+                    <a href="../index.html" class="next-post">Về trang chủ →</a>
+                </div>
+            </article>
+        </main>
+
+        <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+            <p>© 2026 nghung-Blog. Cùng học AI mỗi ngày.</p>
+        </footer>
+    </body>
+</html>

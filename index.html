@@ -1,114 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Hung Blog</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+            rel="stylesheet"
+        />
+    </head>
 
-<head>
-<meta charset="UTF-8">
-<title>Hung Blog</title>
+    <body>
+        <!-- NAVBAR -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <h2 class="logo">nghung-Blog</h2>
+                <a href="#">Trang chủ</a>
+                <a href="#">Danh mục</a>
+                <a href="#">About</a>
+            </div>
+<!-- 
+            <div class="nav-right">
+                <input class="search" placeholder="Search blog..." />
+                <button class="login">Login</button>
+            </div> -->
+        </nav>
 
-<link rel="stylesheet" href="css/style.css">
+        <!-- TITLE -->
+        <section class="title">
+            <h1>BÀI VIẾT NỔI BẬT</h1>
+        </section>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+        <!-- TAGS -->
+        <div class="tags">
+            <span>#machine learning</span>
+            <span>#deep learning</span>
+            <span>#transformer</span>
+            <span>#ai agent</span>
+            <span>#cybersecurity</span>
+        </div>
 
-</head>
+        <!-- POSTS -->
+        <main class="posts">
 
-<body>
+            <!-- Card 1: Focal Loss (ĐÃ CÓ LINK) -->
+            <a href="pages/focal-loss.html" style="text-decoration: none; color: inherit;">
+                <div class="card">
+                    <img src="images/post2.jpg" alt="Focal Loss Concept" />
+                    <div class="card-content">
+                        <h3>Focal Loss Explained</h3>
+                        <p>Chuyên mục: Các hàm loss cơ bản trong học máy</p>
+                    </div>
+                </div>
+            </a>
 
-<!-- NAVBAR -->
+            <!-- Card 2: SQL Injection -->
+            <a href="pages/sql-injection.html" style="text-decoration: none; color: inherit;">
+                <div class="card">
+                    <img src="images/post3.jpg" alt="SQL Injection" />
+                    <div class="card-content">
+                        <h3>Ngôn ngữ truy vấn SQL</h3>
+                        <p>Chuyên mục cơ sở dữ liệu SQL</p>
+                    </div>
+                </div>
+            </a>
 
-<nav class="navbar">
+            <a href="pages/mse-loss.html" style="text-decoration: none; color: inherit;">
+                <div class="card">
+                    <img src="images/post3.jpg" alt="MSE loss" />
+                    <div class="card-content">
+                        <h3>Mean Sqquared Error (MSE)</h3>
+                        <p>Chuyên mục: Các hàm loss cơ bản trong học máy</p>
+                    </div>
+                </div>
+            </a>
 
-<div class="nav-left">
+            <a href="pages/huber-loss.html" style="text-decoration: none; color: inherit;">
+                <div class="card">
+                    <img src="images/post3.jpg" alt="MSE loss" />
+                    <div class="card-content">
+                        <h3>Mean Sqquared Error (MSE)</h3>
+                        <p>Chuyên mục: Các hàm loss cơ bản trong học máy</p>
+                    </div>
+                </div>
+            </a>
 
-<h2 class="logo">nghung-Blog</h2>
-
-<a href="#">Trang chủ</a>
-<a href="#">Danh mục</a>
-<a href="#">About</a>
-
-</div>
-
-<div class="nav-right">
-
-<input class="search" placeholder="Search blog...">
-
-<button class="login">Login</button>
-
-</div>
-
-</nav>
-
-
-<!-- TITLE -->
-
-<section class="title">
-
-<h1>BÀI VIẾT NỔI BẬT</h1>
-
-</section>
-
-
-<!-- TAGS -->
-
-<div class="tags">
-
-<span>#machine learning</span>
-<span>#deep learning</span>
-<span>#transformer</span>
-<span>#ai agent</span>
-<span>#cybersecurity</span>
-
-</div>
-
-
-<!-- POSTS -->
-
-<main class="posts">
-
-<div class="card">
-
-<img src="images/post1.jpg">
-
-<div class="card-content">
-
-<h3>Understanding Transformer</h3>
-
-<p>How transformer architecture works in modern AI models.</p>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<img src="images/post2.jpg">
-
-<div class="card-content">
-
-<h3>Focal Loss Explained</h3>
-
-<p>Handling class imbalance in deep learning.</p>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<img src="images/post3.jpg">
-
-<div class="card-content">
-
-<h3>SQL Injection Attack</h3>
-
-<p>How attackers exploit database vulnerabilities.</p>
-
-</div>
-
-</div>
-
-</main>
-
-</body>
+            <a href="pages/mae-loss.html" style="text-decoration: none; color: inherit;">
+                <div class="card">
+                    <img src="images/post3.jpg" alt="MSE loss" />
+                    <div class="card-content">
+                        <h3>Mean Sqquared Error (MSE)</h3>
+                        <p>Chuyên mục: Các hàm loss cơ bản trong học máy</p>
+                    </div>
+                </div>
+            </a>
+        </main>
+    </body>
 </html>
