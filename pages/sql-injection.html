@@ -1,87 +1,104 @@
 <!DOCTYPE html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Hướng dẫn học SQL cơ bản - Hung Blog</title>
-        <link rel="stylesheet" href="../css/style.css" />
-        <link rel="stylesheet" href="../css/focal-loss.css" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
-        <style>
-            /* Style bổ sung cho các khối code */
-            .sql-code {
-                background-color: #1e1e1e;
-                color: #dcdcdc;
-                padding: 20px;
-                border-radius: 8px;
-                font-family: 'Consolas', monospace;
-                line-height: 1.6;
-                margin: 15px 0;
-                overflow-x: auto;
-            }
-            .keyword { color: #569cd6; font-weight: bold; }
-            .table-name { color: #4ec9b0; }
-            .condition { color: #ce9178; }
-            .note-box {
-                background-color: #fff3cd;
-                border-left: 5px solid #ffc107;
-                padding: 15px;
-                margin: 20px 0;
-            }
-        </style>
-    </head>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hướng dẫn học SQL cơ bản - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/focal-loss.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        /* Style bổ sung cho các khối code */
+        .sql-code {
+            background-color: #1e1e1e;
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            line-height: 1.6;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Giữ nguyên cấu trúc nhưng cho phép xuống dòng khi cần */
+        }
+        .keyword { color: #569cd6; font-weight: bold; }
+        .table-name { color: #4ec9b0; }
+        .condition { color: #ce9178; }
+        .note-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <h2 class="logo">nghung-Blog</h2>
+            <a href="../index.html">Trang chủ</a>
+            <a href="#">Lộ trình học</a>
+            <a href="#">Bài tập</a>
+        </div>
+        <div class="nav-right">
+            <input class="search" placeholder="Tìm kiếm bài học..." />
+            <button class="login">Vào học</button>
+        </div>
+    </nav>
 
-    <body>
-        <nav class="navbar">
-            <div class="nav-left">
-                <h2 class="logo">nghung-Blog</h2>
-                <a href="../index.html">Trang chủ</a>
-                <a href="#">Lộ trình học</a>
-                <a href="#">Bài tập</a>
-            </div>
-            <div class="nav-right">
-                <input class="search" placeholder="Tìm kiếm bài học..." />
-                <button class="login">Vào học</button>
-            </div>
-        </nav>
+    <main class="blog-post">
+        <article class="post-container">
+            <header class="post-header">
+                <h1>Làm chủ ngôn ngữ SQL: Từ cơ bản đến nâng cao</h1>
+                <div class="post-meta">
+                    <span class="post-date">Ngày cập nhật: 13/03/2026</span>
+                    <span class="post-category">Chuyên mục: Database (Cơ sở dữ liệu)</span>
+                </div>
+            </header>
 
-        <main class="blog-post">
-            <article class="post-container">
-                <header class="post-header">
-                    <h1>Làm chủ ngôn ngữ SQL: Từ cơ bản đến nâng cao</h1>
-                    <div class="post-meta">
-                        <span class="post-date">Ngày cập nhật: 13/03/2026</span>
-                        <span class="post-category">Chuyên mục: Database (Cơ sở dữ liệu)</span>
-                    </div>
-                </header>
+            <div class="post-content">
+                <p>SQL (Structured Query Language) là ngôn ngữ tiêu chuẩn để tương tác với các hệ quản trị cơ sở dữ liệu quan hệ. Dưới đây là tóm tắt các cú pháp quan trọng nhất.</p>
 
-                <div class="post-content">
-                    <p>SQL (Structured Query Language) là ngôn ngữ tiêu chuẩn để tương tác với các hệ quản trị cơ sở dữ liệu quan hệ. Dưới đây là tóm tắt các cú pháp quan trọng nhất.</p>
-
-                    <h2>I. Cấu trúc câu lệnh truy vấn cơ bản</h2>
+                <!-- Phần I: Cấu trúc câu lệnh cơ bản -->
+                <section aria-labelledby="section1">
+                    <h2 id="section1">I. Cấu trúc câu lệnh truy vấn cơ bản</h2>
                     <p>Một câu lệnh SQL hoàn chỉnh thường tuân theo thứ tự sau:</p>
                     
-                    <div class="sql-code">
-                        <span class="keyword">SELECT</span> [tính chất] &lt;danh sách thuộc tính&gt;<br>
-                        <span class="keyword">FROM</span> &lt;danh sách table hoặc query/view [as alias]&gt;<br>
-                        [<span class="keyword">WHERE</span> &lt;điều kiện lọc mẫu tin&gt;]<br>
-                        [<span class="keyword">GROUP BY</span> &lt;nhóm dữ liệu&gt;]<br>
-                        [<span class="keyword">HAVING</span> &lt;điều kiện sau khi nhóm&gt;]<br>
-                        [<span class="keyword">ORDER BY</span> &lt;thuộc tính sắp xếp&gt; <span class="keyword">ASC | DESC</span>]
-                    </div>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> [tính chất] &lt;danh sách thuộc tính&gt;
+<span class="keyword">FROM</span> &lt;danh sách table hoặc query/view [as alias]&gt;
+[<span class="keyword">WHERE</span> &lt;điều kiện lọc mẫu tin&gt;]
+[<span class="keyword">GROUP BY</span> &lt;nhóm dữ liệu&gt;]
+[<span class="keyword">HAVING</span> &lt;điều kiện sau khi nhóm&gt;]
+[<span class="keyword">ORDER BY</span> &lt;thuộc tính sắp xếp&gt; <span class="keyword">ASC | DESC</span>]</pre>
 
-                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                        <tr style="background-color: #f2f2f2;">
-                            <th style="padding: 10px; border: 1px solid #ddd;">Từ khóa</th>
-                            <th style="padding: 10px; border: 1px solid #ddd;">Ý nghĩa</th>
+                    <table>
+                        <tr>
+                            <th>Từ khóa</th>
+                            <th>Ý nghĩa</th>
                         </tr>
                         <tr><td><strong>SELECT</strong></td><td>Xác định các cột cần hiển thị trong kết quả.</td></tr>
                         <tr><td><strong>FROM</strong></td><td>Xác định các bảng (tables) cần lấy dữ liệu.</td></tr>
                         <tr><td><strong>WHERE</strong></td><td>Lọc các bản ghi thỏa mãn điều kiện nhất định.</td></tr>
                         <tr><td><strong>ORDER BY</strong></td><td>Sắp xếp kết quả (Mặc định là ASC - tăng dần).</td></tr>
                     </table>
+                </section>
 
-                    <h2>II. Các phép toán so sánh và điều kiện đặc biệt</h2>
+                <!-- Phần II: Các phép toán so sánh và điều kiện đặc biệt -->
+                <section aria-labelledby="section2">
+                    <h2 id="section2">II. Các phép toán so sánh và điều kiện đặc biệt</h2>
                     <ul>
                         <li><strong>Tìm kiếm đơn giản:</strong> Kết hợp nhiều điều kiện bằng <code>AND</code> hoặc <code>OR</code>.</li>
                         <li><strong>IS NULL / IS NOT NULL:</strong> Kiểm tra giá trị trống (NULL) hoặc có dữ liệu.</li>
@@ -93,36 +110,73 @@
                     <div class="note-box">
                         <strong>Mẹo nhỏ:</strong> Khi so sánh chuỗi, hãy luôn ưu tiên sử dụng <code>LIKE</code> để tránh các lỗi so sánh chính xác tuyệt đối không cần thiết.
                     </div>
+                </section>
 
-                    <h2>III. Phép Kết (Join) - Truy vấn từ nhiều bảng</h2>
-                    <p>Khi dữ liệu nằm ở nhiều bảng khác nhau, chúng ta cần thực hiện phép kết tại mệnh đề <code>FROM</code> và thiết lập điều kiện kết tại <code>WHERE</code>.</p>
-                    
-                    <h3>Nguyên tắc kết dựa trên khóa:</h3>
-                    <p>Thông thường, chúng ta kết bảng dựa trên mối quan hệ <strong>Khóa chính - Khóa ngoại</strong>:</p>
-                    <div class="sql-code">
-                        <span class="keyword">SELECT</span> * <br>
-                        <span class="keyword">FROM</span> Bang_A, Bang_B <br>
-                        <span class="keyword">WHERE</span> Bang_A.Khoa_Chinh = Bang_B.Khoa_Ngoai;
-                    </div>
+                <!-- Phần III: Phép kết (JOIN) - Đã được thống nhất và làm rõ -->
+                <section aria-labelledby="section3">
+                    <h2 id="section3">III. Phép kết (JOIN) - Truy vấn từ nhiều bảng</h2>
+                    <p>
+                        Khi dữ liệu nằm ở nhiều bảng khác nhau, chúng ta cần sử dụng phép JOIN để kết hợp các bảng lại với nhau dựa trên một điều kiện liên kết (thường là khóa chính - khóa ngoại).
+                    </p>
 
-                    <h3>Ví dụ thực tế:</h3>
-                    <p>Lấy tên sinh viên và tên lớp mà sinh viên đó đang học:</p>
-                    <div class="sql-code">
-                        <span class="keyword">SELECT</span> SINHVIEN.HoTen, LOP.TenLop <br>
-                        <span class="keyword">FROM</span> SINHVIEN, LOP <br>
-                        <span class="keyword">WHERE</span> SINHVIEN.MaLop = LOP.MaLop;
-                    </div>
-                </div>
+                    <h3>1. INNER JOIN (JOIN)</h3>
+                    <p>
+                        <code>INNER JOIN</code> (hay còn gọi đơn giản là <code>JOIN</code>) trả về các dòng có giá trị khớp ở cả hai bảng.
+                        Chỉ những bản ghi thỏa mãn điều kiện JOIN mới được hiển thị.
+                    </p>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> BangA
+<span class="keyword">INNER JOIN</span> BangB
+<span class="keyword">ON</span> BangA.id = BangB.id;</pre>
 
-                <div class="post-navigation">
-                    <a href="../index.html" class="back-home">← Quay lại trang chủ</a>
-                    <a href="#" class="next-post">Bài tiếp theo: Truy vấn nâng cao →</a>
-                </div>
-            </article>
-        </main>
+                    <h3>2. LEFT JOIN (LEFT OUTER JOIN)</h3>
+                    <p>
+                        <code>LEFT JOIN</code> trả về tất cả các bản ghi từ bảng bên trái (BangA), và các bản ghi khớp từ bảng bên phải (BangB).
+                        Nếu không có bản ghi tương ứng ở bảng bên phải, giá trị sẽ là NULL.
+                    </p>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> BangA
+<span class="keyword">LEFT JOIN</span> BangB
+<span class="keyword">ON</span> BangA.id = BangB.id;</pre>
 
-        <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
-            <p>© 2026 nghung-Blog. Kiến thức là sức mạnh.</p>
-        </footer>
-    </body>
+                    <h3>3. RIGHT JOIN (RIGHT OUTER JOIN)</h3>
+                    <p>
+                        <code>RIGHT JOIN</code> trả về tất cả các bản ghi từ bảng bên phải (BangB), và các bản ghi khớp từ bảng bên trái (BangA).
+                        Nếu không có bản ghi tương ứng ở bảng bên trái, giá trị sẽ là NULL.
+                    </p>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> BangA
+<span class="keyword">RIGHT JOIN</span> BangB
+<span class="keyword">ON</span> BangA.id = BangB.id;</pre>
+
+                    <h3>4. Ví dụ minh họa</h3>
+                    <p>
+                        Giả sử có hai bảng: <code>SinhVien</code> (id, ten, ma_lop) và <code>Lop</code> (id, ten_lop).
+                        Ta có thể JOIN để lấy thông tin sinh viên và tên lớp tương ứng:
+                    </p>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> SinhVien.ten, Lop.ten_lop
+<span class="keyword">FROM</span> SinhVien
+<span class="keyword">INNER JOIN</span> Lop
+<span class="keyword">ON</span> SinhVien.ma_lop = Lop.id;</pre>
+                    <p>
+                        Kết quả sẽ chỉ hiển thị những sinh viên có mã lớp hợp lệ (tồn tại trong bảng <code>Lop</code>).
+                    </p>
+                </section>
+            </div> <!-- end post-content -->
+
+            <div class="post-navigation">
+                <a href="../index.html" class="back-home">← Quay lại trang chủ</a>
+                <a href="#" class="next-post">Bài tiếp theo: Truy vấn nâng cao →</a>
+            </div>
+        </article>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. Kiến thức là sức mạnh.</p>
+    </footer>
+</body>
 </html>
