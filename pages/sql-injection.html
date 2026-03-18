@@ -77,6 +77,9 @@
                     <p>Một câu lệnh SQL hoàn chỉnh thường tuân theo thứ tự sau:</p>
                     
                     <pre class="sql-code">
+<span class="keyword">UPDATE</span> &lt;bảng&gt; <span class="keyword">SET</span> &lt;cột&gt;=&lt;giá trị&gt; <span class="keyword">WHERE</span> &lt;điều kiện&gt;;
+<span class="keyword">INSERT INTO</span> &lt;bảng&gt; (&lt;cột&gt;) <span class="keyword">VALUES</span> (&lt;giá trị&gt;);
+<span class="keyword">DELETE FROM</span> &lt;bảng&gt; <span class="keyword">WHERE</span> &lt;điều kiện&gt;;
 <span class="keyword">SELECT</span> [tính chất] &lt;danh sách thuộc tính&gt;
 <span class="keyword">FROM</span> &lt;danh sách table hoặc query/view [as alias]&gt;
 [<span class="keyword">WHERE</span> &lt;điều kiện lọc mẫu tin&gt;]
@@ -90,6 +93,9 @@
                             <th>Ý nghĩa</th>
                         </tr>
                         <tr><td><strong>SELECT</strong></td><td>Xác định các cột cần hiển thị trong kết quả.</td></tr>
+                        <tr><td><strong>UPDATE</strong></td><td>Cập nhật giá trị của các cột trong bảng.</td></tr>
+                        <tr><td><strong>INSERT INTO</strong></td><td>Chèn dữ liệu mới vào bảng.</td></tr>
+                        <tr><td><strong>DELETE FROM</strong></td><td>Xóa các bản ghi khỏi bảng.</td></tr>
                         <tr><td><strong>FROM</strong></td><td>Xác định các bảng (tables) cần lấy dữ liệu.</td></tr>
                         <tr><td><strong>WHERE</strong></td><td>Lọc các bản ghi thỏa mãn điều kiện nhất định.</td></tr>
                         <tr><td><strong>ORDER BY</strong></td><td>Sắp xếp kết quả (Mặc định là ASC - tăng dần).</td></tr>
