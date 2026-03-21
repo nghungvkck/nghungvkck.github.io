@@ -3,11 +3,11 @@
 [![GitHub](https://img.shields.io/badge/GitHub-nghungvkck-blue?style=flat-square&logo=github)](https://github.com/nghungvkck)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Chào mừng bạn đến với **nghung-Blog** - trang blog cá nhân của Nguyễn Hùng! Đây là nơi mình chia sẻ kiến thức về Machine Learning, Deep Learning và Cybersecurity thông qua các bài viết chi tiết, ví dụ thực tế và tài liệu tham khảo.
+Chào mừng bạn đến với **nghung-Blog** - trang blog cá nhân của Nguyễn Văn Hưng! Đây là nơi mình chia sẻ kiến thức về Machine Learning, Deep Learning và Cybersecurity thông qua các bài viết chi tiết, ví dụ thực tế và tài liệu tham khảo.
 
 ## 📖 Giới thiệu
 
-Mình là **Nguyễn Hùng**, sinh viên năm 2 ngành Khoa học Máy tính tại **Trường Đại học Khoa học Tự nhiên (ĐHQGHN)**. Blog này được tạo ra với mục đích:
+Mình là **Nguyễn Văn Hưng**, sinh viên năm 2 ngành Khoa học Máy tính tại **Trường Đại học Khoa học Tự nhiên (ĐHQGHN)**. Blog này được tạo ra với mục đích:
 
 - 📚 **Chia sẻ kiến thức**: Ghi lại những gì mình học được trong quá trình nghiên cứu
 - 🎯 **Học tập cùng nhau**: Tạo cộng đồng để trao đổi và thảo luận
@@ -106,16 +106,16 @@ git push origin feature/AmazingFeature
 - Thêm ví dụ minh họa
 - Đề xuất chủ đề bài viết mới
 
-## 📊 Thống kê
+<!-- ## 📊 Thống kê
 
-![GitHub stats](https://github-readme-stats.vercel.app/api?username=nghungvkck&show_icons=true&theme=radical)
+![GitHub stats](https://github-readme-stats.vercel.app/api?username=nghungvkck&show_icons=true&theme=radical) -->
 
 ## 📞 Liên hệ
 
 - **GitHub**: [@nghungvkck](https://github.com/nghungvkck)
 - **Email**: [nghungvkck@gmail.com](mailto:nghungvkck@gmail.com)
-- **LinkedIn**: [Nguyễn Hùng](https://linkedin.com/in/nghungvkck)
-- **Blog**: [nghung-blog.vercel.app](https://nghung-blog.vercel.app)
+- **Facebook**: [Nguyễn Văn Hưng](https://www.facebook.com/nguyen.hung.577643/)
+- **Blog**: [nghung-blog](https://nghungvkck.github.io/)
 
 ## 📜 License
 
@@ -131,4 +131,4 @@ Cảm ơn bạn đã dành thời gian ghé thăm blog của mình! Hy vọng nh
 
 ---
 
-**Made with ❤️ by Nguyễn Hùng**
+**Made with ❤️ by Nguyễn Văn Hưng**
