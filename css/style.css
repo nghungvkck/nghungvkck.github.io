@@ -51,6 +51,74 @@ body {
     color: #007bff;
 }
 
+/* ===== DROPDOWN MENU ===== */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    color: #444;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.dropdown-btn:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    top: 100%;
+    left: 0;
+    margin-top: 5px;
+}
+
+.dropdown-content a {
+    color: #444;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.dropdown-content a:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+    transform: translateX(5px);
+}
+
+.dropdown-content a:first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.dropdown-content a:last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
 .nav-right {
     display: flex;
     align-items: center;
@@ -140,6 +208,26 @@ body {
     gap: 25px;
 }
 
+/* Posts Section Container */
+.posts section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    grid-column: 1 / -1;
+    margin-bottom: 10px;
+}
+
+.posts section h2 {
+    grid-column: 1 / -1;
+}
+
+/* Card Links */
+.posts section a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 /* Card Styles */
 .card {
     background: white;
@@ -181,6 +269,29 @@ body {
     font-weight: 600;
 }
 
+/* Post navigation center alignment */
+.post-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.post-navigation a {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #2196F3;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.25s ease;
+}
+
+.post-navigation a:hover {
+    background: #1976D2;
+}
+
 .card-content p {
     color: #666;
     font-size: 14px;
@@ -207,6 +318,12 @@ a.card-link {
     .nav-left {
         flex-wrap: wrap;
         justify-content: center;
+    }
+    
+    .dropdown-content {
+        min-width: 180px;
+        left: 50%;
+        transform: translateX(-50%);
     }
     
     .nav-right {
@@ -243,6 +360,15 @@ a.card-link {
     
     .nav-left a {
         font-size: 0.9rem;
+    }
+    
+    .dropdown-btn {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+    
+    .dropdown-content {
+        min-width: 160px;
     }
     
     .search {
