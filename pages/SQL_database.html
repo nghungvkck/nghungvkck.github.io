@@ -174,6 +174,72 @@
                         Kết quả sẽ chỉ hiển thị những sinh viên có mã lớp hợp lệ (tồn tại trong bảng <code>Lop</code>).
                     </p>
                 </section>
+
+                <!-- Phần IV: SQL lồng (Subquery) -->
+                <section aria-labelledby="section4">
+                    <h2 id="section4">IV. SQL lồng (Subquery)</h2>
+                    <p>
+                        <code>Subquery</code> Truy vấn lồng là những câu lệnh mà trong thành phần WHERE 
+                        có chứa thêm một câu lệnh SELECT khác nữa. Câu lệnh này thường gặp khi dữ liệu cần thiết 
+                        phải duyệt qua nhiều lần. Đây là một trong những vấn đề khó khăn nhất khi thực hiện truy vẫn dữ liệu.
+                        <ul>
+                            <li>Các câu lệnh SELECT có thể lồng nhiều mức.</li>
+                            <li>Các câu truy vấn con trong cùng một mệnh đề WHERE được kết hợp bằng phép nối logic.</li>
+                            <li>Câu truy vấn con thường trả về một tập các giá trị.</li>
+                        </ul>
+                    </p>
+
+                    <h3>1. Subquery trong mệnh đề WHERE</h3>
+                    <p>
+                        Dùng khi cần lọc dữ liệu dựa trên kết quả từ một truy vấn khác.
+                    </p>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> ten, luong
+<span class="keyword">FROM</span> NhanVien
+<span class="keyword">WHERE</span> luong &gt; (
+    <span class="keyword">SELECT</span> AVG(luong)
+    <span class="keyword">FROM</span> NhanVien
+);</pre>
+                    <p>
+                        Ví dụ trên lấy ra các nhân viên có lương cao hơn mức lương trung bình của toàn công ty.
+                    </p>
+
+                    <h3>2. Subquery với toán tử IN</h3>
+                    <p>
+                        Dùng để đối chiếu với một tập kết quả trả về từ truy vấn con.
+                    </p>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> ten_sinh_vien
+<span class="keyword">FROM</span> SinhVien
+<span class="keyword">WHERE</span> ma_lop <span class="keyword">IN</span> (
+    <span class="keyword">SELECT</span> id
+    <span class="keyword">FROM</span> Lop
+    <span class="keyword">WHERE</span> ten_lop <span class="keyword">LIKE</span> 'CNTT%'
+);</pre>
+                    <p>
+                        Truy vấn này lấy danh sách sinh viên thuộc các lớp có tên bắt đầu bằng <code>CNTT</code>.
+                    </p>
+
+                    <h3>3. Subquery trong mệnh đề FROM</h3>
+                    <p>
+                        Có thể dùng truy vấn con như một bảng tạm (derived table) để tính toán trung gian.
+                    </p>
+                    <pre class="sql-code">
+<span class="keyword">SELECT</span> tmp.ma_lop, tmp.so_luong
+<span class="keyword">FROM</span> (
+    <span class="keyword">SELECT</span> ma_lop, COUNT(*) <span class="keyword">AS</span> so_luong
+    <span class="keyword">FROM</span> SinhVien
+    <span class="keyword">GROUP BY</span> ma_lop
+) <span class="keyword">AS</span> tmp
+<span class="keyword">WHERE</span> tmp.so_luong &gt; 30;</pre>
+                    <p>
+                        Câu lệnh trên tìm các lớp có số lượng sinh viên lớn hơn 30.
+                    </p>
+
+                    <div class="note-box">
+                        <strong>Lưu ý:</strong> Nếu subquery trả về nhiều dòng, hãy dùng <code>IN</code>, <code>EXISTS</code> hoặc so sánh phù hợp; tránh dùng toán tử <code>=</code> để không gây lỗi.
+                    </div>
+                </section>
             </div> <!-- end post-content -->
 
             <div style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 20px; margin: 30px 0; border-radius: 8px;">
