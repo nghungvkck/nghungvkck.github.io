@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distance Metrics và Loss Functions - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/focal-loss.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <h2 class="logo">nghung-Blog</h2>
+            <a href="../index.html">Trang chủ</a>
+            <a href="vector-database.html">Vector Database</a>
+            <a href="SQL_database.html">SQL Database</a>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <article class="post-container">
+            <header class="post-header">
+                <h1>Distance Metrics</h1>
+                <div class="post-meta">
+                    <span class="post-date">Ngày đăng: 30/03/2026</span>
+                    <span class="post-category">Chuyên mục: Machine Learning cho Vector Search</span>
+                </div>
+                <div class="post-tags">
+                    <span>#distance metrics</span>
+                    <span>#loss functions</span>
+                    <span>#vector database</span>
+                    <span>#embedding</span>
+                </div>
+            </header>
+
+            <div class="post-content">
+                <h2>Khái niệm</h2>
+                <p>
+                    Trong Vector Database như FAISS, Pinecone hay Weaviate, mỗi đối tượng như ảnh,
+                    văn bản, sản phẩm hoặc người dùng được ánh xạ thành một vector trong không gian nhiều chiều.
+                    Khi cần tìm kiếm các đối tượng tương tự, hệ thống sẽ so sánh các vector bằng những hàm đo khoảng cách
+                    hoặc độ tương đồng.
+                </p>
+                <p>
+                    Trong machine learning, các hàm này thường xuất hiện trong những bài toán như
+                    <strong>metric learning</strong>, <strong>contrastive learning</strong> và <strong>retrieval</strong>.
+                    Vì vậy chúng là cầu nối giữa phần loss function khi huấn luyện và phần truy vấn khi triển khai vector search.
+                </p>
+
+                <div style="background: #f7fbff; border: 1px solid #cfe3ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                    <h3 style="margin-top: 0;">Vai trò của distance metrics</h3>
+                    <ul style="margin-bottom: 0;">
+                        <li>Trong huấn luyện: kéo các embedding giống nhau lại gần nhau.</li>
+                        <li>Trong truy vấn: xếp hạng các vector gần nhất.</li>
+                        <li>Trong semantic search: đo độ giống nhau về mặt ngữ nghĩa.</li>
+                    </ul>
+                </div>
+
+                <h2>1. L2 Distance (Euclidean Distance)</h2>
+                <p>
+                    L2 Distance đo khoảng cách đường thẳng giữa hai vector trong không gian nhiều chiều.
+                    Đây là metric phổ biến khi embedding chưa được chuẩn hóa.
+                </p>
+                <div class="formula">
+                    <p>\( L_2(A, B) = \sqrt{\sum_{i=1}^{n}(a_i - b_i)^2} \)</p>
+                </div>
+                <p>Ví dụ với \( A = [1,2] \), \( B = [4,6] \):</p>
+                <div class="formula">
+                    <p>\( L_2 = \sqrt{(1-4)^2 + (2-6)^2} = \sqrt{9 + 16} = 5 \)</p>
+                </div>
+                <ul>
+                    <li>Phổ biến trong image retrieval và face recognition.</li>
+                    <li>Phù hợp khi cần khoảng cách hình học thực sự.</li>
+                </ul>
+
+                <h2>2. L1 Distance (Manhattan Distance)</h2>
+                <p>
+                    L1 Distance đo tổng sai khác tuyệt đối theo từng chiều. So với L2, metric này thường ít nhạy hơn với outlier.
+                </p>
+                <div class="formula">
+                    <p>\( L_1(A, B) = \sum_{i=1}^{n}|a_i - b_i| \)</p>
+                </div>
+                <p>Ví dụ với \( A = [1,2] \), \( B = [4,6] \):</p>
+                <div class="formula">
+                    <p>\( L_1 = |1-4| + |2-6| = 3 + 4 = 7 \)</p>
+                </div>
+                <ul>
+                    <li>Phù hợp với dữ liệu nhiễu hoặc rời rạc.</li>
+                    <li>Bền hơn trước các giá trị ngoại lai.</li>
+                </ul>
+
+                <h2>3. Cosine Similarity / Cosine Distance</h2>
+                <p>
+                    Cosine Similarity đo độ giống nhau theo góc giữa hai vector thay vì theo độ dài.
+                    Đây là metric rất phổ biến cho text embedding và semantic search.
+                </p>
+                <div class="formula">
+                    <p>\( \cos(A, B) = \frac{A \cdot B}{\|A\|\|B\|} \)</p>
+                    <p>\( \text{Cosine Distance} = 1 - \cos(A, B) \)</p>
+                </div>
+                <ul>
+                    <li>\( A = [1,0], B = [0,1] \Rightarrow \cos = 0 \)</li>
+                    <li>\( A = [1,1], B = [2,2] \Rightarrow \cos = 1 \)</li>
+                </ul>
+                <ul>
+                    <li>Phù hợp khi chỉ quan tâm hướng ngữ nghĩa của vector.</li>
+                    <li>Rất hay dùng trong NLP và question matching.</li>
+                </ul>
+
+                <h2>4. Dot Product (Inner Product)</h2>
+                <p>
+                    Dot Product là phép nhân và cộng tương ứng giữa hai vector. Giá trị lớn thường thể hiện mức độ đồng hướng và độ lớn cao.
+                </p>
+                <div class="formula">
+                    <p>\( A \cdot B = \sum_{i=1}^{n} a_i b_i \)</p>
+                </div>
+                <p>Ví dụ với \( A = [1,2] \), \( B = [3,4] \):</p>
+                <div class="formula">
+                    <p>\( A \cdot B = 1 \times 3 + 2 \times 4 = 11 \)</p>
+                </div>
+                <ul>
+                    <li>Hiệu quả trong các hệ truy vấn vector tối ưu tốc độ.</li>
+                    <li>Phổ biến trong CLIP, BERT và các hệ ANN.</li>
+                </ul>
+
+                <div style="background: #fff8ef; border: 1px solid #ffd9a8; border-radius: 10px; padding: 18px; margin: 24px 0;">
+                    <h3 style="margin-top: 0;">So sánh nhanh</h3>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>L2</strong>: đo khoảng cách hình học thực sự.</li>
+                        <li><strong>L1</strong>: ổn hơn khi có nhiễu và outlier.</li>
+                        <li><strong>Cosine</strong>: phù hợp nhất cho text embedding và semantic similarity.</li>
+                        <li><strong>Dot Product</strong>: phù hợp với hệ truy vấn nhanh và vector đã chuẩn hóa.</li>
+                    </ul>
+                </div>
+
+                <h2>Kết luận</h2>
+                <p>
+                    Chọn đúng metric sẽ ảnh hưởng trực tiếp đến chất lượng tìm kiếm, tốc độ truy vấn và cách hệ thống hiểu dữ liệu.
+                    Khi học về loss functions, bạn nên xem các distance metrics này là phần nối giữa huấn luyện embedding và triển khai Vector Database.
+                </p>
+            </div>
+
+            <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <a href="vector-database.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                        <strong>Vector Database</strong>
+                        <p style="font-size: 0.9em; margin: 5px 0 0 0;">Quay lại bài tổng quan về vector database</p>
+                    </a>
+                    <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                        <strong>Trang chủ</strong>
+                        <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="post-navigation" style="display: flex; justify-content: space-between; gap: 15px; margin-top: 30px;">
+                <a href="vector-database.html" style="padding: 10px 20px; background-color: #f5f5f5; border-radius: 5px; text-decoration: none; color: #333; flex: 1; text-align: left;">← Quay lại Vector Database</a>
+                <a href="../index.html" style="padding: 10px 20px; background-color: #2196F3; border-radius: 5px; text-decoration: none; color: white; flex: 1; text-align: right;">Về trang chủ →</a>
+            </div>
+        </article>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+</body>
+</html>

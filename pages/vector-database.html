@@ -21,7 +21,7 @@
     <main class="blog-post">
         <article class="post-container">
             <header class="post-header">
-                <h1>9.3 Vector Database</h1>
+                <h1>Vector Database</h1>
                 <div class="post-meta">
                     <span class="post-date">Ngày đăng: 30/03/2026</span>
                     <span class="post-category">Chuyên mục: Database cho AI</span>
@@ -35,7 +35,7 @@
             </header>
 
             <div class="post-content">
-                <h2>9.3.1 Khái niệm</h2>
+                <h2>Khái niệm</h2>
                 <p>
                     <strong>Vector Database</strong> hay còn gọi là <strong>vector store</strong>,
                     <strong>vector search engine</strong> là một loại cơ sở dữ liệu được thiết kế
@@ -52,12 +52,7 @@
 
                 <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
                     <h3 style="margin-top: 0;">Tổng quan quy trình</h3>
-                    <p style="margin-bottom: 10px;">
-                        Context/Application → Embedding Model → Vector Embedding → Vector Database → Query Results
-                    </p>
-                    <div class="formula">
-                        <p>[0.1, 0.3, ..., 0.5]</p>
-                    </div>
+                    <img src="../images/Tong_Quan_ve_vector_database.png" alt="Tổng quan về Vector Database" style="width: 100%; border-radius: 8px; margin-top: 10px;">
                 </div>
 
                 <p>Hãy cùng phân tích quy trình trên:</p>
@@ -69,7 +64,7 @@
                     <li>Sau đó từ các vector tương đồng, hệ thống tham chiếu ngược lại nội dung gốc để trả kết quả cho người dùng.</li>
                 </ul>
 
-                <h2>9.3.2 Embedding</h2>
+                <h2>Embedding</h2>
                 <p>
                     <strong>Embedding</strong> là quá trình chuyển đổi dữ liệu thô như văn bản, hình ảnh,
                     âm thanh hoặc video thành một vector số nhiều chiều, trong đó mỗi chiều đại diện cho
@@ -90,7 +85,7 @@
                     </ul>
                 </div>
 
-                <h2>9.3.3 Indexing trong Vector Database</h2>
+                <h2>Indexing trong Vector Database</h2>
                 <p>
                     Sau khi dữ liệu đã được chuyển đổi thành vector embedding, bước tiếp theo trong Vector
                     Database là <strong>indexing</strong>, tức xây dựng chỉ mục giúp tối ưu khả năng truy vấn
@@ -106,7 +101,7 @@
 
                 <p>
                     Trong phạm vi bài này, chúng ta sẽ tìm hiểu ba cách indexing dữ liệu từ cơ bản đến nâng cao:
-                    <strong>Flat Index</strong>, <strong>IVF</strong> và <strong>PQ</strong>.
+                    <strong>Flat Index</strong>, <strong>IVF</strong>.
                 </p>
 
                 <h3>Flat Index</h3>
@@ -164,93 +159,12 @@
                     </p>
                 </div>
 
-                <h3>Product Quantization - PQ</h3>
-                <p>
-                    Ý tưởng của lượng tử hóa là nén dữ liệu nhưng vẫn cố gắng bảo toàn thông tin quan trọng.
-                    Với <strong>Product Quantization</strong>, vector gốc có <strong>d</strong> chiều được chia
-                    thành <strong>m</strong> segment nhỏ hơn.
-                </p>
-
-                <p>Cách PQ tổ chức dữ liệu trong database:</p>
-                <ul>
-                    <li>Vector gốc d chiều được chia thành m segment.</li>
-                    <li>Với mỗi segment, thuật toán K-means được áp dụng để tạo một codebook gồm các centroid đại diện.</li>
-                    <li>Thay vì lưu toàn bộ giá trị thực của segment, hệ thống chỉ lưu chỉ số centroid tương ứng.</li>
-                    <li>Kết quả là vector gốc có thể được nén từ vài KB xuống chỉ còn vài bytes.</li>
-                </ul>
-
-                <p>
-                    Khi truy vấn với vector <strong>Q</strong>, ta cũng chia Q thành các segment tương tự, rồi tính
-                    khoảng cách từ từng segment của Q tới các centroid tương ứng để tạo ra một bảng tra khoảng cách.
-                    Sau đó, với mỗi PQ code trong database, hệ thống tra khoảng cách ở từng segment và cộng lại để
-                    ước tính khoảng cách giữa Q và vector đã lưu. Vector có tổng khoảng cách nhỏ nhất sẽ được xem
-                    là gần nhất.
-                </p>
-
-                <div style="background: #f6fff8; border: 1px solid #bfe7c9; border-radius: 10px; padding: 16px; margin: 20px 0;">
-                    <p style="margin: 0;">
-                        Query vector → chia segment → lookup distance → cộng tổng → chọn vector gần nhất
-                    </p>
-                </div>
-
-                <h2>So sánh một số công cụ Vector Database phổ biến</h2>
-                <p>
-                    Vector Database Tools là các công cụ chuyên dụng được thiết kế để lưu trữ, indexing và
-                    tìm kiếm dữ liệu dưới dạng vector embeddings, tức các biểu diễn số học đa chiều của dữ liệu
-                    phi cấu trúc như text, hình ảnh, âm thanh hoặc video.
-                </p>
-
-                <table>
-                    <tr>
-                        <th>Công cụ</th>
-                        <th>Đặc điểm chính</th>
-                        <th>Ưu điểm</th>
-                        <th>Hạn chế</th>
-                    </tr>
-                    <tr>
-                        <td>Faiss</td>
-                        <td>Library C++/Python, không có persistence.</td>
-                        <td>Hiệu năng rất cao, hỗ trợ nhiều thuật toán ANN.</td>
-                        <td>Không lưu trữ dữ liệu lâu dài.</td>
-                    </tr>
-                    <tr>
-                        <td>Milvus</td>
-                        <td>Distributed, persistent, hỗ trợ REST API.</td>
-                        <td>Production-ready, hỗ trợ nhiều metric.</td>
-                        <td>Cần vận hành hạ tầng riêng.</td>
-                    </tr>
-                    <tr>
-                        <td>Weaviate</td>
-                        <td>Semantic search, GraphQL API.</td>
-                        <td>Tích hợp mô hình ngôn ngữ, dễ dùng.</td>
-                        <td>Hạn chế backend tùy biến ở một số tình huống.</td>
-                    </tr>
-                    <tr>
-                        <td>Pinecone</td>
-                        <td>SaaS, dễ deploy, auto-scale.</td>
-                        <td>Không cần quản lý hạ tầng.</td>
-                        <td>Phụ thuộc vào nhà cung cấp.</td>
-                    </tr>
-                    <tr>
-                        <td>pgvector</td>
-                        <td>Extension cho PostgreSQL.</td>
-                        <td>Dễ tích hợp với RDBMS hiện có.</td>
-                        <td>Hiệu năng thấp hơn các hệ chuyên dụng.</td>
-                    </tr>
-                </table>
-
                 <h2>Kết luận</h2>
                 <p>
                     Vector Database là thành phần quan trọng trong các hệ thống AI hiện đại khi dữ liệu cần được
                     biểu diễn dưới dạng embedding và truy vấn theo mức độ tương đồng. Giá trị cốt lõi của nó không
                     chỉ nằm ở việc lưu vector, mà còn ở khả năng indexing và tìm kiếm gần đúng hiệu quả trên tập dữ
                     liệu rất lớn.
-                </p>
-                <p>
-                    Ba kỹ thuật thường gặp gồm Flat Index, IVF và PQ thể hiện ba mức đánh đổi khác nhau giữa
-                    độ chính xác, tốc độ và chi phí lưu trữ. Việc chọn công cụ như Faiss, Milvus, Weaviate,
-                    Pinecone hay pgvector sẽ phụ thuộc vào quy mô hệ thống, yêu cầu triển khai và mức độ kiểm
-                    soát hạ tầng mà bạn cần.
                 </p>
             </div>
 

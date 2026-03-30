@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="../css/focal-loss.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <style>
-        /* Style bổ sung cho các khối code */
         .sql-code {
             background-color: #1e1e1e;
             color: #dcdcdc;
@@ -18,7 +17,7 @@
             line-height: 1.6;
             margin: 15px 0;
             overflow-x: auto;
-            white-space: pre-wrap; /* Giữ nguyên cấu trúc nhưng cho phép xuống dòng khi cần */
+            white-space: pre-wrap;
         }
         .keyword { color: #569cd6; font-weight: bold; }
         .table-name { color: #4ec9b0; }
@@ -71,7 +70,6 @@
             <div class="post-content">
                 <p>SQL (Structured Query Language) là ngôn ngữ tiêu chuẩn để tương tác với các hệ quản trị cơ sở dữ liệu quan hệ. Dưới đây là tóm tắt các cú pháp quan trọng nhất.</p>
 
-                <!-- Phần I: Cấu trúc câu lệnh cơ bản -->
                 <section aria-labelledby="section1">
                     <h2 id="section1">I. Cấu trúc câu lệnh truy vấn cơ bản</h2>
                     <p>Một câu lệnh SQL hoàn chỉnh thường tuân theo thứ tự sau:</p>
@@ -96,41 +94,38 @@
                         <tr><td><strong>UPDATE</strong></td><td>Cập nhật giá trị của các cột trong bảng.</td></tr>
                         <tr><td><strong>INSERT INTO</strong></td><td>Chèn dữ liệu mới vào bảng.</td></tr>
                         <tr><td><strong>DELETE FROM</strong></td><td>Xóa các bản ghi khỏi bảng.</td></tr>
-                        <tr><td><strong>FROM</strong></td><td>Xác định các bảng (tables) cần lấy dữ liệu.</td></tr>
+                        <tr><td><strong>FROM</strong></td><td>Xác định các bảng cần lấy dữ liệu.</td></tr>
                         <tr><td><strong>WHERE</strong></td><td>Lọc các bản ghi thỏa mãn điều kiện nhất định.</td></tr>
-                        <tr><td><strong>ORDER BY</strong></td><td>Sắp xếp kết quả (Mặc định là ASC - tăng dần).</td></tr>
-                        <tr><td><strong>GROUP BY</strong></td><td>Nhóm các bản ghi có cùng giá trị ở một hoặc nhiều cột, thường dùng với các hàm tổng hợp như COUNT, SUM, AVG.</td></tr>
-                        <tr><td><strong>HAVING</strong></td><td>Lọc các nhóm dữ liệu sau khi đã GROUP BY (tương tự WHERE nhưng áp dụng cho nhóm).</td></tr>
+                        <tr><td><strong>ORDER BY</strong></td><td>Sắp xếp kết quả, mặc định là tăng dần.</td></tr>
+                        <tr><td><strong>GROUP BY</strong></td><td>Nhóm dữ liệu có cùng giá trị ở một hoặc nhiều cột.</td></tr>
+                        <tr><td><strong>HAVING</strong></td><td>Lọc các nhóm dữ liệu sau khi đã GROUP BY.</td></tr>
                     </table>
                 </section>
 
-                <!-- Phần II: Các phép toán so sánh và điều kiện đặc biệt -->
                 <section aria-labelledby="section2">
                     <h2 id="section2">II. Các phép toán so sánh và điều kiện đặc biệt</h2>
                     <ul>
                         <li><strong>Tìm kiếm đơn giản:</strong> Kết hợp nhiều điều kiện bằng <code>AND</code> hoặc <code>OR</code>.</li>
-                        <li><strong>IS NULL / IS NOT NULL:</strong> Kiểm tra giá trị trống (NULL) hoặc có dữ liệu.</li>
+                        <li><strong>IS NULL / IS NOT NULL:</strong> Kiểm tra giá trị trống hoặc có dữ liệu.</li>
                         <li><strong>IN / NOT IN:</strong> Kiểm tra xem một giá trị có nằm trong một tập hợp cho trước hay không.</li>
-                        <li><strong>Phép LIKE:</strong> Dùng cho dữ liệu chuỗi (String). Thay vì dùng dấu <code>=</code>, dùng <code>LIKE</code> kết hợp với ký tự đại diện (ví dụ <code>%</code>) để tìm kiếm linh hoạt hơn.</li>
-                        <li><strong>DATEDIFF():</strong> Tính khoảng cách ngày giữa hai biểu thức <code>expr1 - expr2</code>.</li>
+                        <li><strong>LIKE:</strong> Dùng cho dữ liệu chuỗi với ký tự đại diện như <code>%</code>.</li>
+                        <li><strong>DATEDIFF():</strong> Tính khoảng cách ngày giữa hai biểu thức.</li>
                     </ul>
 
                     <div class="note-box">
-                        <strong>Mẹo nhỏ:</strong> Khi so sánh chuỗi, hãy luôn ưu tiên sử dụng <code>LIKE</code> để tránh các lỗi so sánh chính xác tuyệt đối không cần thiết.
+                        <strong>Mẹo nhỏ:</strong> Khi so sánh chuỗi, hãy ưu tiên sử dụng <code>LIKE</code> để tránh các lỗi so sánh chính xác tuyệt đối không cần thiết.
                     </div>
                 </section>
 
-                <!-- Phần III: Phép kết (JOIN) - Đã được thống nhất và làm rõ -->
                 <section aria-labelledby="section3">
                     <h2 id="section3">III. Phép kết (JOIN) - Truy vấn từ nhiều bảng</h2>
                     <p>
-                        Khi dữ liệu nằm ở nhiều bảng khác nhau, chúng ta cần sử dụng phép JOIN để kết hợp các bảng lại với nhau dựa trên một điều kiện liên kết (thường là khóa chính - khóa ngoại).
+                        Khi dữ liệu nằm ở nhiều bảng khác nhau, chúng ta cần sử dụng phép JOIN để kết hợp các bảng lại với nhau dựa trên một điều kiện liên kết.
                     </p>
 
                     <h3>1. INNER JOIN (JOIN)</h3>
                     <p>
-                        <code>INNER JOIN</code> (hay còn gọi đơn giản là <code>JOIN</code>) trả về các dòng có giá trị khớp ở cả hai bảng.
-                        Chỉ những bản ghi thỏa mãn điều kiện JOIN mới được hiển thị.
+                        <code>INNER JOIN</code> trả về các dòng có giá trị khớp ở cả hai bảng.
                     </p>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> *
@@ -140,8 +135,7 @@
 
                     <h3>2. LEFT JOIN (LEFT OUTER JOIN)</h3>
                     <p>
-                        <code>LEFT JOIN</code> trả về tất cả các bản ghi từ bảng bên trái (BangA), và các bản ghi khớp từ bảng bên phải (BangB).
-                        Nếu không có bản ghi tương ứng ở bảng bên phải, giá trị sẽ là NULL.
+                        <code>LEFT JOIN</code> trả về tất cả các bản ghi từ bảng bên trái và các bản ghi khớp từ bảng bên phải.
                     </p>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> *
@@ -151,8 +145,7 @@
 
                     <h3>3. RIGHT JOIN (RIGHT OUTER JOIN)</h3>
                     <p>
-                        <code>RIGHT JOIN</code> trả về tất cả các bản ghi từ bảng bên phải (BangB), và các bản ghi khớp từ bảng bên trái (BangA).
-                        Nếu không có bản ghi tương ứng ở bảng bên trái, giá trị sẽ là NULL.
+                        <code>RIGHT JOIN</code> trả về tất cả các bản ghi từ bảng bên phải và các bản ghi khớp từ bảng bên trái.
                     </p>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> *
@@ -163,36 +156,21 @@
                     <h3>4. Ví dụ minh họa</h3>
                     <p>
                         Giả sử có hai bảng: <code>SinhVien</code> (id, ten, ma_lop) và <code>Lop</code> (id, ten_lop).
-                        Ta có thể JOIN để lấy thông tin sinh viên và tên lớp tương ứng:
                     </p>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> SinhVien.ten, Lop.ten_lop
 <span class="keyword">FROM</span> SinhVien
 <span class="keyword">INNER JOIN</span> Lop
 <span class="keyword">ON</span> SinhVien.ma_lop = Lop.id;</pre>
-                    <p>
-                        Kết quả sẽ chỉ hiển thị những sinh viên có mã lớp hợp lệ (tồn tại trong bảng <code>Lop</code>).
-                    </p>
                 </section>
 
-                <!-- Phần IV: SQL lồng (Subquery) -->
                 <section aria-labelledby="section4">
                     <h2 id="section4">IV. SQL lồng (Subquery)</h2>
                     <p>
-                        <code>Subquery</code> Truy vấn lồng là những câu lệnh mà trong thành phần WHERE 
-                        có chứa thêm một câu lệnh SELECT khác nữa. Câu lệnh này thường gặp khi dữ liệu cần thiết 
-                        phải duyệt qua nhiều lần. Đây là một trong những vấn đề khó khăn nhất khi thực hiện truy vẫn dữ liệu.
-                        <ul>
-                            <li>Các câu lệnh SELECT có thể lồng nhiều mức.</li>
-                            <li>Các câu truy vấn con trong cùng một mệnh đề WHERE được kết hợp bằng phép nối logic.</li>
-                            <li>Câu truy vấn con thường trả về một tập các giá trị.</li>
-                        </ul>
+                        <code>Subquery</code> là truy vấn lồng bên trong một truy vấn khác, thường dùng để lọc dữ liệu hoặc tính toán trung gian.
                     </p>
 
                     <h3>1. Subquery trong mệnh đề WHERE</h3>
-                    <p>
-                        Dùng khi cần lọc dữ liệu dựa trên kết quả từ một truy vấn khác.
-                    </p>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> ten, luong
 <span class="keyword">FROM</span> NhanVien
@@ -200,14 +178,8 @@
     <span class="keyword">SELECT</span> AVG(luong)
     <span class="keyword">FROM</span> NhanVien
 );</pre>
-                    <p>
-                        Ví dụ trên lấy ra các nhân viên có lương cao hơn mức lương trung bình của toàn công ty.
-                    </p>
 
                     <h3>2. Subquery với toán tử IN</h3>
-                    <p>
-                        Dùng để đối chiếu với một tập kết quả trả về từ truy vấn con.
-                    </p>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> ten_sinh_vien
 <span class="keyword">FROM</span> SinhVien
@@ -216,14 +188,8 @@
     <span class="keyword">FROM</span> Lop
     <span class="keyword">WHERE</span> ten_lop <span class="keyword">LIKE</span> 'CNTT%'
 );</pre>
-                    <p>
-                        Truy vấn này lấy danh sách sinh viên thuộc các lớp có tên bắt đầu bằng <code>CNTT</code>.
-                    </p>
 
                     <h3>3. Subquery trong mệnh đề FROM</h3>
-                    <p>
-                        Có thể dùng truy vấn con như một bảng tạm (derived table) để tính toán trung gian.
-                    </p>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> tmp.ma_lop, tmp.so_luong
 <span class="keyword">FROM</span> (
@@ -232,29 +198,26 @@
     <span class="keyword">GROUP BY</span> ma_lop
 ) <span class="keyword">AS</span> tmp
 <span class="keyword">WHERE</span> tmp.so_luong &gt; 30;</pre>
-                    <p>
-                        Câu lệnh trên tìm các lớp có số lượng sinh viên lớn hơn 30.
-                    </p>
 
                     <div class="note-box">
-                        <strong>Lưu ý:</strong> Nếu subquery trả về nhiều dòng, hãy dùng <code>IN</code>, <code>EXISTS</code> hoặc so sánh phù hợp; tránh dùng toán tử <code>=</code> để không gây lỗi.
+                        <strong>Lưu ý:</strong> Nếu subquery trả về nhiều dòng, hãy dùng <code>IN</code>, <code>EXISTS</code> hoặc so sánh phù hợp; tránh dùng toán tử <code>=</code>.
                     </div>
                 </section>
-            </div> <!-- end post-content -->
+            </div>
 
             <div style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 20px; margin: 30px 0; border-radius: 8px;">
-                    <h3 style="margin-top: 0; color: #856404;">🔐 Chủ đề liên quan</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <a href="../index.html" style="text-decoration: none; color: #856404; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
-                            <strong>Xem các bài viết khác</strong>
-                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Trở về trang chủ</p>
-                        </a>
-                        <div style="text-decoration: none; color: #856404; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; text-align: center; display: block; background-color: #fff9e6;">
-                            <strong>SQL -database</strong>
-                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Hệ quản trị cơ sở dữ liệu</p>
-                        </div>
+                <h3 style="margin-top: 0; color: #856404;">Chủ đề liên quan</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <a href="../index.html" style="text-decoration: none; color: #856404; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                        <strong>Xem các bài viết khác</strong>
+                        <p style="font-size: 0.9em; margin: 5px 0 0 0;">Trở về trang chủ</p>
+                    </a>
+                    <div style="text-decoration: none; color: #856404; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; text-align: center; display: block; background-color: #fff9e6;">
+                        <strong>SQL Database</strong>
+                        <p style="font-size: 0.9em; margin: 5px 0 0 0;">Hệ quản trị cơ sở dữ liệu</p>
                     </div>
                 </div>
+            </div>
 
             <div class="post-navigation" style="display: flex; justify-content: space-between; gap: 15px; margin-top: 30px;">
                 <a href="../index.html" style="padding: 10px 20px; background-color: #f5f5f5; border-radius: 5px; text-decoration: none; color: #333; flex: 1; text-align: left;">← Quay lại trang chủ</a>
