@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector Database - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/focal-loss.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <h2 class="logo">nghung-Blog</h2>
+            <a href="../index.html">Trang chủ</a>
+            <a href="#">Database</a>
+            <a href="#">AI Applications</a>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <article class="post-container">
+            <header class="post-header">
+                <h1>9.3 Vector Database</h1>
+                <div class="post-meta">
+                    <span class="post-date">Ngày đăng: 30/03/2026</span>
+                    <span class="post-category">Chuyên mục: Database cho AI</span>
+                </div>
+                <div class="post-tags">
+                    <span>#vector database</span>
+                    <span>#embedding</span>
+                    <span>#ann</span>
+                    <span>#semantic retrieval</span>
+                </div>
+            </header>
+
+            <div class="post-content">
+                <h2>9.3.1 Khái niệm</h2>
+                <p>
+                    <strong>Vector Database</strong> hay còn gọi là <strong>vector store</strong>,
+                    <strong>vector search engine</strong> là một loại cơ sở dữ liệu được thiết kế
+                    chuyên biệt để lưu trữ, chỉ mục và truy vấn các <strong>vector embeddings</strong>
+                    là biểu diễn số của dữ liệu phức tạp như hình ảnh, văn bản, âm thanh, sensor data.
+                </p>
+                <p>
+                    Trong khi các cơ sở dữ liệu truyền thống quản lý dữ liệu dưới dạng scalar như số,
+                    chuỗi, ngày tháng, thì Vector Database xử lý tốt dữ liệu đa chiều, từ hàng trăm
+                    đến hàng chục nghìn chiều do các embedding tạo ra. Các vector này chứa đặc trưng
+                    ngữ nghĩa quan trọng để phục vụ cho các ứng dụng AI như <strong>similarity search</strong>,
+                    <strong>semantic retrieval</strong> và <strong>retrieval-augmented generation</strong>.
+                </p>
+
+                <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                    <h3 style="margin-top: 0;">Tổng quan quy trình</h3>
+                    <p style="margin-bottom: 10px;">
+                        Context/Application → Embedding Model → Vector Embedding → Vector Database → Query Results
+                    </p>
+                    <div class="formula">
+                        <p>[0.1, 0.3, ..., 0.5]</p>
+                    </div>
+                </div>
+
+                <p>Hãy cùng phân tích quy trình trên:</p>
+                <ul>
+                    <li>Đầu tiên, chúng ta sử dụng mô hình nhúng để tạo các vector nhúng cho nội dung cần lập chỉ mục.</li>
+                    <li>Vector embedding được chèn vào Vector Database cùng với một số tham chiếu đến nội dung gốc của vector đó.</li>
+                    <li>Khi ứng dụng đưa ra truy vấn, chúng ta dùng cùng Embedding Model để tạo vector embedding cho truy vấn.</li>
+                    <li>Từ vector truy vấn này, hệ thống tìm các vector embedding tương đồng trong Vector Database.</li>
+                    <li>Sau đó từ các vector tương đồng, hệ thống tham chiếu ngược lại nội dung gốc để trả kết quả cho người dùng.</li>
+                </ul>
+
+                <h2>9.3.2 Embedding</h2>
+                <p>
+                    <strong>Embedding</strong> là quá trình chuyển đổi dữ liệu thô như văn bản, hình ảnh,
+                    âm thanh hoặc video thành một vector số nhiều chiều, trong đó mỗi chiều đại diện cho
+                    một đặc trưng ngữ nghĩa hoặc hình thái của dữ liệu.
+                </p>
+                <p>
+                    Việc biểu diễn như vậy giúp các hệ thống AI và Vector Database có thể tính toán độ
+                    tương đồng giữa các đối tượng mà không cần hiểu trực tiếp ngôn ngữ tự nhiên, hình ảnh
+                    thô hay âm thanh.
+                </p>
+
+                <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #1976D2;">Vì sao cần embedding?</h3>
+                    <ul style="margin-bottom: 0;">
+                        <li>Dữ liệu như văn bản, hình ảnh vốn ở dạng rời rạc, không thể so sánh trực tiếp.</li>
+                        <li>Embedding giúp đưa dữ liệu về cùng một không gian vector, nơi mọi dữ liệu đều trở thành một điểm trong không gian đó.</li>
+                        <li>Nhờ đó, việc tìm kiếm tương tự, phân cụm hay recommendation đều chỉ cần đo khoảng cách giữa các vector.</li>
+                    </ul>
+                </div>
+
+                <h2>9.3.3 Indexing trong Vector Database</h2>
+                <p>
+                    Sau khi dữ liệu đã được chuyển đổi thành vector embedding, bước tiếp theo trong Vector
+                    Database là <strong>indexing</strong>, tức xây dựng chỉ mục giúp tối ưu khả năng truy vấn
+                    tìm kiếm gần đúng <strong>Approximate Nearest Neighbor - ANN</strong> với tốc độ nhanh và
+                    chi phí hợp lý ngay cả trên dữ liệu lớn.
+                </p>
+
+                <p>Vì sao cần indexing?</p>
+                <ul>
+                    <li>Với hàng triệu đến hàng tỷ vector, việc so sánh trực tiếp brute-force search là phi thực tế do chi phí tính toán quá lớn.</li>
+                    <li>Index giúp tổ chức các vector thông minh để chỉ cần tìm kiếm trong một phần nhỏ không gian vector nhưng vẫn giữ độ chính xác cao.</li>
+                </ul>
+
+                <p>
+                    Trong phạm vi bài này, chúng ta sẽ tìm hiểu ba cách indexing dữ liệu từ cơ bản đến nâng cao:
+                    <strong>Flat Index</strong>, <strong>IVF</strong> và <strong>PQ</strong>.
+                </p>
+
+                <h3>Flat Index</h3>
+                <p>
+                    Flat Index là một tên gọi khác của tìm kiếm brute-force. Tất cả các vector được lưu
+                    trong một cấu trúc chỉ mục duy nhất mà không có bất kỳ tổ chức phân cấp nào.
+                </p>
+                <p>
+                    Cách tiếp cận này khá giống với KNN: hệ thống sẽ so sánh vector truy vấn với toàn bộ
+                    các vector đã lưu bằng một độ đo khoảng cách như <strong>L2</strong>,
+                    <strong>Cosine</strong> hoặc <strong>Dot Product</strong>, sau đó trả về
+                    <strong>k</strong> kết quả gần nhất.
+                </p>
+
+                <div style="background: #fafafa; border: 1px solid #e5e5e5; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                    <p style="margin: 0;"><strong>Query Vector</strong> → so sánh với toàn bộ dataset → <strong>Results (k)</strong></p>
+                </div>
+
+                <p>Đặc điểm của phương pháp này:</p>
+                <ul>
+                    <li>Chính xác tuyệt đối vì so sánh toàn bộ vector dataset.</li>
+                    <li>Không cần build index phức tạp.</li>
+                    <li>Chi phí tính toán cao nếu dataset lớn, đặc biệt từ hàng triệu vector trở lên.</li>
+                </ul>
+                <p>
+                    Chúng ta thường dùng Flat Index khi dataset nhỏ đến trung bình, khoảng vài nghìn đến vài
+                    trăm nghìn vector, hoặc khi cần đảm bảo độ chính xác tuyệt đối và không quá hạn chế tài nguyên.
+                </p>
+
+                <h3>Inverted File Index - IVF</h3>
+                <p>
+                    IVF là một trong những kỹ thuật lập chỉ mục đơn giản và trực quan nhất. Dù thường được
+                    dùng trong các hệ thống truy xuất văn bản, IVF cũng có thể điều chỉnh cho cơ sở dữ liệu
+                    vector để tìm kiếm xấp xỉ lân cận gần nhất.
+                </p>
+
+                <p>IVF hoạt động như sau:</p>
+                <ul>
+                    <li>Sử dụng các thuật toán phân cụm để chia toàn bộ vector trong dataset thành nhiều cluster khác nhau.</li>
+                    <li>Mỗi cluster có một trọng tâm centroid tương ứng, và mỗi vector được gán vào cluster có centroid gần nhất.</li>
+                    <li>Khi truy vấn, thay vì so sánh với toàn bộ dataset, hệ thống chỉ cần tìm centroid gần nhất với vector truy vấn.</li>
+                    <li>Sau đó việc tìm kiếm gần nhất chỉ diễn ra trong cluster tương ứng hoặc một số cluster gần nhất.</li>
+                </ul>
+
+                <p>
+                    Giả sử có <strong>N</strong> vector, mỗi vector có <strong>D</strong> chiều, thì Flat Index
+                    có độ phức tạp gần mức <strong>O(ND)</strong>. Với IVF, nếu có <strong>k</strong> centroid,
+                    hệ thống chỉ cần xét centroid gần nhất trước rồi tìm trong vùng dữ liệu nhỏ hơn, nhờ đó giảm
+                    đáng kể chi phí truy vấn thực tế.
+                </p>
+
+                <div style="background: #fffaf2; border: 1px solid #ffe0a8; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                    <p style="margin: 0;">
+                        Dataset → Clustering → Centroids → Query chỉ tìm trong cluster liên quan
+                    </p>
+                </div>
+
+                <h3>Product Quantization - PQ</h3>
+                <p>
+                    Ý tưởng của lượng tử hóa là nén dữ liệu nhưng vẫn cố gắng bảo toàn thông tin quan trọng.
+                    Với <strong>Product Quantization</strong>, vector gốc có <strong>d</strong> chiều được chia
+                    thành <strong>m</strong> segment nhỏ hơn.
+                </p>
+
+                <p>Cách PQ tổ chức dữ liệu trong database:</p>
+                <ul>
+                    <li>Vector gốc d chiều được chia thành m segment.</li>
+                    <li>Với mỗi segment, thuật toán K-means được áp dụng để tạo một codebook gồm các centroid đại diện.</li>
+                    <li>Thay vì lưu toàn bộ giá trị thực của segment, hệ thống chỉ lưu chỉ số centroid tương ứng.</li>
+                    <li>Kết quả là vector gốc có thể được nén từ vài KB xuống chỉ còn vài bytes.</li>
+                </ul>
+
+                <p>
+                    Khi truy vấn với vector <strong>Q</strong>, ta cũng chia Q thành các segment tương tự, rồi tính
+                    khoảng cách từ từng segment của Q tới các centroid tương ứng để tạo ra một bảng tra khoảng cách.
+                    Sau đó, với mỗi PQ code trong database, hệ thống tra khoảng cách ở từng segment và cộng lại để
+                    ước tính khoảng cách giữa Q và vector đã lưu. Vector có tổng khoảng cách nhỏ nhất sẽ được xem
+                    là gần nhất.
+                </p>
+
+                <div style="background: #f6fff8; border: 1px solid #bfe7c9; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                    <p style="margin: 0;">
+                        Query vector → chia segment → lookup distance → cộng tổng → chọn vector gần nhất
+                    </p>
+                </div>
+
+                <h2>So sánh một số công cụ Vector Database phổ biến</h2>
+                <p>
+                    Vector Database Tools là các công cụ chuyên dụng được thiết kế để lưu trữ, indexing và
+                    tìm kiếm dữ liệu dưới dạng vector embeddings, tức các biểu diễn số học đa chiều của dữ liệu
+                    phi cấu trúc như text, hình ảnh, âm thanh hoặc video.
+                </p>
+
+                <table>
+                    <tr>
+                        <th>Công cụ</th>
+                        <th>Đặc điểm chính</th>
+                        <th>Ưu điểm</th>
+                        <th>Hạn chế</th>
+                    </tr>
+                    <tr>
+                        <td>Faiss</td>
+                        <td>Library C++/Python, không có persistence.</td>
+                        <td>Hiệu năng rất cao, hỗ trợ nhiều thuật toán ANN.</td>
+                        <td>Không lưu trữ dữ liệu lâu dài.</td>
+                    </tr>
+                    <tr>
+                        <td>Milvus</td>
+                        <td>Distributed, persistent, hỗ trợ REST API.</td>
+                        <td>Production-ready, hỗ trợ nhiều metric.</td>
+                        <td>Cần vận hành hạ tầng riêng.</td>
+                    </tr>
+                    <tr>
+                        <td>Weaviate</td>
+                        <td>Semantic search, GraphQL API.</td>
+                        <td>Tích hợp mô hình ngôn ngữ, dễ dùng.</td>
+                        <td>Hạn chế backend tùy biến ở một số tình huống.</td>
+                    </tr>
+                    <tr>
+                        <td>Pinecone</td>
+                        <td>SaaS, dễ deploy, auto-scale.</td>
+                        <td>Không cần quản lý hạ tầng.</td>
+                        <td>Phụ thuộc vào nhà cung cấp.</td>
+                    </tr>
+                    <tr>
+                        <td>pgvector</td>
+                        <td>Extension cho PostgreSQL.</td>
+                        <td>Dễ tích hợp với RDBMS hiện có.</td>
+                        <td>Hiệu năng thấp hơn các hệ chuyên dụng.</td>
+                    </tr>
+                </table>
+
+                <h2>Kết luận</h2>
+                <p>
+                    Vector Database là thành phần quan trọng trong các hệ thống AI hiện đại khi dữ liệu cần được
+                    biểu diễn dưới dạng embedding và truy vấn theo mức độ tương đồng. Giá trị cốt lõi của nó không
+                    chỉ nằm ở việc lưu vector, mà còn ở khả năng indexing và tìm kiếm gần đúng hiệu quả trên tập dữ
+                    liệu rất lớn.
+                </p>
+                <p>
+                    Ba kỹ thuật thường gặp gồm Flat Index, IVF và PQ thể hiện ba mức đánh đổi khác nhau giữa
+                    độ chính xác, tốc độ và chi phí lưu trữ. Việc chọn công cụ như Faiss, Milvus, Weaviate,
+                    Pinecone hay pgvector sẽ phụ thuộc vào quy mô hệ thống, yêu cầu triển khai và mức độ kiểm
+                    soát hạ tầng mà bạn cần.
+                </p>
+            </div>
+
+            <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <a href="SQL_database.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                        <strong>SQL Database</strong>
+                        <p style="font-size: 0.9em; margin: 5px 0 0 0;">Kiến thức nền về hệ quản trị cơ sở dữ liệu</p>
+                    </a>
+                    <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                        <strong>Trang chủ</strong>
+                        <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết hiện có</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="post-navigation" style="display: flex; justify-content: space-between; gap: 15px; margin-top: 30px;">
+                <a href="../index.html" style="padding: 10px 20px; background-color: #f5f5f5; border-radius: 5px; text-decoration: none; color: #333; flex: 1; text-align: left;">← Quay lại trang chủ</a>
+                <a href="SQL_database.html" style="padding: 10px 20px; background-color: #2196F3; border-radius: 5px; text-decoration: none; color: white; flex: 1; text-align: right;">Bài liên quan: SQL Database →</a>
+            </div>
+        </article>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+</body>
+</html>
