@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conda - Trình quản lý gói và môi trường cho Python & Data Science - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <!-- Highlight.js cho tô màu code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        pre code.hljs {
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Conda: Trình quản lý gói và môi trường cho Python & Data Science</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 11/04/2026</span>
+                        <span>Chuyên mục: Công cụ cho Data Science</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#conda</span>
+                        <span>#python</span>
+                        <span>#environment</span>
+                        <span>#package-manager</span>
+                        <span>#datascience</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa Conda</h2>
+                    <p><strong>Conda</strong> là một trình quản lý gói mã nguồn mở và hệ thống quản lý môi trường, chạy trên Windows, macOS và Linux. Conda được phát triển bởi Anaconda Inc., đặc biệt phổ biến trong cộng đồng <strong>Data Science</strong> và <strong>Machine Learning</strong>. Nó có thể nhanh chóng cài đặt, chạy và cập nhật các gói phần mềm cùng các phụ thuộc của chúng.</p>
+                    <p>Khác với <code>pip</code> (chỉ quản lý gói Python), Conda có thể quản lý <strong>gói đa ngôn ngữ</strong> (Python, R, C/C++, Julia, v.v.) và toàn bộ môi trường bao gồm cả các thư viện hệ thống như CUDA, OpenCV, v.v.</p>
+                    <p>Conda được cài sẵn trong các bản phân phối <strong>Anaconda</strong> (đầy đủ) và <strong>Miniconda</strong> (nhẹ, chỉ có conda + Python).</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">🔄 So sánh Conda vs Pip</h3>
+                        <ul>
+                            <li><strong>Ngôn ngữ</strong>: Conda đa ngôn ngữ; Pip chỉ Python.</li>
+                            <li><strong>Phụ thuộc</strong>: Conda kiểm tra xung đột tốt hơn, có thể cài thư viện hệ thống.</li>
+                            <li><strong>Môi trường</strong>: Conda tích hợp quản lý môi trường; Pip cần thêm virtualenv.</li>
+                            <li><strong>Binary</strong>: Conda cài sẵn binary; Pip thường build từ source (có thể lỗi).</li>
+                        </ul>
+                    </div>
+
+                    <h2>II. Lợi ích của Conda</h2>
+                    <p>Sử dụng Conda mang lại nhiều lợi ích quan trọng:</p>
+                    <ul>
+                        <li><strong>Quản lý môi trường độc lập</strong>: Tạo các môi trường riêng biệt cho từng dự án, tránh xung đột giữa các phiên bản thư viện.</li>
+                        <li><strong>Cài đặt gói nhanh chóng, ổn định</strong>: Conda sử dụng các binary được biên dịch sẵn, hạn chế lỗi build từ source.</li>
+                        <li><strong>Hỗ trợ nhiều phiên bản Python</strong>: Dễ dàng chuyển đổi giữa Python 3.8, 3.9, 3.10... trong các môi trường khác nhau.</li>
+                        <li><strong>Quản lý gói phi Python</strong>: Có thể cài đặt các công cụ như Jupyter, TensorFlow với CUDA, OpenCV, R, v.v.</li>
+                        <li><strong>Không cần quyền admin</strong>: Cài đặt gói trong không gian người dùng, an toàn.</li>
+                        <li><strong>Reproducibility</strong>: Xuất file <code>environment.yml</code> để tái tạo chính xác môi trường.</li>
+                    </ul>
+
+                    <h2>III. Một vài cú pháp cơ bản</h2>
+                    <p>Dưới đây là các lệnh Conda thông dụng nhất (chạy trong terminal hoặc Anaconda Prompt).</p>
+
+                    <h3>1. Kiểm tra phiên bản và thông tin</h3>
+                    <pre><code class="language-bash">conda --version
+conda info</code></pre>
+
+                    <h3>2. Quản lý môi trường</h3>
+                    <pre><code class="language-bash"># Tạo môi trường mới với Python 3.9
+conda create --name myenv python=3.9
+
+# Kích hoạt môi trường
+conda activate myenv
+
+# Tạm dừng kích hoạt (về base)
+conda deactivate
+
+# Liệt kê tất cả môi trường
+conda env list
+
+# Xóa môi trường
+conda remove --name myenv --all
+
+# Sao chép môi trường
+conda create --name newenv --clone oldenv
+
+# Xuất môi trường ra file YAML
+conda env export > environment.yml
+
+# Tạo môi trường từ file YAML
+conda env create -f environment.yml</code></pre>
+
+                    <h3>3. Quản lý gói</h3>
+                    <pre><code class="language-bash"># Cài gói từ channel mặc định
+conda install numpy pandas matplotlib
+
+# Cài gói từ channel conda-forge (có nhiều gói mới)
+conda install -c conda-forge jupyterlab
+
+# Cài gói từ pip (nếu không có trong conda)
+pip install some-package
+
+# Cài phiên bản cụ thể
+conda install scikit-learn=1.2.0
+
+# Liệt kê các gói trong môi trường hiện tại
+conda list
+
+# Cập nhật một gói
+conda update numpy
+
+# Cập nhật tất cả gói
+conda update --all
+
+# Xóa gói
+conda remove numpy</code></pre>
+
+                    <h3>4. Tìm kiếm gói</h3>
+                    <pre><code class="language-bash"># Tìm gói có chứa từ khóa
+conda search tensorflow
+
+# Tìm với channel cụ thể
+conda search -c conda-forge pytorch</code></pre>
+
+                    <h3>5. Cập nhật Conda và quản lý channel</h3>
+                    <pre><code class="language-bash"># Cập nhật conda lên phiên bản mới nhất
+conda update conda
+
+# Cập nhật anaconda metapackage (nếu dùng full Anaconda)
+conda update anaconda
+
+# Thêm channel (ví dụ conda-forge) ưu tiên
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+
+# Xem các channel đã cấu hình
+conda config --show channels</code></pre>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">💡 Mẹo thực hành</h3>
+                        <ul>
+                            <li>Luôn tạo môi trường riêng cho mỗi dự án: <code>conda create -n project_name python=3.x</code>.</li>
+                            <li>Sử dụng channel <code>conda-forge</code> vì nó có rất nhiều gói và thường xuyên cập nhật.</li>
+                            <li>Sau khi cài xong môi trường, nên lưu file <code>environment.yml</code> vào git để đồng đội dễ dàng tái tạo.</li>
+                            <li>Để tiết kiệm dung lượng, dùng Miniconda thay vì Anaconda đầy đủ.</li>
+                        </ul>
+                    </div>
+
+                    <h2>IV. Kết luận</h2>
+                    <p>Conda là công cụ không thể thiếu đối với bất kỳ ai làm việc với Python trong Data Science, Machine Learning hay các dự án phức tạp. Với khả năng quản lý môi trường và gói vượt trội, nó giúp bạn tránh được những đau đầu về xung đột thư viện, tái tạo kết quả dễ dàng. Kết hợp giữa conda và pip khi cần sẽ mang lại hiệu quả tối ưu.</p>
+                    <p>Bài tiếp theo sẽ hướng dẫn sử dụng <strong>Docker với Conda</strong> để đóng gói môi trường cho ứng dụng ML.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="fastapi.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>FastAPI</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Web Framework hiện đại</p>
+                        </a>
+                        <a href="docker-part1.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Docker Phần 1</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Container cơ bản</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="fastapi.html">← Previous: FastAPI</a>
+                    <a href="conda-advanced.html">Next: Conda nâng cao →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
