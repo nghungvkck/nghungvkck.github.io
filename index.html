@@ -5,121 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nghung-Blog</title>
     <link rel="stylesheet" href="css/style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-left">
-            <h2 class="logo">nghung-Blog</h2>
-            <a href="index.html">Trang chủ</a>
+            <a href="index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+        <div class="nav-right">
             <div class="dropdown">
-                <button class="dropdown-btn">Danh mục ▼</button>
+                <!-- <button class="dropdown-btn">Tools <span aria-hidden="true">⌄</span></button> -->
                 <div class="dropdown-content">
-                    <a href="#machine-learning">Các hàm Loss trong Machine Learning</a>
+                    <a href="#machine-learning">Machine Learning</a>
                     <a href="#database-ai">Database và Vector Search</a>
                 </div>
             </div>
+            <!-- <button class="icon-btn" aria-label="Apps">⌘</button>
+            <button class="icon-btn" aria-label="Search">⌕</button>
+            <a href="#" class="profile-chip">
+                <span class="profile-avatar">VH</span>
+                <span class="profile-name">Văn Hưng Nguyễn</span>
+            </a> -->
         </div>
     </nav>
 
-    <section class="title">
+    <section class="hero">
+        <p class="eyebrow">Nghung Blog</p>
         <h1>Bài viết nổi bật</h1>
     </section>
 
-    <div class="tags">
+    <!-- <div class="tags">
         <span>#machine learning</span>
         <span>#loss functions</span>
         <span>#database</span>
         <span>#vector database</span>
         <span>#semantic search</span>
-    </div>
+    </div> -->
 
     <main class="posts">
-        <section id="machine-learning" style="width: 100%; margin: 30px 0;">
-            <h2 style="color: #2196F3; border-bottom: 3px solid #2196F3; padding-bottom: 10px; margin-bottom: 20px;">
-                Các hàm Loss trong Machine Learning
-            </h2>
+        <section id="machine-learning" class="post-section">
+            <div class="section-heading">
+                <h2>Các hàm Loss trong Machine Learning</h2>
+                <p>Nhóm bài viết nền tảng về loss function, cách hoạt động và tình huống nên dùng.</p>
+            </div>
 
-            <a href="pages/focal-loss.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
+            <a href="pages/focal-loss.html" class="post-link">
+                <article class="card">
                     <img src="images/focal.png" alt="Focal Loss" />
                     <div class="card-content">
                         <h3>Focal Loss</h3>
-                        <p>Hàm loss cho bài toán mất cân bằng dữ liệu.</p>
+                        <p>Hàm loss cho bài toán mất cân bằng dữ liệu, đặc biệt hữu ích trong object detection.</p>
+                        <span class="post-date">30 Thg 03 2026</span>
                     </div>
-                </div>
+                </article>
             </a>
 
-            <a href="pages/mse-loss.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
+            <a href="pages/mse-loss.html" class="post-link">
+                <article class="card">
                     <img src="images/MSE.png" alt="MSE Loss" />
                     <div class="card-content">
                         <h3>Mean Squared Error (MSE)</h3>
-                        <p>Hàm loss cơ bản cho bài toán hồi quy.</p>
+                        <p>Loss cơ bản cho hồi quy, dễ tối ưu nhưng khá nhạy với các điểm dữ liệu bất thường.</p>
+                        <span class="post-date">30 Thg 03 2026</span>
                     </div>
-                </div>
+                </article>
             </a>
 
-            <a href="pages/huber-loss.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
+            <a href="pages/huber-loss.html" class="post-link">
+                <article class="card">
                     <img src="images/huber-loss-function.png" alt="Huber Loss" />
                     <div class="card-content">
                         <h3>Huber Loss</h3>
-                        <p>Kết hợp ưu điểm của MSE và MAE.</p>
+                        <p>Kết hợp ưu điểm của MSE và MAE để vừa mượt khi tối ưu vừa ổn định hơn với nhiễu.</p>
+                        <span class="post-date">30 Thg 03 2026</span>
                     </div>
-                </div>
+                </article>
             </a>
 
-            <a href="pages/mae-loss.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
+            <a href="pages/mae-loss.html" class="post-link">
+                <article class="card">
                     <img src="images/MAE.png" alt="MAE Loss" />
                     <div class="card-content">
                         <h3>Mean Absolute Error (MAE)</h3>
-                        <p>Bền vững hơn với outlier trong dữ liệu.</p>
+                        <p>Bền hơn trước outlier, phù hợp khi bạn muốn giảm tác động của sai số quá lớn.</p>
+                        <span class="post-date">30 Thg 03 2026</span>
                     </div>
-                </div>
+                </article>
             </a>
         </section>
 
-        <section id="database-ai" style="width: 100%; margin: 30px 0;">
-            <h2 style="color: #FF9800; border-bottom: 3px solid #FF9800; padding-bottom: 10px; margin-bottom: 20px;">
-                Database và Vector Search
-            </h2>
+        <section id="database-ai" class="post-section">
+            <div class="section-heading">
+                <h2>Database và Vector Search</h2>
+                <p>Chuỗi bài viết về SQL, vector database và các thước đo khoảng cách cho embedding.</p>
+            </div>
 
-            <a href="pages/SQL_database.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
+            <a href="pages/SQL_database.html" class="post-link">
+                <article class="card">
                     <img src="images/SQL-Databases.png" alt="SQL Database" />
                     <div class="card-content">
                         <h3>SQL Database</h3>
-                        <p>Kiến thức nền về hệ quản trị cơ sở dữ liệu quan hệ.</p>
+                        <p>Kiến thức nền về hệ quản trị cơ sở dữ liệu quan hệ và cách tổ chức dữ liệu hợp lý.</p>
+                        <span class="post-date">30 Thg 03 2026</span>
                     </div>
-                </div>
+                </article>
             </a>
 
-            <a href="pages/vector-database.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
+            <a href="pages/vector-database.html" class="post-link">
+                <article class="card">
                     <img src="images/vector-database-la-gi.img.png" alt="Vector Database" />
                     <div class="card-content">
                         <h3>Vector Database</h3>
-                        <p>Khái niệm, cách hoạt động và ứng dụng trong AI.</p>
+                        <p>Khái niệm, cách hoạt động và vai trò của vector database trong các hệ AI hiện đại.</p>
+                        <span class="post-date">30 Thg 03 2026</span>
                     </div>
-                </div>
+                </article>
             </a>
 
-            <a href="pages/vector-distance-metrics.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                    <img src="images/vector-database-la-gi.img.png" alt="Distance Metrics" />
+            <a href="pages/vector-distance-metrics.html" class="post-link">
+                <article class="card">
+                    <img src="images/Tong_Quan_ve_vector_database.png" alt="Distance Metrics" />
                     <div class="card-content">
                         <h3>Distance Metrics</h3>
-                        <p>Công thức L1, L2, Cosine và Dot Product cho embedding và vector search.</p>
+                        <p>Công thức L1, L2, Cosine và Dot Product cho embedding, truy vấn và so khớp vector.</p>
+                        <span class="post-date">30 Thg 03 2026</span>
                     </div>
-                </div>
+                </article>
             </a>
         </section>
     </main>
 
-    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
-        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    <footer class="home-footer">
+        <a href="index.html" class="brand-mark" aria-label="nghung Blog">
+            <span class="brand-ring"></span>
+        </a>
+        <a href="about.html" class="home-footer-link">About me</a>
+        <p class="home-footer-credit">Developed by <a href="#">Hưng</a></p>
     </footer>
 </body>
 </html>
