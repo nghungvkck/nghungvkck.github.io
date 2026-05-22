@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streamlit - Framework ứng dụng dữ liệu cho Python - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Streamlit: Framework xây dựng ứng dụng dữ liệu với Python</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 09/04/2026</span>
+                        <span>Chuyên mục: Công cụ cho Data Science</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#streamlit</span>
+                        <span>#dashboard</span>
+                        <span>#datascience</span>
+                        <span>#python</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa Streamlit</h2>
+                    <p><strong>Streamlit</strong> là một framework mã nguồn mở dành cho Python, được thiết kế để giúp các nhà khoa học dữ liệu và kỹ sư machine learning nhanh chóng xây dựng ứng dụng web tương tác mà <strong>không cần kiến thức về HTML, CSS hay JavaScript</strong>. Toàn bộ giao diện được tạo ra bằng các câu lệnh Python thuần túy, cho phép biến các script phân tích dữ liệu thành các ứng dụng có thể chia sẻ trong vài phút.</p>
+                    <p>Streamlit ra đời năm 2019, giải quyết bài toán “khoảng cách” giữa mô hình machine learning trong notebook và sản phẩm thực tế có thể tương tác. Chỉ với một file <code>.py</code>, bạn có thể chạy ứng dụng ngay lập tức và chia sẻ qua web.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">🎯 Đặc trưng nổi bật</h3>
+                        <ul>
+                            <li>Chỉ cần Python – không cần frontend.</li>
+                            <li>Hot-reload: sửa code, lưu là ứng dụng tự động cập nhật.</li>
+                            <li>Hỗ trợ caching, session state, và nhiều widget tương tác.</li>
+                            <li>Tích hợp sẵn với Pandas, Matplotlib, Plotly, Altair, v.v.</li>
+                        </ul>
+                    </div>
+
+                    <h2>II. Vai trò và tiện ích của Streamlit</h2>
+                    <p>Streamlit không phải là một framework web đa năng, mà là công cụ <strong>chuyên biệt</strong> cho các tác vụ liên quan đến dữ liệu và machine learning. Vai trò chính của nó bao gồm:</p>
+                    <ul>
+                        <li><strong>Tạo dashboard và báo cáo tương tác</strong>: Thay vì gửi file Jupyter Notebook hay PowerPoint, bạn có thể xây dựng dashboard trực quan với các bộ lọc, biểu đồ động, số liệu thống kê cập nhật theo thời gian thực.</li>
+                        <li><strong>Demo và chia sẻ mô hình Machine Learning</strong>: Streamlit là lựa chọn hàng đầu để tạo giao diện demo cho mô hình phân loại, hồi quy, hay xử lý ảnh. Người dùng có thể nhập dữ liệu đầu vào, chạy suy luận và xem kết quả ngay lập tức.</li>
+                        <li><strong>Xây dựng công cụ nội bộ (internal tools) nhanh chóng</strong>: Trong doanh nghiệp, nhu cầu tạo các công cụ nhỏ để xem log, kiểm tra dữ liệu, quản lý model, hay giám sát pipeline là rất lớn. Streamlit cho phép làm điều này trong vài giờ thay vì vài ngày.</li>
+                        <li><strong>Hỗ trợ triển khai dễ dàng</strong>: Có thể deploy miễn phí lên <strong>Streamlit Community Cloud</strong> trực tiếp từ GitHub, hoặc đóng gói thành Docker để chạy trên server riêng.</li>
+                    </ul>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">🔄 So sánh nhanh với các framework khác</h3>
+                        <ul>
+                            <li><strong>Streamlit</strong>: Tối ưu cho dashboard, phân tích dữ liệu, ứng dụng phức tạp.</li>
+                            <li><strong>Gradio</strong>: Cực kỳ đơn giản, lý tưởng để demo mô hình ML nhanh.</li>
+                            <li><strong>Dash</strong>: Mạnh mẽ, hướng doanh nghiệp, nhưng cần hiểu React.</li>
+                            <li><strong>Flask</strong>: Framework web tổng quát, tùy biến cao nhưng cần kiến thức frontend.</li>
+                        </ul>
+                    </div>
+
+                    <h2>III. Kết luận</h2>
+                    <p>Streamlit đã trở thành công cụ không thể thiếu trong hệ sinh thái Python cho data science và MLOps. Với khả năng chuyển đổi nhanh từ ý tưởng thành ứng dụng web tương tác, nó giúp rút ngắn thời gian đưa mô hình vào thực tiễn, tăng khả năng chia sẻ và cộng tác trong nhóm. Dù bạn là nhà phân tích dữ liệu, nhà khoa học dữ liệu, hay kỹ sư ML, Streamlit đều là một lựa chọn đáng cân nhắc.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="docker-part1.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Docker - Phần 1</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Container và triển khai</p>
+                        </a>
+                        <a href="decision-tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Decision Tree</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Cây quyết định</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="docker-part1.html">← Previous: Docker Phần 1</a>
+                    <a href="gradio.html">Next: Gradio →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

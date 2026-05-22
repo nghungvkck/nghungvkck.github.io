@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Các hàm Loss quan trọng: MSE, MAE, Huber, Focal Loss - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Các hàm Loss quan trọng: MSE, MAE, Huber và Focal Loss</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 08/04/2026</span>
+                        <span>Chuyên mục: Machine Learning & Deep Learning</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#loss-function</span>
+                        <span>#mse</span>
+                        <span>#mae</span>
+                        <span>#huber</span>
+                        <span>#focal-loss</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <p>Trong học máy và học sâu, <strong>hàm loss (hàm mất mát)</strong> đóng vai trò then chốt để đánh giá mức độ sai lệch giữa dự đoán của mô hình và giá trị thực tế. Việc chọn đúng hàm loss ảnh hưởng trực tiếp đến chất lượng và tốc độ hội tụ. Bài viết này giới thiệu bốn hàm loss phổ biến: <strong>MSE, MAE, Huber, Focal Loss</strong> – mỗi loại có ưu nhược điểm riêng phù hợp với từng bài toán cụ thể.</p>
+
+                    <h2>I. Mean Squared Error (MSE)</h2>
+                    <p><strong>Mean Squared Error (MSE)</strong> hay còn gọi là <strong>L2 Loss</strong> là hàm loss cơ bản nhất cho bài toán hồi quy. Nó tính trung bình bình phương các sai lệch giữa giá trị dự đoán \(\hat{y}_i\) và giá trị thực \(y_i\).</p>
+                    <div class="formula">
+                        \[
+                        \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+                        \]
+                    </div>
+                    <p><strong>Đặc điểm:</strong></p>
+                    <ul>
+                        <li><strong>Dễ tối ưu</strong>: Đạo hàm bậc nhất liên tục, hàm lồi mạnh.</li>
+                        <li><strong>Nhạy với outlier</strong>: Vì bình phương sai số, các điểm bất thường có ảnh hưởng rất lớn.</li>
+                        <li>Phù hợp khi dữ liệu ít nhiễu và không có nhiều giá trị ngoại lai.</li>
+                        <li>Được dùng làm loss mặc định cho nhiều bài toán hồi quy tuyến tính, mạng nơ-ron.</li>
+                    </ul>
+
+                    <h2>II. Mean Absolute Error (MAE)</h2>
+                    <p><strong>Mean Absolute Error (MAE)</strong> hay <strong>L1 Loss</strong> tính trung bình giá trị tuyệt đối của các sai lệch.</p>
+                    <div class="formula">
+                        \[
+                        \text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+                        \]
+                    </div>
+                    <p><strong>Đặc điểm:</strong></p>
+                    <ul>
+                        <li><strong>Bền vững với outlier</strong>: Vì không bình phương, các điểm ngoại lai không ảnh hưởng quá mạnh.</li>
+                        <li><strong>Nhược điểm</strong>: Đạo hàm không liên tục tại 0, gây khó khăn cho tối ưu bằng gradient descent (có thể dùng subgradient).</li>
+                        <li>Phù hợp khi dữ liệu có nhiều giá trị bất thường và bạn muốn mô hình ít bị ảnh hưởng bởi chúng.</li>
+                    </ul>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">📐 So sánh nhanh MSE vs MAE</h3>
+                        <p>Ví dụ: Dự đoán \(\hat{y}=100\), thực tế \(y=0\). MSE = 10000, MAE = 100. Nếu có thêm outlier, MSE bị thổi phồng, MAE ổn định hơn. Tuy nhiên, MSE hội tụ nhanh hơn vì gradient tỉ lệ với sai số.</p>
+                    </div>
+
+                    <h2>III. Huber Loss (Smooth L1)</h2>
+                    <p><strong>Huber Loss</strong> là sự kết hợp giữa MSE và MAE, được giới thiệu bởi Peter Huber. Nó dùng MAE cho sai số lớn và MSE cho sai số nhỏ, thông qua tham số \(\delta\).</p>
+                    <div class="formula">
+                        \[
+                        L_{\delta}(y, \hat{y}) = 
+                        \begin{cases}
+                        \frac{1}{2}(y - \hat{y})^2 & \text{khi } |y - \hat{y}| \le \delta \\
+                        \delta |y - \hat{y}| - \frac{1}{2}\delta^2 & \text{ngược lại}
+                        \end{cases}
+                        \]
+                    </div>
+                    <p><strong>Đặc điểm:</strong></p>
+                    <ul>
+                        <li><strong>Kết hợp ưu điểm</strong>: Mượt như MSE khi sai số nhỏ (đạo hàm liên tục), bền như MAE khi sai số lớn.</li>
+                        <li>Kiểm soát mức độ ảnh hưởng của outlier qua \(\delta\): \(\delta\) càng nhỏ thì càng giống MAE, \(\delta\) càng lớn càng giống MSE.</li>
+                        <li>Thường dùng trong hồi quy bền vững và các mô hình cần sự cân bằng.</li>
+                    </ul>
+
+                    <h2>IV. Focal Loss</h2>
+                    <p><strong>Focal Loss</strong> được giới thiệu trong bài báo <em>“Focal Loss for Dense Object Detection” (Tsung-Yi Lin et al., 2017)</em> của Facebook AI Research (FAIR), nhằm giải quyết bài toán <strong>mất cân bằng dữ liệu (class imbalance)</strong> trong object detection. Nó được xây dựng từ Cross-Entropy Loss.</p>
+                    <p>Với bài toán phân loại nhị phân, Cross-Entropy: \( \text{CE}(p_t) = -\log(p_t) \), trong đó \(p_t\) là xác suất mô hình dự đoán đúng lớp thực. Focal Loss thêm hệ số \((1-p_t)^\gamma\) để giảm trọng số của các mẫu dễ (đã được phân loại tốt) và tập trung vào các mẫu khó.</p>
+                    <div class="formula">
+                        \[
+                        \text{FL}(p_t) = -(1-p_t)^\gamma \log(p_t)
+                        \]
+                    </div>
+                    <p>Thường kết hợp với tham số \(\alpha\) để cân bằng giữa các lớp:</p>
+                    <div class="formula">
+                        \[
+                        \text{FL}(p_t) = -\alpha_t (1-p_t)^\gamma \log(p_t)
+                        \]
+                    </div>
+                    <p>Trong đó \(\gamma \ge 0\) là tham số điều chỉnh (thường \(\gamma=2\)). Khi \(\gamma=0\) thì Focal Loss trở về Cross-Entropy.</p>
+                    <p><strong>Đặc điểm:</strong></p>
+                    <ul>
+                        <li>Giải quyết mất cân bằng giữa số lượng mẫu của các lớp (background vs foreground).</li>
+                        <li>Làm giảm đóng góp của các mẫu dễ (dự đoán đúng với xác suất cao), tập trung vào mẫu khó phân loại.</li>
+                        <li>Được ứng dụng rộng rãi trong object detection (RetinaNet), segmentation, và các bài toán dữ liệu mất cân bằng.</li>
+                    </ul>
+
+                    <div style="background: #fffaf2; border: 1px solid #ffe0a8; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                        <h3>📌 Lưu ý khi chọn hàm Loss</h3>
+                        <ul>
+                            <li><strong>MSE</strong> – hồi quy thông thường, ít outlier.</li>
+                            <li><strong>MAE</strong> – hồi quy có nhiều outlier.</li>
+                            <li><strong>Huber</strong> – cần sự cân bằng, vừa mượt vừa bền.</li>
+                            <li><strong>Focal Loss</strong> – phân loại mất cân bằng dữ liệu, object detection.</li>
+                        </ul>
+                        <p style="margin-top: 10px;">Ngoài ra còn nhiều hàm loss khác như Cross-Entropy, Log-Cosh, Quantile Loss, Triplet Loss… tùy vào đặc thù bài toán.</p>
+                    </div>
+
+                    <h2>V. Kết luận</h2>
+                    <p>Mỗi hàm loss có một vai trò riêng. Hiểu rõ bản chất của MSE, MAE, Huber và Focal Loss giúp bạn lựa chọn hoặc tự thiết kế hàm loss phù hợp cho bài toán hồi quy và phân loại. Trong thực tế, việc thử nghiệm và so sánh các loss khác nhau trên tập validation là cần thiết để đạt kết quả tối ưu.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="decision-tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Decision Tree</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Cây quyết định cho ML</p>
+                        </a>
+                        <a href="random-forest.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Random Forest</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Ensemble learning</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="random-forest.html">← Previous: Random Forest</a>
+                    <a href="../index.html">Back to Home →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

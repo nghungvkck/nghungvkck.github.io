@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FastAPI - Web Framework hiện đại cho Python (Chi tiết) - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <!-- Highlight.js cho tô màu code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        /* Tuỳ chỉnh nhẹ cho code block */
+        pre code.hljs {
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>FastAPI: Web Framework hiện đại cho Python (Chi tiết)</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 10/04/2026</span>
+                        <span>Chuyên mục: Web Framework & API</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#fastapi</span>
+                        <span>#python</span>
+                        <span>#restapi</span>
+                        <span>#websocket</span>
+                        <span>#pydantic</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa FastAPI và Uvicorn</h2>
+                    <p><strong>FastAPI</strong> là một web framework hiện đại, mã nguồn mở dành cho Python, được thiết kế để xây dựng API với hiệu suất cao, dễ dàng và nhanh chóng. Nó được xây dựng dựa trên hai nền tảng chính: <strong>Starlette</strong> (phần web routing và middleware) và <strong>Pydantic</strong> (phần kiểm tra và xác thực dữ liệu). FastAPI hỗ trợ cả <strong>đồng bộ</strong> và <strong>bất đồng bộ</strong> (async/await) một cách tự nhiên.</p>
+                    <p>Một số tính năng nổi bật:</p>
+                    <ul>
+                        <li><strong>Hiệu suất cực cao</strong>: nhờ vào Starlette và Pydantic, FastAPI có tốc độ ngang ngửa NodeJS và Go (theo các benchmark).</li>
+                        <li><strong>Tự động tạo tài liệu API</strong>: hỗ trợ Swagger UI (tại <code>/docs</code>) và ReDoc (tại <code>/redoc</code>) dựa trên OpenAPI.</li>
+                        <li><strong>Kiểm tra dữ liệu tự động</strong>: sử dụng Python type hints để validate request/response.</li>
+                        <li><strong>Hỗ trợ WebSocket, GraphQL, OAuth2, CORS, v.v.</strong></li>
+                    </ul>
+                    <p><strong>Uvicorn</strong> là một ASGI server tốc độ cao được dùng để chạy ứng dụng FastAPI. Nó dựa trên uvloop và httptools, cho phép xử lý hàng nghìn request mỗi giây một cách hiệu quả.</p>
+                    <pre><code class="language-bash"># Cài đặt FastAPI và Uvicorn
+pip install fastapi uvicorn
+
+# Tạo file main.py với nội dung đơn giản
+# Sau đó chạy lệnh:
+uvicorn main:app --reload</code></pre>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">🚀 So sánh FastAPI với Flask</h3>
+                        <ul>
+                            <li><strong>Tốc độ</strong>: FastAPI nhanh hơn đáng kể nhờ async và ASGI.</li>
+                            <li><strong>Validation</strong>: Flask cần thư viện ngoài (như Marshmallow); FastAPI có sẵn Pydantic.</li>
+                            <li><strong>Tài liệu</strong>: FastAPI tự động sinh OpenAPI; Flask không có sẵn.</li>
+                            <li><strong>Async</strong>: Flask hỗ trợ async nhưng còn hạn chế; FastAPI hỗ trợ đầy đủ.</li>
+                        </ul>
+                    </div>
+
+                    <h2>II. REST Architecture</h2>
+                    <p>REST (Representational State Transfer) là một kiến trúc thiết kế API dựa trên các nguyên tắc chính:</p>
+                    <ul>
+                        <li><strong>Client–Server</strong>: phân tách giao diện người dùng và máy chủ.</li>
+                        <li><strong>Stateless</strong>: mỗi yêu cầu từ client chứa đầy đủ thông tin, server không lưu trạng thái giữa các yêu cầu.</li>
+                        <li><strong>Cacheable</strong>: phản hồi có thể được lưu cache để cải thiện hiệu suất.</li>
+                        <li><strong>Uniform Interface</strong>: sử dụng các phương thức HTTP chuẩn (GET, POST, PUT, DELETE, PATCH) và mã trạng thái (200, 201, 400, 404, 500...).</li>
+                        <li><strong>Layered System</strong>: cho phép tồn tại các tầng trung gian (proxy, gateway).</li>
+                        <li><strong>Code on Demand</strong> (không bắt buộc): server có thể gửi mã thực thi cho client.</li>
+                    </ul>
+                    <p>FastAPI hỗ trợ REST một cách tự nhiên. Bạn chỉ cần dùng các decorator như <code>@app.get()</code>, <code>@app.post()</code>, <code>@app.put()</code>, <code>@app.delete()</code> để ánh xạ URL đến các hàm xử lý.</p>
+                    <pre><code class="language-python">from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/items/{item_id}")
+async def get_item(item_id: int):
+    return {"item_id": item_id, "name": "Sample"}</code></pre>
+
+                    <h2>III. FastAPI – Pydantic (Data Validation)</h2>
+                    <p><strong>Pydantic</strong> là thư viện xác thực và phân tích cú pháp dữ liệu dựa trên type hints của Python. Trong FastAPI, bạn định nghĩa các model kế thừa từ <code>BaseModel</code> để mô tả cấu trúc của request body, query parameters, hay response.</p>
+                    <p>Pydantic tự động:</p>
+                    <ul>
+                        <li>Chuyển đổi kiểu dữ liệu (ví dụ: string "123" thành int 123).</li>
+                        <li>Kiểm tra tính hợp lệ (ví dụ: email phải đúng định dạng).</li>
+                        <li>Trả về lỗi 422 với thông báo chi tiết khi dữ liệu không hợp lệ.</li>
+                    </ul>
+                    <pre><code class="language-python">from fastapi import FastAPI
+from pydantic import BaseModel, Field
+from typing import Optional
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str
+    price: float = Field(gt=0, description="Giá phải lớn hơn 0")
+    is_offer: Optional[bool] = None
+    tax: float = Field(default=0.0, ge=0)
+
+@app.post("/items/")
+async def create_item(item: Item):
+    # item đã được validate, có thể dùng trực tiếp
+    total = item.price + item.tax
+    return {"item_name": item.name, "total": total}</code></pre>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3>📦 Nested model và validators</h3>
+                        <pre><code class="language-python">from pydantic import BaseModel, validator
+
+class User(BaseModel):
+    username: str
+    password: str
+
+    @validator('password')
+    def password_length(cls, v):
+        if len(v) < 6:
+            raise ValueError('password too short')
+        return v
+
+class Order(BaseModel):
+    user: User
+    items: list[Item]</code></pre>
+                    </div>
+
+                    <h2>IV. FastAPI – Request Body</h2>
+                    <p>Request body thường được dùng trong các phương thức POST, PUT, PATCH. FastAPI hỗ trợ khai báo body thông qua <strong>Pydantic model</strong> hoặc dùng trực tiếp các kiểu đơn giản với <code>Body()</code>.</p>
+                    <pre><code class="language-python">from fastapi import FastAPI, Body
+
+app = FastAPI()
+
+# Dùng Pydantic model
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
+
+# Dùng Body để nhận một giá trị đơn lẻ
+@app.post("/hello/")
+async def hello(name: str = Body(..., embed=True)):
+    return {"message": f"Hello {name}"}
+
+# Kết hợp path params, query params, và body
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item, q: str = None):
+    return {"item_id": item_id, "item": item.dict(), "query": q}</code></pre>
+                    <p>Bạn cũng có thể dùng <code>Body(..., embed=True)</code> để yêu cầu client gửi JSON có cấu trúc <code>{"name": "value"}</code> thay vì gửi trực tiếp <code>"value"</code>.</p>
+
+                    <h2>V. Uploading Files</h2>
+                    <p>FastAPI hỗ trợ upload file qua kiểu <code>UploadFile</code>. Nó sử dụng cơ chế streaming nên có thể xử lý file lớn mà không chiếm nhiều bộ nhớ. Bạn có thể upload một hoặc nhiều file, kèm theo các trường form khác.</p>
+                    <pre><code class="language-python">from fastapi import FastAPI, File, UploadFile, Form
+from typing import List
+
+app = FastAPI()
+
+# Upload một file
+@app.post("/upload/")
+async def upload_file(file: UploadFile = File(...)):
+    # Đọc nội dung file (dạng bytes)
+    contents = await file.read()
+    # Xử lý nội dung...
+    return {"filename": file.filename, "size": len(contents)}
+
+# Upload nhiều file
+@app.post("/upload-multiple/")
+async def upload_multiple(files: List[UploadFile] = File(...)):
+    result = []
+    for f in files:
+        content = await f.read()
+        result.append({"filename": f.filename, "size": len(content)})
+    return result
+
+# Kết hợp file và form fields
+@app.post("/upload-with-metadata/")
+async def upload_with_metadata(
+    file: UploadFile = File(...),
+    description: str = Form(...),
+    tags: str = Form(...)
+):
+    return {
+        "filename": file.filename,
+        "description": description,
+        "tags": tags.split(",")
+    }</code></pre>
+
+                    <h2>VI. FastAPI – WebSockets</h2>
+                    <p>FastAPI hỗ trợ WebSocket qua Starlette, cho phép xây dựng các ứng dụng real-time như chat, thông báo, streaming. Bạn có thể định nghĩa endpoint WebSocket với <code>@app.websocket("/path")</code>.</p>
+                    <pre><code class="language-python">from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from typing import List
+
+app = FastAPI()
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.send_personal_message(f"You wrote: {data}", websocket)
+            await manager.broadcast(f"Client {client_id} said: {data}")
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client {client_id} left the chat")</code></pre>
+                    <p>WebSocket endpoint có thể dùng cả path parameters, query parameters, và có thể quản lý nhiều kết nối đồng thời.</p>
+
+                    <h2>VII. CRUD Operations (Create, Read, Update, Delete)</h2>
+                    <p>CRUD là bốn thao tác cơ bản với dữ liệu. Trong FastAPI, bạn sẽ tạo các endpoint tương ứng với từng thao tác, thường kết hợp với Pydantic model và lưu trữ tạm (ví dụ: dictionary hoặc database).</p>
+                    <pre><code class="language-python">from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+from typing import List, Dict
+
+app = FastAPI()
+
+# Dữ liệu giả lập trong bộ nhớ
+fake_db: Dict[int, dict] = {}
+counter = 1
+
+class ItemCreate(BaseModel):
+    name: str
+    price: float
+
+class ItemResponse(BaseModel):
+    id: int
+    name: str
+    price: float
+
+# CREATE (POST)
+@app.post("/items/", response_model=ItemResponse, status_code=status.HTTP_201_CREATED)
+def create_item(item: ItemCreate):
+    global counter
+    new_item = {"id": counter, "name": item.name, "price": item.price}
+    fake_db[counter] = new_item
+    counter += 1
+    return new_item
+
+# READ all (GET)
+@app.get("/items/", response_model=List[ItemResponse])
+def read_items():
+    return list(fake_db.values())
+
+# READ one (GET)
+@app.get("/items/{item_id}", response_model=ItemResponse)
+def read_item(item_id: int):
+    if item_id not in fake_db:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return fake_db[item_id]
+
+# UPDATE (PUT)
+@app.put("/items/{item_id}", response_model=ItemResponse)
+def update_item(item_id: int, item: ItemCreate):
+    if item_id not in fake_db:
+        raise HTTPException(status_code=404, detail="Item not found")
+    updated = {"id": item_id, "name": item.name, "price": item.price}
+    fake_db[item_id] = updated
+    return updated
+
+# DELETE (DELETE)
+@app.delete("/items/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_item(item_id: int):
+    if item_id not in fake_db:
+        raise HTTPException(status_code=404, detail="Item not found")
+    del fake_db[item_id]
+    return  # 204 No Content</code></pre>
+                    <p>Lưu ý sử dụng <code>HTTPException</code> để trả về lỗi với mã trạng thái phù hợp. Bạn cũng có thể dùng <code>status</code> module cho các mã phổ biến.</p>
+
+                    <h2>VIII. Response Model</h2>
+                    <p><code>response_model</code> trong decorator của FastAPI giúp bạn kiểm soát dữ liệu trả về: lọc các trường, đảm bảo kiểu, và sinh tài liệu OpenAPI chính xác. Nó hoạt động dựa trên Pydantic model.</p>
+                    <pre><code class="language-python">from pydantic import BaseModel, EmailStr
+
+class UserIn(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+
+class UserOut(BaseModel):
+    username: str
+    email: EmailStr
+    # không có password
+
+@app.post("/users/", response_model=UserOut)
+async def create_user(user: UserIn):
+    # Lưu user vào database (giả lập)
+    # Không trả về password dù user object có chứa password
+    return user  # FastAPI tự động loại bỏ trường password
+
+# Sử dụng response_model với các option
+@app.get("/users/{user_id}", response_model=UserOut, response_model_exclude_unset=True)
+def get_user(user_id: int):
+    # Nếu trường nào không được set (None) sẽ không xuất hiện trong response
+    return {"username": "john", "email": "john@example.com", "password": "secret"}
+
+# response_model_include và response_model_exclude
+@app.get("/users/me", response_model=UserOut, response_model_include={"username"})
+def get_current_user():
+    # Chỉ trả về username, các trường khác bị lược bỏ
+    return {"username": "admin", "email": "admin@example.com", "password": "pass"}</code></pre>
+                    <p>Các option hữu ích:</p>
+                    <ul>
+                        <li><code>response_model_exclude_unset=True</code>: bỏ qua các trường có giá trị mặc định hoặc None.</li>
+                        <li><code>response_model_include</code>: tập hợp các trường muốn giữ lại.</li>
+                        <li><code>response_model_exclude</code>: tập hợp các trường muốn loại bỏ.</li>
+                        <li><code>response_model_by_alias</code>: sử dụng tên alias thay vì tên trường.</li>
+                    </ul>
+
+                    <h2>IX. Kết luận</h2>
+                    <p>FastAPI là một framework mạnh mẽ, hiện đại, và đang ngày càng phổ biến trong cộng đồng Python. Với khả năng tự động validate dữ liệu qua Pydantic, hỗ trợ WebSocket, upload file, response model linh hoạt, cùng hiệu suất vượt trội, FastAPI là lựa chọn hàng đầu cho các dự án API, microservices, và hệ thống real-time. Phần tiếp theo sẽ giới thiệu cách tích hợp FastAPI với SQLAlchemy và PostgreSQL.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="streamlit.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Streamlit</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Framework dữ liệu</p>
+                        </a>
+                        <a href="docker-part1.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Docker Phần 1</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Container cơ bản</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="streamlit.html">← Previous: Streamlit</a>
+                    <a href="fastapi-part2.html">Next: FastAPI - Database Integration →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

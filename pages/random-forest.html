@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Forest - Định nghĩa và Nguyên tắc hoạt động - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Random Forest: Định nghĩa và Nguyên tắc hoạt động</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 07/04/2026 (cập nhật 08/04/2026)</span>
+                        <span>Chuyên mục: Machine Learning nâng cao</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#randomforest</span>
+                        <span>#bagging</span>
+                        <span>#ensemble</span>
+                        <span>#classification</span>
+                        <span>#regression</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Tổng quan Ensemble và Bagging</h2>
+                    <p>Trước khi đi vào Random Forest, cần hiểu nó nằm trong họ kỹ thuật <strong>Ensemble Learning</strong>. Ensemble kết hợp nhiều mô hình yếu để tạo mô hình mạnh. <strong>Bagging (Bootstrap Aggregating)</strong> là một kỹ thuật ensemble quan trọng, trong đó các mô hình được huấn luyện song song trên các tập bootstrap và kết hợp bằng voting hoặc trung bình. Random Forest chính là <strong>Bagging kết hợp với Random Subspace Method</strong> (chọn ngẫu nhiên tập con các đặc trưng tại mỗi nút). Chi tiết về Bagging và Boosting có thể xem trong bài <a href="ensemble-learning.html">Ensemble Learning: Bagging và Boosting</a>.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">🌲 Random Forest là gì?</h3>
+                        <p><strong>Random Forest</strong> là phương pháp học tập hợp xây dựng một số lượng lớn các cây quyết định (decision trees) trên các tập bootstrap khác nhau, đồng thời tại mỗi nút chỉ xét một tập con ngẫu nhiên các đặc trưng. Dự đoán cuối cùng là kết hợp kết quả từ tất cả các cây (bỏ phiếu đa số cho phân loại, trung bình cho hồi quy).</p>
+                    </div>
+
+                    <h2>II. Định nghĩa Random Forest</h2>
+                    <p>Random Forest là một ensemble của các cây quyết định, được huấn luyện với hai nguồn ngẫu nhiên:</p>
+                    <ul>
+                        <li><strong>Bootstrap sampling</strong>: Mỗi cây được huấn luyện trên một tập con dữ liệu lấy mẫu có hoàn lại từ tập gốc.</li>
+                        <li><strong>Random subspace</strong>: Tại mỗi nút, thay vì xét toàn bộ \(M\) đặc trưng, chỉ chọn ngẫu nhiên \(m\) đặc trưng (\(m \ll M\)) để tìm phân tách tốt nhất.</li>
+                    </ul>
+                    <p>Nhờ đó các cây trở nên đa dạng, giảm tương quan, tăng độ chính xác tổng thể.</p>
+
+                    <h3>1. So sánh với cây quyết định đơn lẻ</h3>
+                    <ul>
+                        <li>Cây đơn: dễ overfitting, phương sai cao, nhưng dễ giải thích.</li>
+                        <li>Random Forest: giảm overfitting đáng kể, ổn định hơn, nhưng khó giải thích hơn (black-box hơn).</li>
+                    </ul>
+
+                    <h2>III. Nguyên tắc hoạt động</h2>
+                    <p>Random Forest hoạt động qua các bước sau:</p>
+
+                    <h3>1. Xây dựng rừng (huấn luyện)</h3>
+                    <ol>
+                        <li><strong>Tạo bootstrap samples</strong>: Với \(K\) cây, tạo \(K\) tập con bằng bootstrap từ tập huấn luyện gốc.</li>
+                        <li><strong>Huấn luyện từng cây</strong>:
+                            <ul>
+                                <li>Mỗi cây được phát triển mà không cắt tỉa (max depth).</li>
+                                <li>Tại mỗi nút, chọn ngẫu nhiên \(m\) đặc trưng (thường \(m = \sqrt{M}\) cho phân loại, \(m = M/3\) cho hồi quy).</li>
+                                <li>Chọn đặc trưng và ngưỡng phân tách tốt nhất dựa trên độ đo (Gini, Entropy cho phân loại; phương sai cho hồi quy – chi tiết xem bài <a href="decision-tree.html">Decision Tree</a>).</li>
+                                <li>Lặp lại cho đến khi dừng (số mẫu < min_samples_split hoặc tinh khiết).</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3>2. Dự đoán với rừng</h3>
+                    <ul>
+                        <li><strong>Phân loại</strong>: Mỗi cây bỏ phiếu cho một lớp; lớp có số phiếu cao nhất là kết quả.</li>
+                        <li><strong>Hồi quy</strong>: Mỗi cây đưa ra giá trị số; kết quả là trung bình các giá trị.</li>
+                    </ul>
+
+                    <h3>3. Đánh giá Out-of-Bag (OOB)</h3>
+                    <p>Mỗi cây sử dụng khoảng 63.2% mẫu gốc để huấn luyện, 36.8% còn lại là out-of-bag. Các mẫu OOB có thể được dùng để ước lượng lỗi mà không cần tập validation riêng. OOB error là một ước lượng khách quan và thường khá sát với lỗi trên tập kiểm tra.</p>
+
+                    <h3>4. Độ quan trọng của đặc trưng (Feature Importance)</h3>
+                    <p>Random Forest cung cấp hai cách đo:</p>
+                    <ul>
+                        <li><strong>Mean Decrease Impurity (MDI)</strong>: Tổng mức giảm Gini (hoặc Entropy) do một đặc trưng gây ra, trung bình trên tất cả cây.</li>
+                        <li><strong>Mean Decrease Accuracy (MDA)</strong>: Xáo trộn ngẫu nhiên giá trị của một đặc trưng trong OOB và đo độ giảm độ chính xác. Giảm càng nhiều thì đặc trưng càng quan trọng.</li>
+                    </ul>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">📐 Tham số quan trọng trong Random Forest (scikit-learn)</h3>
+                        <ul>
+                            <li><code>n_estimators</code>: Số cây (càng nhiều càng tốt, nhưng chậm).</li>
+                            <li><code>max_features</code>: Số đặc trưng xét tại mỗi nút (mặc định sqrt(n_features) cho phân loại).</li>
+                            <li><code>max_depth</code>: Độ sâu tối đa của cây (None: phát triển hết cỡ).</li>
+                            <li><code>min_samples_split</code>: Số mẫu tối thiểu để split một nút.</li>
+                            <li><code>bootstrap</code>: Có dùng bootstrap hay không (mặc định True).</li>
+                            <li><code>oob_score</code>: Có tính OOB error không.</li>
+                        </ul>
+                    </div>
+
+                    <h2>IV. Kết luận</h2>
+                    <p>Random Forest là một thuật toán mạnh mẽ, dễ sử dụng, ít cần điều chỉnh tham số và thường đạt độ chính xác cao trong nhiều bài toán thực tế. Nó kết hợp thành công bagging và random subspace để giảm phương sai và tăng tính đa dạng giữa các cây. Tuy nhiên, khi số cây lớn, mô hình có thể tốn bộ nhớ và chậm dự đoán. Nếu cần độ chính xác cao hơn nữa, bạn có thể thử Gradient Boosting (XGBoost, LightGBM).</p>
+                    <p>Bài tiếp theo sẽ giới thiệu về <strong>Gradient Boosting</strong>.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="ensemble-learning.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Ensemble Learning: Bagging & Boosting</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Nền tảng của Random Forest</p>
+                        </a>
+                        <a href="decision-tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Decision Tree</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Cơ sở cho các cây trong rừng</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="ensemble-learning.html">← Previous: Ensemble Learning</a>
+                    <a href="gradient-boosting.html">Next: Gradient Boosting →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

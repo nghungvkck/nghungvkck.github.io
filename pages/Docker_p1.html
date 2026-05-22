@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docker - Phần 1: Định nghĩa, Image, Container và Cú pháp - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Docker - Phần 1: Định nghĩa, Image, Container và Cú pháp cơ bản</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 08/04/2026</span>
+                        <span>Chuyên mục: DevOps & Containerization</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#docker</span>
+                        <span>#container</span>
+                        <span>#image</span>
+                        <span>#devops</span>
+                        <span>#cli</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Docker là gì?</h2>
+                    <p><strong>Docker</strong> là công cụ mã nguồn mở dùng để đóng gói và chạy ứng dụng trong các môi trường cách ly gọi là <strong>container</strong>. Docker cho phép nhà phát triển triển khai ứng dụng một cách nhất quán trên mọi hệ thống (từ máy tính cá nhân đến máy chủ).</p>
+                    <p>Một máy vật lý có phần cứng (ổ đĩa, CPU, RAM) chạy hệ điều hành – gọi là <strong>máy host</strong>. Trên máy host này, ta cài Docker. Khi muốn chạy một ứng dụng, Docker sẽ tạo ra một container – môi trường cách ly chứa đầy đủ thư viện, gói phụ thuộc để ứng dụng hoạt động. Docker có thể tạo nhiều container khác nhau, mỗi container cách ly hoàn toàn, không tương tác trực tiếp với nhau.</p>
+                    <p>Container giống như một máy ảo hạng nhẹ, nhưng có bản chất khác biệt: thay vì chạy một hệ điều hành riêng, container dùng chung kernel của máy host, chỉ bổ sung thêm các thư viện cần thiết. Nhờ đó container <strong>nhẹ hơn, khởi động nhanh hơn</strong> và ít tốn tài nguyên hơn so với máy ảo truyền thống.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">⚙️ So sánh Docker với máy ảo (VM)</h3>
+                        <ul>
+                            <li><strong>Máy ảo</strong>: Mỗi VM chạy một hệ điều hành riêng, chiếm nhiều tài nguyên (RAM, CPU, disk).</li>
+                            <li><strong>Docker container</strong>: Chia sẻ kernel host, chỉ thêm các tầng thư viện cần thiết → nhẹ hơn, khởi động nhanh (vài giây).</li>
+                        </ul>
+                    </div>
+
+                    <h2>II. Cài đặt Docker</h2>
+                    <p>Dưới đây là hướng dẫn nhanh cài Docker trên các hệ điều hành phổ biến.</p>
+
+                    <h3>1. Windows 10</h3>
+                    <pre><code># Kích hoạt Hyper-V (chạy PowerShell với quyền Admin)
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+
+# Sau đó tải Docker Desktop từ:
+# https://hub.docker.com/editions/community/docker-ce-desktop-windows
+
+# Kiểm tra cài đặt
+docker --version</code></pre>
+
+                    <h3>2. Ubuntu</h3>
+                    <pre><code>sudo apt update
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+sudo apt update
+apt-cache policy docker-ce
+sudo apt install docker-ce
+sudo systemctl status docker
+sudo usermod -aG docker $USER
+# Cài thêm docker-compose
+sudo apt install docker-compose
+sudo apt install virtualbox   # nếu cần</code></pre>
+
+                    <h3>3. CentOS 7</h3>
+                    <pre><code>sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce
+sudo usermod -aG docker $(whoami)
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
+# Cài Docker Compose
+sudo yum install epel-release
+sudo yum install -y python-pip
+sudo pip install docker-compose
+sudo yum upgrade python*
+docker-compose version</code></pre>
+
+                    <h2>III. Docker Image</h2>
+                    <p><strong>Docker Image</strong> là một gói phần mềm chỉ đọc (read-only), chứa mọi thứ cần thiết để chạy một ứng dụng: mã nguồn, thư viện, biến môi trường, tệp cấu hình. Image được xây dựng từ các layer và không thể thay đổi sau khi tạo. Khi một image được chạy, thể hiện thực thi của nó được gọi là <strong>container</strong>.</p>
+
+                    <h3>Các lệnh cơ bản với Docker Image</h3>
+                    <pre><code># Liệt kê các image có trên máy
+docker images
+
+# Tìm kiếm image trên Docker Hub
+docker search &lt;tên_image&gt;
+
+# Tải image từ registry
+docker pull &lt;tên_image&gt;[:&lt;tag&gt;]   # tag mặc định là 'latest'
+
+# Xóa image (cần dừng container liên quan trước)
+docker image rm &lt;tên_image&gt;:&lt;tag&gt;
+# hoặc xóa bằng ID (chỉ cần vài ký tự đầu)
+docker image rm &lt;image_id&gt;
+
+# Lưu image ra file .tar
+docker save --output &lt;tên_file.tar&gt; &lt;tên_image&gt;
+
+# Tạo image từ file .tar
+docker load -i &lt;tên_file.tar&gt;
+
+# Đổi tên image (tạo tag mới)
+docker tag &lt;image_id&gt; &lt;tên_mới&gt;:&lt;tag_mới&gt;</code></pre>
+
+                    <h2>IV. Docker Container</h2>
+                    <p><strong>Container</strong> là một thể hiện đang chạy của một Docker Image. Container có thể được tạo, khởi động, dừng, di chuyển và xóa. Mỗi container đều cô lập với nhau và với host, nhưng có thể giao tiếp qua network được cấu hình.</p>
+
+                    <h3>Các lệnh cơ bản với Docker Container</h3>
+                    <pre><code># Tạo và chạy container từ image
+docker run [tùy_chọn] &lt;tên_image&gt; [lệnh] [tham_số]
+# Các tùy chọn thường dùng:
+# -i : giữ STDIN mở (interactive)
+# -t : cấp terminal (kết hợp -it để có shell)
+# --name : đặt tên cho container
+# -h : đặt hostname cho container
+# --rm : tự động xóa container khi dừng
+# -d : chạy ngầm (detach)
+
+# Ví dụ: chạy Ubuntu với shell tương tác
+docker run -it ubuntu:latest
+
+# Ví dụ: đặt tên và hostname
+docker run -it --name "XYZ" -h centos1 centos:latest
+
+# Ví dụ: chạy lệnh ls và tự xóa sau khi kết thúc
+docker run -it --rm debian ls -la
+
+# Xem danh sách container đang chạy
+docker ps
+
+# Xem tất cả container (kể cả đã dừng)
+docker ps -a
+
+# Thoát container nhưng vẫn chạy ngầm: Ctrl + P + Q
+# Thoát và dừng container: gõ `exit`
+
+# Khởi động lại container đã dừng
+docker start &lt;tên_container&gt; hoặc &lt;container_id&gt;
+
+# Kết nối vào container đang chạy
+docker attach &lt;tên_container&gt;
+
+# Dừng container đang chạy
+docker stop &lt;tên_container&gt;
+
+# Xóa container đã dừng
+docker rm &lt;tên_container&gt;
+
+# Xóa container đang chạy (mạnh)
+docker rm -f &lt;tên_container&gt;</code></pre>
+
+                    <h3>Lưu container thành image (commit)</h3>
+                    <pre><code># Container phải ở trạng thái dừng (exited)
+docker commit &lt;tên_container&gt; &lt;tên_image_mới&gt;:&lt;tag&gt;
+
+# Ví dụ: lưu container ubuntu thành image ubuntu-ssh:V1
+docker commit ubuntu ubuntu-ssh:V1</code></pre>
+
+                    <h3>Thực thi lệnh từ bên ngoài container (docker exec)</h3>
+                    <pre><code># Chạy một lệnh trong container đang chạy mà không cần attach
+docker exec &lt;tên_container&gt; &lt;lệnh&gt;
+
+# Ví dụ: chạy lệnh ls trong container ubuntu
+docker exec ubuntu ls</code></pre>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">💡 Mẹo nhỏ</h3>
+                        <p>Bạn có thể dùng <code>docker exec -it &lt;container&gt; bash</code> để mở một shell mới bên trong container đang chạy, rất hữu ích để kiểm tra hay gỡ lỗi.</p>
+                    </div>
+
+                    <h2>V. Kết luận</h2>
+                    <p>Trong phần 1 này, chúng ta đã tìm hiểu:</p>
+                    <ul>
+                        <li><strong>Docker</strong> là gì, lợi ích so với máy ảo.</li>
+                        <li>Cách cài đặt Docker trên Windows, Ubuntu, CentOS.</li>
+                        <li>Khái niệm <strong>Docker Image</strong> và các lệnh: <code>images, search, pull, rm, save, load, tag</code>.</li>
+                        <li>Khái niệm <strong>Docker Container</strong> và các lệnh: <code>run, ps, start, attach, stop, rm, exec, commit</code>.</li>
+                    </ul>
+                    <p>Phần tiếp theo sẽ đi sâu vào Docker Network, Volume, và Docker Compose để quản lý multi-container.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="elasticsearch.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Elasticsearch</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Tìm kiếm phân tán</p>
+                        </a>
+                        <a href="decision-tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Decision Tree</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Cây quyết định</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="decision-tree.html">← Previous: Decision Tree</a>
+                    <a href="docker-part2.html">Next: Docker - Phần 2 →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thuật toán K-means</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <!-- MathJax để hiển thị công thức toán học -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Thuật toán K-means: Định nghĩa, Toán học và Cách tìm K tối ưu</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 03/04/2026</span>
+                        <span>Chuyên mục: Machine Learning cơ bản</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#kmeans</span>
+                        <span>#clustering</span>
+                        <span>#unsupervised</span>
+                        <span>#elbow-method</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa K-means</h2>
+                    <p><strong>K-means</strong> là một thuật toán <strong>phân cụm không giám sát</strong> (unsupervised clustering) nhằm chia một tập dữ liệu thành <strong>K cụm</strong> riêng biệt, trong đó mỗi điểm dữ liệu thuộc về cụm có tâm (centroid) gần nhất. Mục tiêu là tối thiểu hóa tổng bình phương khoảng cách giữa các điểm trong cùng một cụm (inertia).</p>
+                    <p>K-means được sử dụng rộng rãi trong phân khúc khách hàng, nén ảnh, phát hiện bất thường, và tiền xử lý cho các mô hình học sâu.</p>
+                    
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">🎯 Đặc điểm chính</h3>
+                        <ul>
+                            <li>Phân cụm dựa trên khoảng cách Euclidean (thường dùng).</li>
+                            <li>Cần xác định trước số cụm K.</li>
+                            <li>Hội tụ đến tối ưu cục bộ, phụ thuộc vào khởi tạo.</li>
+                            <li>Độ phức tạp \(O(n \cdot K \cdot I \cdot d)\) với \(n\) số điểm, \(I\) số lần lặp, \(d\) số chiều.</li>
+                        </ul>
+                    </div>
+
+                    <h2>II. Toán học đằng sau K-means</h2>
+                    <p>K-means giải bài toán tối ưu: phân hoạch tập dữ liệu \( X = \{x_1, x_2, \ldots, x_n\} \subset \mathbb{R}^d \) vào K cụm \( C_1, \ldots, C_K \) sao cho tổng bình phương khoảng cách từ mỗi điểm đến tâm cụm của nó là nhỏ nhất.</p>
+
+                    <h3>1. Hàm mục tiêu (Inertia)</h3>
+                    <div class="formula">
+                        \[
+                        J = \sum_{k=1}^{K} \sum_{x_i \in C_k} \|x_i - \mu_k\|^2
+                        \]
+                    </div>
+                    <p>Trong đó \( \mu_k = \frac{1}{|C_k|} \sum_{x_i \in C_k} x_i \) là centroid (tâm) của cụm thứ \(k\).</p>
+                    <p>Việc tối thiểu hóa \(J\) là bài toán NP-khó, do đó K-means sử dụng một heuristic lặp: <strong>Lloyd's algorithm</strong>.</p>
+
+                    <h3>2. Các bước của giải thuật</h3>
+                    <ol>
+                        <li><strong>Khởi tạo</strong>: Chọn ngẫu nhiên K điểm từ dữ liệu làm centroid ban đầu.</li>
+                        <li><strong>Gán nhãn</strong>: Với mỗi điểm \( x_i \), gán nó vào cụm có centroid gần nhất theo khoảng cách Euclidean:
+                            <div class="formula">
+                                \[
+                                C_k = \{ x_i : \|x_i - \mu_k\|^2 \le \|x_i - \mu_j\|^2 \ \forall j \}
+                                \]
+                            </div>
+                        </li>
+                        <li><strong>Cập nhật centroid</strong>: Tính lại tâm của mỗi cụm dựa trên các điểm mới được gán:
+                            <div class="formula">
+                                \[
+                                \mu_k = \frac{1}{|C_k|} \sum_{x_i \in C_k} x_i
+                                \]
+                            </div>
+                        </li>
+                        <li><strong>Lặp lại</strong> bước 2 và 3 cho đến khi hội tụ (centroid không thay đổi hoặc thay đổi nhỏ hơn ngưỡng).</li>
+                    </ol>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">📐 Minh họa hình học</h3>
+                        <p>Với dữ liệu 2D, mỗi bước lặp sẽ di chuyển các centroid vào trung tâm của cụm, giống như "các trung tâm" kéo các điểm về phía mình và dần ổn định. Hàm \(J\) luôn giảm sau mỗi bước, đảm bảo hội tụ (có thể đến local minima).</p>
+                    </div>
+
+                    <h3>3. Hạn chế của hàm mục tiêu</h3>
+                    <ul>
+                        <li>Inertia giả sử các cụm có hình cầu và kích thước tương đương.</li>
+                        <li>Nhạy cảm với outliers (giá trị ngoại lai) vì bình phương khoảng cách phóng đại ảnh hưởng.</li>
+                        <li>Kết quả phụ thuộc vào khởi tạo ban đầu (có thể dùng k-means++ để cải thiện).</li>
+                    </ul>
+
+                    <h2>III. Cách tìm K tối ưu</h2>
+                    <p>Một trong những thách thức lớn nhất khi dùng K-means là <strong>chọn số cụm K</strong> phù hợp mà không có nhãn thật. Dưới đây là các phương pháp phổ biến.</p>
+
+                    <h3>1. Phương pháp Elbow (Điểm khuỷu tay)</h3>
+                    <p>Chạy K-means với K từ 1 đến một giá trị max nào đó, tính <strong>inertia</strong> (tổng bình phương khoảng cách nội cụm). Vẽ biểu đồ inertia theo K. Khi K tăng, inertia giảm dần. Điểm mà tốc độ giảm đột ngột chậm lại (như khuỷu tay) được chọn là K tối ưu.</p>
+                    <div class="formula">
+                        <p>Chọn K tại điểm mà đường cong bắt đầu "bẻ gập" rõ rệt.</p>
+                    </div>
+                    <p><strong>Ưu điểm</strong>: Trực quan, dễ cài đặt.<br>
+                    <strong>Nhược điểm</strong>: Không tự động, có thể có nhiều điểm khuỷu tay giả.</p>
+
+                    <h3>2. Phương pháp Silhouette Score</h3>
+                    <p>Silhouette score đo lường mức độ gần gũi của một điểm với cụm của nó so với các cụm khác. Với mỗi điểm \(i\):</p>
+                    <div class="formula">
+                        \[
+                        s(i) = \frac{b(i) - a(i)}{\max\{a(i), b(i)\}}
+                        \]
+                    </div>
+                    <p>Trong đó \( a(i) \) là khoảng cách trung bình đến các điểm cùng cụm, \( b(i) \) là khoảng cách trung bình đến cụm gần nhất khác. Silhouette score nằm trong \([-1, 1]\), càng gần 1 càng tốt. Trung bình silhouette của toàn bộ dữ liệu cho biết chất lượng phân cụm. Chọn K tối đa hóa silhouette trung bình.</p>
+                    
+                    <h3>3. Gap Statistic</h3>
+                    <p>So sánh inertia thực tế với inertia kỳ vọng của dữ liệu ngẫu nhiên (phân bố đều trong cùng miền). Gap statistic được tính:</p>
+                    <div class="formula">
+                        \[
+                        \text{Gap}(K) = \mathbb{E}[\log(W_k^*)] - \log(W_k)
+                        \]
+                    </div>
+                    <p>Chọn K nhỏ nhất sao cho \(\text{Gap}(K) \ge \text{Gap}(K+1) - s_{K+1}\) (với \(s\) là độ lệch chuẩn mô phỏng). Đây là phương pháp thống kê chặt chẽ, nhưng tốn tính toán.</p>
+
+                    <h3>4. Các chỉ số khác</h3>
+                    <ul>
+                        <li><strong>Davies-Bouldin Index</strong>: Tỉ lệ giữa khoảng cách nội cụm và khoảng cách giữa các cụm, càng nhỏ càng tốt.</li>
+                        <li><strong>Calinski-Harabasz Index</strong>: Phương sai giữa cụm trên phương sai trong cụm, càng cao càng tốt.</li>
+                        <li><strong>Phương pháp chủ quan theo miền nghiệp vụ</strong>: Đôi khi K được xác định bởi nhu cầu thực tế (ví dụ phân khúc khách hàng thành 3 nhóm: cao, trung bình, thấp).</li>
+                    </ul>
+
+                    <div style="background: #fffaf2; border: 1px solid #ffe0a8; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                        <h3>📌 Lưu ý khi chọn K</h3>
+                        <p>Không có phương pháp nào là hoàn hảo tuyệt đối. Nên kết hợp nhiều phương pháp (elbow + silhouette) và kiểm tra tính ổn định của cụm (bootstrap). Ngoài ra, nếu dữ liệu không có cấu trúc cụm rõ ràng, việc chọn K sẽ mơ hồ.</p>
+                    </div>
+
+                    <h2>IV. Kết luận</h2>
+                    <p>K-means là thuật toán phân cụm kinh điển, dễ hiểu và hiệu quả cho nhiều bài toán. Hiểu rõ <strong>định nghĩa, cơ sở toán học và cách chọn K</strong> giúp bạn áp dụng đúng và tránh các bẫy thường gặp (local optima, chọn sai K, ảnh hưởng của outliers). Các cải tiến như k-means++, mini-batch K-means, và kết hợp với các phương pháp đánh giá cụm sẽ nâng cao hiệu suất trong thực tế.</p>
+                    <p>Bài tiếp theo sẽ giới thiệu về <strong>DBSCAN</strong> – một thuật toán phân cụm dựa trên mật độ, khắc phục nhược điểm của K-means với dữ liệu hình dạng phức tạp.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="elasticsearch.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Elasticsearch</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Tìm kiếm phân tán, full-text</p>
+                        </a>
+                        <a href="vector-database.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Vector Database</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Semantic search, embedding</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="elasticsearch.html">← Previous: Elasticsearch</a>
+                    <a href="../index.html">Back to Home →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

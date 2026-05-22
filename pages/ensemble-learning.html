@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ensemble Learning: Bagging và Boosting - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#database-ai">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Ensemble Learning: Bagging và Boosting</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 08/04/2026</span>
+                        <span>Chuyên mục: Machine Learning nâng cao</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#ensemble</span>
+                        <span>#bagging</span>
+                        <span>#boosting</span>
+                        <span>#bias-variance</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Khái niệm Ensemble Learning</h2>
+                    <p><strong>Ensemble Learning</strong> (học tập hợp) là kỹ thuật kết hợp nhiều mô hình học máy (gọi là <strong>base learners</strong> hoặc <strong>weak learners</strong>) để tạo ra một mô hình mạnh hơn, có độ chính xác cao hơn và ổn định hơn so với từng mô hình riêng lẻ. Ý tưởng cốt lõi: "nhiều cái đầu tốt hơn một cái đầu".</p>
+                    <p>Các base learners có thể cùng loại (ví dụ toàn bộ là cây quyết định) hoặc khác loại. Hai kỹ thuật ensemble phổ biến nhất là <strong>Bagging</strong> và <strong>Boosting</strong>.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">🎯 Tại sao Ensemble hoạt động tốt?</h3>
+                        <p>Giả sử có \(K\) mô hình độc lập, mỗi mô hình có tỷ lệ lỗi \(\varepsilon < 0.5\). Xác suất để đa số kết luận sai giảm theo cấp số nhân khi \(K\) lớn (định lý Condorcet). Ngoài ra, ensemble giúp <strong>giảm phương sai (variance)</strong> và/hoặc <strong>giảm bias</strong>.</p>
+                    </div>
+
+                    <h2>II. Bagging (Bootstrap Aggregating)</h2>
+                    <p>Bagging do <strong>Leo Breiman</strong> đề xuất năm 1996. Mục tiêu: giảm phương sai, chống overfitting.</p>
+
+                    <h3>1. Nguyên lý hoạt động</h3>
+                    <ul>
+                        <li><strong>Bootstrap sampling</strong>: Từ tập huấn luyện gốc \(D\) có \(N\) mẫu, tạo ra \(K\) tập con (mỗi tập kích thước \(N\)) bằng cách lấy mẫu ngẫu nhiên <strong>có hoàn lại</strong>. Mỗi tập con có khoảng 63.2% mẫu gốc, phần còn lại là out-of-bag (OOB).</li>
+                        <li><strong>Huấn luyện song song</strong>: Trên mỗi tập bootstrap, huấn luyện một base learner độc lập (thường là cây quyết định sâu, không cắt tỉa).</li>
+                        <li><strong>Kết hợp dự đoán</strong>:
+                            <ul>
+                                <li>Phân loại: <strong>majority voting</strong> (bỏ phiếu đa số).</li>
+                                <li>Hồi quy: <strong>lấy trung bình</strong> các kết quả.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3>2. Đánh giá Out-of-Bag (OOB)</h3>
+                    <p>Với mỗi mẫu \(i\), xác định các cây không sử dụng mẫu đó (gọi là cây OOB). Dùng các cây này dự đoán mẫu \(i\), tính sai số OOB. Sai số OOB là ước lượng khách quan cho lỗi tổng quát, không cần tập validation riêng.</p>
+
+                    <h3>3. Ưu nhược điểm của Bagging</h3>
+                    <ul>
+                        <li><strong>Ưu</strong>: Giảm phương sai mạnh, ít overfitting, có thể song song hóa.</li>
+                        <li><strong>Nhược</strong>: Không giảm bias, độ chính xác có thể không cao nếu base learner đã có bias lớn.</li>
+                        <li><strong>Điển hình</strong>: Random Forest (bagging + random subspace).</li>
+                    </ul>
+
+                    <h2>III. Boosting</h2>
+                    <p>Boosting xây dựng các base learner một cách <strong>tuần tự</strong>, mỗi mô hình sau cố gắng sửa lỗi của mô hình trước. Các biến thể nổi tiếng: AdaBoost, Gradient Boosting, XGBoost, LightGBM, CatBoost.</p>
+
+                    <h3>1. Nguyên lý tổng quát</h3>
+                    <ul>
+                        <li>Khởi tạo trọng số bằng nhau cho tất cả mẫu huấn luyện.</li>
+                        <li>Với mỗi bước \(t = 1 \to T\):
+                            <ul>
+                                <li>Huấn luyện base learner \(h_t\) trên dữ liệu có trọng số.</li>
+                                <li>Tính sai số \(\varepsilon_t\) của \(h_t\).</li>
+                                <li>Tính trọng số \(\alpha_t\) cho \(h_t\) (thường \(\alpha_t = \frac{1}{2}\ln\frac{1-\varepsilon_t}{\varepsilon_t}\)).</li>
+                                <li>Cập nhật trọng số mẫu: tăng trọng số các mẫu bị sai, giảm các mẫu đúng.</li>
+                            </ul>
+                        </li>
+                        <li>Kết hợp tuyến tính có trọng số \(\alpha_t\) của các \(h_t\).</li>
+                    </ul>
+                    <div class="formula">
+                        \[ H(x) = \text{sign}\left(\sum_{t=1}^{T} \alpha_t h_t(x)\right) \]
+                    </div>
+
+                    <h3>2. AdaBoost (Adaptive Boosting)</h3>
+                    <p>AdaBoost là boosting đầu tiên, dùng với base learner yếu (ví dụ cây một lớp - decision stump). Mỗi bước tập trung vào các mẫu khó phân loại.</p>
+
+                    <h3>3. Gradient Boosting</h3>
+                    <p>Mở rộng AdaBoost sang hồi quy và các hàm mất mát tùy ý. Mỗi cây mới dự đoán phần dư (negative gradient) của hàm mất mát so với dự đoán hiện tại.</p>
+
+                    <h3>4. Ưu nhược điểm của Boosting</h3>
+                    <ul>
+                        <li><strong>Ưu</strong>: Giảm bias mạnh, thường đạt độ chính xác rất cao, xử lý được nhiều dạng hàm mất mát.</li>
+                        <li><strong>Nhược</strong>: Dễ overfitting nếu không điều chỉnh, khó song song hóa (tuần tự), chậm hơn bagging, nhạy với nhiễu.</li>
+                    </ul>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">📊 So sánh Bagging và Boosting</h3>
+                        <table style="width:100%; border-collapse: collapse;">
+                            <tr><th>Tiêu chí</th><th>Bagging</th><th>Boosting</th></tr>
+                            <tr><td>Huấn luyện</td><td>Song song, độc lập</td><td>Tuần tự, phụ thuộc</td></tr>
+                            <tr><td>Trọng số mẫu</td><td>Đồng đều (bootstrap)</td><td>Thay đổi sau mỗi bước</td></tr>
+                            <tr><td>Mục tiêu</td><td>Giảm phương sai</td><td>Giảm bias (và variance nhẹ)</td></tr>
+                            <tr><td>Nguy cơ</td><td>Ít overfitting</td><td>Dễ overfitting</td></tr>
+                            <tr><td>Base learner</td><td>Mạnh (cây sâu)</td><td>Yếu (cây nông)</td></tr>
+                            <tr><td>Ví dụ</td><td>Random Forest</td><td>AdaBoost, XGBoost</td></tr>
+                        </table>
+                    </div>
+
+                    <h2>IV. Kết luận</h2>
+                    <p>Bagging và Boosting là hai kỹ thuật ensemble nền tảng. Bagging xây dựng các mô hình độc lập, song song, giảm phương sai – phù hợp khi base learner có phương sai cao (cây sâu). Boosting xây dựng tuần tự, tập trung sửa lỗi, giảm bias – phù hợp khi base learner yếu. Tùy vào bài toán và dữ liệu, bạn có thể chọn hoặc kết hợp cả hai. Bài tiếp theo sẽ đi sâu vào <strong>Random Forest</strong>, một ứng dụng điển hình của Bagging.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="random-forest.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Random Forest</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Bagging + Random Subspace</p>
+                        </a>
+                        <a href="decision-tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Decision Tree</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Cơ sở cho ensemble</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="decision-tree.html">← Previous: Decision Tree</a>
+                    <a href="random-forest.html">Next: Random Forest →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
