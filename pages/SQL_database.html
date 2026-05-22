@@ -73,7 +73,21 @@
             </header>
 
             <div class="post-content">
-                <p>SQL (Structured Query Language) là ngôn ngữ tiêu chuẩn để tương tác với các hệ quản trị cơ sở dữ liệu quan hệ. Dưới đây là tóm tắt các cú pháp quan trọng nhất.</p>
+                <p>
+                    SQL là viết tắt của Structured Query Language là ngôn ngữ truy vấn có cấu trúc. Nó là một ngôn ngữ, 
+                    là tập hợp các lệnh để tương tác với cơ sở dữ liệu. 
+                    Dùng để lưu trữ, thao tác và truy xuất dữ liệu được lưu trữ trong một cơ sở dữ liệu quan hệ. 
+                </p>
+
+                <p>
+                SQL được sử dụng phổ biến vì nó có các ưu điểm sau:
+                </p>
+                <ul>
+                    <li>Cho phép truy cập dữ liệu trong các hệ thống quản lý cơ sở dữ liệu quan hệ.</li>
+                    <li>Cho phép xác định dữ liệu trong cơ sở dữ liệu và thao tác dữ liệu đó.</li>
+                    <li>Cho phép nhúng trong các ngôn ngữ khác sử dụng mô-đun SQL, thư viện và trình biên dịch trước.</li>
+                    <li>Cho phép thiết lập quyền trên các bảng, thủ tục và view.</li>
+                </ul>
 
                 <section aria-labelledby="section1">
                     <h2 id="section1">I. Cấu trúc câu lệnh truy vấn cơ bản</h2>
@@ -125,13 +139,17 @@
                 <section aria-labelledby="section3">
                     <h2 id="section3">III. Phép kết (JOIN) - Truy vấn từ nhiều bảng</h2>
                     <p>
-                        Khi dữ liệu nằm ở nhiều bảng khác nhau, chúng ta cần sử dụng phép JOIN để kết hợp các bảng lại với nhau dựa trên một điều kiện liên kết.
-                    </p>
+                        JOIN là phép kết nối dữ liệu từ nhiều bảng lại với nhau, nối 2 bảng, 3 bảng.. với nhau. 
+                        Khi bạn cần truy vấn các cột dữ liệu từ nhiều bảng khác nhau để trả về trong cùng một tập kết quả , 
+                        bạn cần dùng JOIN. 2 bảng kết nối được với nhau khi có 1 trường chung giữa 2 bảng này.
 
                     <h3>1. INNER JOIN (JOIN)</h3>
                     <p>
                         <code>INNER JOIN</code> trả về các dòng có giá trị khớp ở cả hai bảng.
                     </p>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/inner_join.jpg" width="800" style="max-width:100%; height:auto;">
+                    </div>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> *
 <span class="keyword">FROM</span> BangA
@@ -142,6 +160,9 @@
                     <p>
                         <code>LEFT JOIN</code> trả về tất cả các bản ghi từ bảng bên trái và các bản ghi khớp từ bảng bên phải.
                     </p>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/left_join.jpg" width="800" style="max-width:100%; height:auto;">
+                    </div>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> *
 <span class="keyword">FROM</span> BangA
@@ -152,13 +173,16 @@
                     <p>
                         <code>RIGHT JOIN</code> trả về tất cả các bản ghi từ bảng bên phải và các bản ghi khớp từ bảng bên trái.
                     </p>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/right_join.jpg" width="800" style="max-width:100%; height:auto;">
+                    </div>
                     <pre class="sql-code">
 <span class="keyword">SELECT</span> *
 <span class="keyword">FROM</span> BangA
 <span class="keyword">RIGHT JOIN</span> BangB
 <span class="keyword">ON</span> BangA.id = BangB.id;</pre>
 
-                    <h3>4. Ví dụ minh họa</h3>
+                    <!-- <h3>4. Ví dụ minh họa</h3>
                     <p>
                         Giả sử có hai bảng: <code>SinhVien</code> (id, ten, ma_lop) và <code>Lop</code> (id, ten_lop).
                     </p>
@@ -167,7 +191,7 @@
 <span class="keyword">FROM</span> SinhVien
 <span class="keyword">INNER JOIN</span> Lop
 <span class="keyword">ON</span> SinhVien.ma_lop = Lop.id;</pre>
-                </section>
+                </section> -->
 
                 <section aria-labelledby="section4">
                     <h2 id="section4">IV. SQL lồng (Subquery)</h2>

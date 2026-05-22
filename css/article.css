@@ -279,8 +279,12 @@ body.article-page .nav-links a {
 .article-layout {
     display: grid;
     grid-template-columns: minmax(180px, 20%) minmax(0, 80%);
-    gap: 36px;
+    gap: 52px;
     align-items: start;
+}
+
+.article-layout .post-container {
+    padding-right: 12px;
 }
 
 .article-sidebar {
@@ -308,9 +312,19 @@ body.article-page .nav-links a {
     margin-top: 8px;
 }
 
+.toc-h2 a {
+    padding-left: 10px;
+    font-family: "Merriweather", serif;
+    font-size: 0.98rem;
+    font-weight: 900;
+    color: var(--text, #171717);
+}
+
 .toc-h3 a {
-    padding-left: 28px;
+    padding-left: 30px;
     font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--muted, #6d6257);
 }
 
 .toc-list a {
@@ -330,6 +344,7 @@ body.article-page .nav-links a {
 @media (max-width: 1100px) {
     .article-layout {
         grid-template-columns: 1fr;
+        gap: 0;
     }
 
     .article-sidebar {
