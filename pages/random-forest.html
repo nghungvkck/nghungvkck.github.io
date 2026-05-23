@@ -49,26 +49,23 @@
 
                 <div class="post-content">
                     <h2>I. Tổng quan Ensemble và Bagging</h2>
-                    <p>Trước khi đi vào Random Forest, cần hiểu nó nằm trong họ kỹ thuật <strong>Ensemble Learning</strong>. Ensemble kết hợp nhiều mô hình yếu để tạo mô hình mạnh. <strong>Bagging (Bootstrap Aggregating)</strong> là một kỹ thuật ensemble quan trọng, trong đó các mô hình được huấn luyện song song trên các tập bootstrap và kết hợp bằng voting hoặc trung bình. Random Forest chính là <strong>Bagging kết hợp với Random Subspace Method</strong> (chọn ngẫu nhiên tập con các đặc trưng tại mỗi nút). Chi tiết về Bagging và Boosting có thể xem trong bài <a href="ensemble-learning.html">Ensemble Learning: Bagging và Boosting</a>.</p>
-
-                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
-                        <h3 style="margin-top: 0;">🌲 Random Forest là gì?</h3>
-                        <p><strong>Random Forest</strong> là phương pháp học tập hợp xây dựng một số lượng lớn các cây quyết định (decision trees) trên các tập bootstrap khác nhau, đồng thời tại mỗi nút chỉ xét một tập con ngẫu nhiên các đặc trưng. Dự đoán cuối cùng là kết hợp kết quả từ tất cả các cây (bỏ phiếu đa số cho phân loại, trung bình cho hồi quy).</p>
-                    </div>
+                    <p>Trước khi đi vào Random Forest, bạn đọc hãy đọc 2 bài viết trước về <strong>Decision Tree</strong> và <strong>Ensemble learning</strong> để hiểu hơn về kĩ thuật và các chỉ số đo độ tinh khiết của các mô hình cây. Ensemble kết hợp nhiều mô hình yếu để tạo mô hình mạnh. <strong>Bagging (Bootstrap Aggregating)</strong> là một kỹ thuật ensemble quan trọng, trong đó các mô hình được huấn luyện song song trên các tập bootstrap và kết hợp bằng voting hoặc trung bình. Random Forest chính là <strong>Bagging kết hợp với Random Subspace Method</strong> (chọn ngẫu nhiên tập con các đặc trưng tại mỗi nút). Chi tiết về Bagging và Boosting có thể xem trong bài <a href="ensemble-learning.html">Ensemble Learning: Bagging và Boosting</a>.</p>
 
                     <h2>II. Định nghĩa Random Forest</h2>
-                    <p>Random Forest là một ensemble của các cây quyết định, được huấn luyện với hai nguồn ngẫu nhiên:</p>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">Random Forest là gì?</h3>
+                        <p><strong>Random Forest</strong> là phương pháp học tập hợp xây dựng một số lượng lớn các cây quyết định (decision trees) trên các tập bootstrap khác nhau, đồng thời tại mỗi nút chỉ xét một tập con ngẫu nhiên các đặc trưng. Dự đoán cuối cùng là kết hợp kết quả từ tất cả các cây (bỏ phiếu đa số cho phân loại, trung bình cho hồi quy).</p>
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/aicandy_randomforest_2.png" alt="Random Forest visualization" style="width: 70%;">
+                    </div>
+                    
+                    <p>Thuật toán được huấn luyện với hai nguồn ngẫu nhiên:</p>
                     <ul>
                         <li><strong>Bootstrap sampling</strong>: Mỗi cây được huấn luyện trên một tập con dữ liệu lấy mẫu có hoàn lại từ tập gốc.</li>
                         <li><strong>Random subspace</strong>: Tại mỗi nút, thay vì xét toàn bộ \(M\) đặc trưng, chỉ chọn ngẫu nhiên \(m\) đặc trưng (\(m \ll M\)) để tìm phân tách tốt nhất.</li>
                     </ul>
                     <p>Nhờ đó các cây trở nên đa dạng, giảm tương quan, tăng độ chính xác tổng thể.</p>
-
-                    <h3>1. So sánh với cây quyết định đơn lẻ</h3>
-                    <ul>
-                        <li>Cây đơn: dễ overfitting, phương sai cao, nhưng dễ giải thích.</li>
-                        <li>Random Forest: giảm overfitting đáng kể, ổn định hơn, nhưng khó giải thích hơn (black-box hơn).</li>
-                    </ul>
 
                     <h2>III. Nguyên tắc hoạt động</h2>
                     <p>Random Forest hoạt động qua các bước sau:</p>
@@ -87,13 +84,61 @@
                     </ol>
 
                     <h3>2. Dự đoán với rừng</h3>
+                    <p>Sau khi huấn luyện xong K cây quyết định độc lập, Random Forest kết hợp dự đoán của chúng để đưa ra kết quả cuối cùng. Cách kết hợp phụ thuộc vào loại bài toán:</p>
                     <ul>
-                        <li><strong>Phân loại</strong>: Mỗi cây bỏ phiếu cho một lớp; lớp có số phiếu cao nhất là kết quả.</li>
-                        <li><strong>Hồi quy</strong>: Mỗi cây đưa ra giá trị số; kết quả là trung bình các giá trị.</li>
+                        <li>
+                            <strong>Đối với phân loại (Classification):</strong> 
+                            <ul>
+                                <li>Mỗi cây trong rừng thực hiện "bỏ phiếu" (voting) cho một lớp. Cụ thể, cây sẽ đưa ra nhãn lớp dự đoán dựa trên các đặc trưng đầu vào.</li>
+                                <li>Hai hình thức bỏ phiếu phổ biến:
+                                    <ul>
+                                        <li><strong>Hard voting (bỏ phiếu cứng):</strong> Mỗi cây chỉ được một phiếu cho lớp mà nó dự đoán. Lớp nào nhận được nhiều phiếu nhất sẽ là kết quả cuối cùng. Ví dụ: 100 cây, 60 cây dự đoán "chó", 30 cây dự đoán "mèo", 10 cây dự đoán "chim" → kết quả là "chó".</li>
+                                        <li><strong>Soft voting (bỏ phiếu mềm):</strong> Nếu cây có khả năng xuất ra xác suất (ví dụ cây phân loại dùng xác suất hậu nghiệm), ta có thể lấy tổng (hoặc trung bình) xác suất dự đoán từ các cây, sau đó chọn lớp có tổng xác suất cao nhất. Cách này thường cho kết quả mượt mà và chính xác hơn.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Xử lý khi có hòa phiếu:</strong> Nếu hai hoặc nhiều lớp nhận cùng số phiếu cao nhất, Random Forest có thể chọn lớp đầu tiên theo thứ tự, hoặc tăng thêm số lượng cây để giảm khả năng hòa.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Đối với hồi quy (Regression):</strong> 
+                            <ul>
+                                <li>Mỗi cây trong rừng trả về một giá trị số thực (giá trị dự đoán) dựa trên các đặc trưng đầu vào.</li>
+                                <li>Kết quả cuối cùng thường là <strong>giá trị trung bình</strong> (mean) của tất cả các dự đoán từ các cây:
+                                    <div class="formula">
+                                        \[
+                                        \hat{y}_{\text{forest}} = \frac{1}{K} \sum_{k=1}^{K} \hat{y}_{\text{tree}_k}
+                                        \]
+                                    </div>
+                                </li>
+                                <li>Một số biến thể có thể dùng <strong>trung vị (median)</strong> thay vì trung bình để tăng tính ổn định trước các outlier (giá trị ngoại lai) từ một vài cây.</li>
+                                <li>Ví dụ: 100 cây, dự đoán lần lượt các giá trị: 2.5, 3.0, 2.8, …, 3.1. Giá trị trung bình của 100 số đó sẽ là dự đoán cuối cùng.</li>
+                            </ul>
+                        </li>
                     </ul>
+                    <p>Nhờ cơ chế kết hợp này, Random Forest giảm được phương sai (variance) so với một cây đơn lẻ, ít bị overfitting hơn, và thường đạt độ chính xác cao.</p>
 
                     <h3>3. Đánh giá Out-of-Bag (OOB)</h3>
-                    <p>Mỗi cây sử dụng khoảng 63.2% mẫu gốc để huấn luyện, 36.8% còn lại là out-of-bag. Các mẫu OOB có thể được dùng để ước lượng lỗi mà không cần tập validation riêng. OOB error là một ước lượng khách quan và thường khá sát với lỗi trên tập kiểm tra.</p>
+                    <p>Trong Random Forest, mỗi cây được huấn luyện trên một tập bootstrap (lấy mẫu có hoàn lại) từ tập dữ liệu gốc. Một tính chất thú vị của bootstrap là: với tập dữ liệu có \(n\) mẫu, xác suất để một mẫu cụ thể <strong>không được chọn</strong> trong một lần lấy mẫu là \(1 - \frac{1}{n}\). Sau \(n\) lần lấy (có hoàn lại), xác suất để mẫu đó không xuất hiện trong tập bootstrap là:</p>
+                    <div class="formula">
+                        \[
+                        \left(1 - \frac{1}{n}\right)^n \xrightarrow[n\to\infty]{} \frac{1}{e} \approx 0.368
+                        \]
+                    </div>
+                    <p>Điều này có nghĩa là mỗi cây chỉ sử dụng khoảng <strong>63.2%</strong> số mẫu gốc để huấn luyện, <strong>36.8%</strong> số mẫu còn lại (gọi là <strong>Out-of-Bag samples – OOB</strong>) không được dùng để xây dựng cây đó. Các mẫu OOB đóng vai trò như một tập kiểm tra tự nhiên, không cần phải tách riêng tập validation.</p>
+                    <p><strong>Cách tính OOB error:</strong></p>
+                    <ol>
+                        <li>Với mỗi mẫu \( (x_i, y_i) \) trong tập dữ liệu gốc, xác định tất cả các cây mà mẫu này <strong>không</strong> xuất hiện trong tập bootstrap của chúng (tức là cây chưa từng thấy mẫu này).</li>
+                        <li>Cho mỗi cây đó dự đoán trên \(x_i\) (bỏ phiếu cho phân loại, giá trị số cho hồi quy).</li>
+                        <li>Kết hợp các dự đoán này (majority voting cho phân loại, trung bình cho hồi quy) để thu được dự đoán OOB cho mẫu \(i\).</li>
+                        <li>Sau khi làm tương tự cho tất cả các mẫu, OOB error được tính là tỷ lệ dự đoán sai (đối với phân loại) hoặc MSE/MAE (đối với hồi quy) trên các mẫu OOB.</li>
+                    </ol>
+                    <p><strong>Ưu điểm của OOB so với cross-validation thông thường:</strong></p>
+                    <ul>
+                        <li><strong>Miễn phí tính toán:</strong> Không cần chạy lại nhiều lần huấn luyện như k-fold cross-validation.</li>
+                        <li><strong>Không làm giảm kích thước tập huấn luyện:</strong> Toàn bộ dữ liệu vẫn được dùng để huấn luyện từng cây (mỗi cây thiếu một phần khác nhau).</li>
+                        <li><strong>Ước lượng khách quan:</strong> OOB error thường rất gần với lỗi trên tập kiểm tra độc lập, và có thể dùng để chọn siêu tham số (số lượng cây, max_features, v.v.).</li>
+                    </ul>
+                    <p>Trong thực hành, nếu tập dữ liệu lớn, bạn có thể chỉ cần dùng OOB error để đánh giá chất lượng mô hình mà không cần tách riêng tập validation. Thư viện scikit-learn cho phép tính OOB error bằng cách đặt tham số <code>oob_score=True</code> khi khởi tạo RandomForestClassifier hoặc RandomForestRegressor.</p>
 
                     <h3>4. Độ quan trọng của đặc trưng (Feature Importance)</h3>
                     <p>Random Forest cung cấp hai cách đo:</p>
@@ -103,7 +148,7 @@
                     </ul>
 
                     <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
-                        <h3 style="margin-top: 0; color: #1976D2;">📐 Tham số quan trọng trong Random Forest (scikit-learn)</h3>
+                        <h3 style="margin-top: 0; color: #1976D2;">Tham số quan trọng trong Random Forest (scikit-learn)</h3>
                         <ul>
                             <li><code>n_estimators</code>: Số cây (càng nhiều càng tốt, nhưng chậm).</li>
                             <li><code>max_features</code>: Số đặc trưng xét tại mỗi nút (mặc định sqrt(n_features) cho phân loại).</li>

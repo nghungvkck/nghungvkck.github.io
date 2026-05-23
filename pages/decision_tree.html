@@ -50,9 +50,11 @@
                 <div class="post-content">
                     <h2>I. Định nghĩa Decision Tree</h2>
                     <p><strong>Cây quyết định (Decision Tree)</strong> là phương pháp học có giám sát không tham số, xây dựng mô hình dạng cây để xấp xỉ dữ liệu huấn luyện. Cây gồm các <strong>node trong</strong> kiểm tra một thuộc tính, các nhánh là giá trị của thuộc tính đó, và <strong>node lá</strong> cho kết quả (nhãn lớp cho phân loại, giá trị số cho hồi quy).</p>
-                    
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/DecisionTree_img.jpg" alt="Minh họa cây quyết định" style="width: 80%;">
+                    </div>
                     <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
-                        <h3 style="margin-top: 0;">🌳 Đặc trưng của cây quyết định</h3>
+                        <h3 style="margin-top: 0;">Đặc trưng của cây quyết định</h3>
                         <ul>
                             <li>Dễ hiểu, trực quan, có thể giải thích được.</li>
                             <li>Xử lý được cả dữ liệu số và phân loại.</li>
@@ -60,90 +62,92 @@
                             <li>Dễ bị overfitting nếu không cắt tỉa (pruning) hoặc giới hạn độ sâu.</li>
                         </ul>
                     </div>
+                    <p>Các thuật toán phổ biến: <strong>ID3</strong>, <strong>C4.5</strong>, <strong>CART</strong>. Chúng đánh giá độ quan trọng của thuộc tính bằng các độ đo như <strong>Gini</strong>, <strong>Entropy/Information Gain</strong> cho phân loại, và <strong>Variance Reduction</strong> cho hồi quy.</p>
 
-                    <p>Thuật toán phổ biến để xây dựng cây là <strong>ID3 (Iterative Dichotomiser)</strong>, <strong>C4.5</strong>, <strong>CART</strong>. Chúng đánh giá độ quan trọng của thuộc tính bằng các độ đo như <strong>Gini Impurity</strong>, <strong>Entropy/Information Gain</strong> cho phân loại, và <strong>Variance Reduction</strong> cho hồi quy.</p>
+                    <!-- ==================== PHẦN PHÂN LOẠI ==================== -->
+                    <h2>II. Decision Tree cho bài toán Phân loại</h2>
+                    <h3>1. Các chỉ số đo độ bất thuần (impurity)</h3>
+                    <p>Xét tập dữ liệu \(D\) có \(n\) phần tử, thuộc \(C\) lớp khác nhau. Gọi \(p_j\) là tỷ lệ phần tử trong \(D\) thuộc lớp \(j\) (\(\sum_{j=1}^{C} p_j = 1\)).</p>
+                    
+                    <h4>a) Chỉ số Gini (Gini Impurity)</h4>
+                    <div class="formula">\[ \text{Gini}(D) = 1 - \sum_{j=1}^{C} p_j^2 \]</div>
+                    <p>Gini = 0 khi tập chỉ có một lớp (thuần khiết), lớn nhất khi phân phối lớp đều.</p>
 
-                    <h3>1. Các chỉ số cho bài toán phân loại</h3>
-                    <p>Xét tập dữ liệu \(D\) với \(C\) lớp, tỷ lệ mẫu lớp thứ \(j\) là \(p_j\).</p>
-                    <ul>
-                        <li><strong>Gini Impurity</strong>:
-                            <div class="formula">\[ \text{Gini}(D) = 1 - \sum_{j=1}^{C} p_j^2 \]</div>
-                            Giá trị nhỏ nhất là 0 (khi chỉ có một lớp), lớn nhất khi các lớp cân bằng.
-                        </li>
-                        <li><strong>Entropy</strong>:
-                            <div class="formula">\[ \text{Entropy}(D) = -\sum_{j=1}^{C} p_j \log_2 p_j \]</div>
-                        </li>
-                        <li><strong>Classification Error</strong>:
-                            <div class="formula">\[ \text{Error}(D) = 1 - \max_j p_j \]</div>
-                        </li>
-                    </ul>
+                    <h4>b) Độ đo Entropy</h4>
+                    <div class="formula">\[ \text{Entropy}(D) = -\sum_{j=1}^{C} p_j \log_2 p_j \]</div>
+                    <p>Entropy = 0 khi thuần khiết, bằng \(\log_2 C\) khi các lớp cân bằng.</p>
 
-                    <h3>2. Độ đo cho bài toán hồi quy</h3>
-                    <p>Với hồi quy, mỗi node lá dự đoán bằng giá trị trung bình của các mẫu tại node đó. Độ đo phổ biến là <strong>phương sai (Variance)</strong> hoặc <strong>tổng bình phương sai số (SSE)</strong>:</p>
-                    <div class="formula">
-                        \[ \text{Variance}(D) = \frac{1}{|D|} \sum_{i \in D} (y_i - \bar{y})^2 \]
-                    </div>
-                    <p>trong đó \(\bar{y}\) là giá trị trung bình của nhãn trong \(D\).</p>
+                    <h4>c) Sai số phân loại (Classification Error)</h4>
+                    <div class="formula">\[ \text{Error}(D) = 1 - \max_j p_j \]</div>
+                    <p>Tỷ lệ sai tối thiểu nếu đoán tất cả vào lớp đa số. Ít nhạy hơn Gini và Entropy.</p>
 
-                    <h2>II. Công thức tính Gain, trọng số và cách chọn thuộc tính</h2>
-                    <p>Khi phân tách một node thành các node con dựa trên thuộc tính \(A\) (có \(v\) giá trị khác nhau, tạo các tập con \(D_1, D_2, \dots, D_v\)), ta tính <strong>độ lợi (gain)</strong> dựa trên việc giảm độ đo bất thuần.</p>
+                    <h3>2. Công thức tính Gain (độ lợi) cho phân loại</h3>
+                    <p>Khi phân tách node cha \(D\) thành \(v\) node con \(D_1, ..., D_v\) dựa trên thuộc tính \(A\). Đặt \(n = |D|\), \(n_k = |D_k|\). Trọng số \(w_k = n_k/n\).</p>
 
-                    <h3>1. Information Gain (cho phân loại với Entropy)</h3>
-                    <div class="formula">
-                        \[ \text{Gain}(D, A) = \text{Entropy}(D) - \sum_{k=1}^{v} \frac{|D_k|}{|D|} \cdot \text{Entropy}(D_k) \]
-                    </div>
-                    <p>Trong đó \(\frac{|D_k|}{|D|}\) là <strong>trọng số</strong> của nhánh thứ \(k\). Chọn thuộc tính có Gain lớn nhất.</p>
+                    <h4>a) Reduction in Gini (Gini Gain)</h4>
+                    <div class="formula">\[ \text{Gini}_{\text{tb}}(D, A) = \sum_{k=1}^{v} \frac{n_k}{n} \cdot \text{Gini}(D_k) \]</div>
+                    <div class="formula">\[ \text{Gain}_{\text{Gini}}(D, A) = \text{Gini}(D) - \text{Gini}_{\text{tb}}(D, A) \]</div>
 
-                    <h3>2. Reduction in Gini (tương tự)</h3>
-                    <div class="formula">
-                        \[ \text{GiniGain}(D, A) = \text{Gini}(D) - \sum_{k=1}^{v} \frac{|D_k|}{|D|} \cdot \text{Gini}(D_k) \]
-                    </div>
+                    <h4>b) Information Gain (dùng Entropy)</h4>
+                    <div class="formula">\[ \text{Entropy}_{\text{tb}}(D, A) = \sum_{k=1}^{v} \frac{n_k}{n} \cdot \text{Entropy}(D_k) \]</div>
+                    <div class="formula">\[ \text{Gain}_{\text{Entropy}}(D, A) = \text{Entropy}(D) - \text{Entropy}_{\text{tb}}(D, A) \]</div>
 
-                    <h3>3. Variance Reduction (cho hồi quy)</h3>
-                    <div class="formula">
-                        \[ \text{VarGain}(D, A) = \text{Var}(D) - \sum_{k=1}^{v} \frac{|D_k|}{|D|} \cdot \text{Var}(D_k) \]
-                    </div>
-                    <p>Chọn thuộc tính làm giảm phương sai nhiều nhất.</p>
+                    <p>Chọn thuộc tính có Gain lớn nhất (cả hai trường hợp).</p>
 
-                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
-                        <h3 style="margin-top: 0; color: #1976D2;">📐 Ví dụ minh họa cho phân loại</h3>
-                        <p>Xét tập D có 10 mẫu: 6 lớp A, 4 lớp B.<br>
-                        \(\text{Gini}(D) = 1 - [(0.6)^2 + (0.4)^2] = 1 - (0.36+0.16)=0.48\)<br>
-                        Giả sử thuộc tính X chia D thành D1 (7 mẫu: 5A,2B) và D2 (3 mẫu: 1A,2B).<br>
-                        \(\text{Gini}(D1)=1-[(5/7)^2+(2/7)^2]=1-(0.51+0.082)=0.408\)<br>
-                        \(\text{Gini}(D2)=1-[(1/3)^2+(2/3)^2]=1-(0.111+0.444)=0.445\)<br>
-                        Trọng số: \(w_1=0.7, w_2=0.3\).<br>
-        \(\text{GiniGain}=0.48 - (0.7*0.408+0.3*0.445)=0.48-0.419=0.061\)</p>
-                    </div>
+                    <h3>3. Ví dụ minh họa (Gini Gain)</h3>
+                    <p>Tập \(D\) có 10 mẫu: 6 lớp A, 4 lớp B. \(\text{Gini}(D)=1-(0.6^2+0.4^2)=0.48\).<br>
+                    Thuộc tính X chia \(D\) thành \(D_1\) (7 mẫu: 5A,2B) và \(D_2\) (3 mẫu: 1A,2B).<br>
+                    \(\text{Gini}(D_1)=1-[(5/7)^2+(2/7)^2]=0.408\), \(\text{Gini}(D_2)=1-[(1/3)^2+(2/3)^2]=0.444\).<br>
+                    Trọng số: \(w_1=0.7, w_2=0.3\). \(\text{Gini}_{\text{tb}} = 0.7×0.408 + 0.3×0.444 = 0.4188\).<br>
+                    \(\text{Gain}_{\text{Gini}} = 0.48 - 0.4188 = 0.0612\).</p>
 
                     <h3>4. Gain Ratio (khắc phục thiên vị thuộc tính nhiều giá trị)</h3>
-                    <p>Được dùng trong C4.5:</p>
-                    <div class="formula">
-                        \[ \text{GainRatio}(D,A) = \frac{\text{Gain}(D,A)}{\text{SplitInfo}(D,A)} \]
-                        \[ \text{SplitInfo}(D,A) = -\sum_{k=1}^{v} \frac{|D_k|}{|D|} \log_2\left(\frac{|D_k|}{|D|}\right) \]
-                    </div>
+                    <div class="formula">\[ \text{GainRatio}(D,A) = \frac{\text{Gain}(D,A)}{\text{SplitInfo}(D,A)} \]</div>
+                    <div class="formula">\[ \text{SplitInfo}(D,A) = -\sum_{k=1}^{v} \frac{|D_k|}{|D|} \log_2\frac{|D_k|}{|D|} \]</div>
 
-                    <h3>5. Xử lý thuộc tính số (Continuous Attributes)</h3>
-                    <p>Với thuộc tính số, ta sắp xếp các giá trị, xét ngưỡng là trung bình cộng giữa hai giá trị kề nhau, tính gain cho từng ngưỡng và chọn ngưỡng tốt nhất.</p>
+                    <!-- ==================== PHẦN HỒI QUY ==================== -->
+                    <h2>III. Decision Tree cho bài toán Hồi quy</h2>
+                    <h3>1. Độ đo: Phương sai (Variance)</h3>
+                    <p>Xét tập \(D\) có \(n\) phần tử, nhãn \(y_i\). Gọi \(\bar{y}\) là trung bình của các nhãn:</p>
+                    <div class="formula">\[ \bar{y} = \frac{1}{n}\sum_{i \in D} y_i \]</div>
+                    <div class="formula">\[ \text{Var}(D) = \frac{1}{n}\sum_{i \in D} (y_i - \bar{y})^2 \]</div>
+                    <p>Phương sai càng nhỏ, các giá trị càng đồng nhất. Khi tất cả nhãn bằng nhau, \(\text{Var}(D)=0\).</p>
 
-                    <h2>III. Kết luận</h2>
-                    <p>Decision Tree là một mô hình mạnh mẽ, trực quan, có thể giải thích được, áp dụng cho cả phân loại và hồi quy. Việc hiểu rõ các độ đo (Gini, Entropy, Variance) và cách tính gain với trọng số giúp bạn nắm được cốt lõi của thuật toán. Tuy nhiên, cây quyết định dễ bị overfitting; cần cắt tỉa (pruning) hoặc sử dụng các phương pháp ensemble như Random Forest, Gradient Boosting để cải thiện độ chính xác và độ ổn định.</p>
-                    <p>Trong thực hành, bạn có thể dùng <code>DecisionTreeClassifier</code> và <code>DecisionTreeRegressor</code> từ thư viện scikit-learn với các tham số như <code>criterion='gini'</code> hoặc <code>'entropy'</code>, <code>max_depth</code>, <code>min_samples_split</code> để kiểm soát overfitting.</p>
-                    <p>Bài tiếp theo sẽ tìm hiểu về <strong>Random Forest</strong> – tập hợp nhiều cây quyết định để tăng độ chính xác.</p>
+                    <h3>2. Variance Reduction (độ giảm phương sai)</h3>
+                    <p>Phân tách node cha \(D\) thành các node con \(D_1,...,D_v\) theo thuộc tính \(A\). Phương sai trung bình có trọng số:</p>
+                    <div class="formula">\[ \text{Var}_{\text{tb}}(D, A) = \sum_{k=1}^{v} \frac{|D_k|}{|D|} \cdot \text{Var}(D_k) \]</div>
+                    <p>Độ giảm phương sai (Variance Reduction):</p>
+                    <div class="formula">\[ \text{Gain}_{\text{Var}}(D, A) = \text{Var}(D) - \text{Var}_{\text{tb}}(D, A) \]</div>
+                    <p>Chọn thuộc tính làm giảm phương sai nhiều nhất.</p>
+
+                    <h3>3. Ví dụ minh họa (Variance Reduction)</h3>
+                    <p>Tập \(D\) có 6 mẫu với nhãn: \(y = [10, 12, 14, 20, 22, 24]\).<br>
+                    \(\bar{y}=17\), \(\text{Var}(D)=((10-17)^2+...+(24-17)^2)/6 \approx 28.67\).<br>
+                    Giả sử thuộc tính \(A\) tách thành \(D_1\): [10,12,14] (trung bình 12, var=2.67) và \(D_2\): [20,22,24] (trung bình 22, var=2.67).<br>
+                    Trọng số: mỗi tập 3/6=0.5. \(\text{Var}_{\text{tb}} = 0.5×2.67+0.5×2.67=2.67\).<br>
+                    \(\text{Gain}_{\text{Var}} = 28.67 - 2.67 = 26\). Rất cao, chứng tỏ phân tách rất tốt.</p>
+
+                    <!-- ==================== CÁC PHẦN CHUNG ==================== -->
+                    <h2>IV. Xử lý thuộc tính số (Continuous Attributes)</h2>
+                    <p>Với thuộc tính số, ta sắp xếp các giá trị, xét ngưỡng là trung bình cộng giữa hai giá trị kề nhau, tính gain (hoặc variance reduction) cho từng ngưỡng và chọn ngưỡng tốt nhất.</p>
+
+                    <h2>V. Kết luận</h2>
+                    <p>Decision Tree là mô hình mạnh mẽ, dễ giải thích. Hiểu rõ các chỉ số (Gini, Entropy, Variance) và cách tính gain giúp nắm được cốt lõi của thuật toán. Cần chú ý overfitting – có thể dùng pruning hoặc ensemble (Random Forest, Gradient Boosting).</p>
+                    <p>Trong thực hành, dùng <code>DecisionTreeClassifier</code> với <code>criterion='gini'</code> hoặc <code>'entropy'</code> cho phân loại, và <code>DecisionTreeRegressor</code> với <code>criterion='squared_error'</code> (MSE) cho hồi quy.</p>
                 </div>
 
                 <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
                     <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <a href="kmeans.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                        <a href="kmeans.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
                             <strong>K-means Clustering</strong>
                             <p style="font-size: 0.9em; margin: 5px 0 0 0;">Phân cụm không giám sát</p>
                         </a>
-                        <a href="elasticsearch.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
-                            <strong>Elasticsearch</strong>
-                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Tìm kiếm phân tán</p>
+                        <a href="random-forest.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Random Forest</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Tập hợp cây quyết định</p>
                         </a>
-                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
                             <strong>Trang chủ</strong>
                             <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
                         </a>

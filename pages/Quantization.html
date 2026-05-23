@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantization – Kỹ thuật tối ưu mô hình học sâu - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Quantization – Kỹ thuật tối ưu mô hình học sâu</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 24/04/2026</span>
+                        <span>Chuyên mục: Tối ưu & Triển khai mô hình</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#quantization</span>
+                        <span>#pytorch</span>
+                        <span>#model-compression</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa</h2>
+                    <p><strong>Quantization</strong> là phương pháp tối ưu mô hình học sâu bằng cách tính toán và lưu trữ tensor ở kiểu dữ liệu có số bit thấp hơn (ví dụ từ float32 xuống int8), qua đó giảm kích thước mô hình, tăng tốc độ suy luận và tiết kiệm bộ nhớ, trong khi vẫn giữ được độ chính xác chấp nhận được. Mô hình học sâu về bản chất là các phép toán ma trận, do đó cách biểu diễn số ảnh hưởng trực tiếp đến hiệu năng.</p>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/quantrization_fp32_int8.jpg" alt="">
+                    </div>
+                    <p>Việc lưu trữ số dấu phẩy động 32-bit (float32) cho độ chính xác cao nhưng tốn nhiều bộ nhớ và thời gian tính toán. Ngược lại, số nguyên 8-bit (int8) nhẹ hơn nhiều nhưng có phạm vi biểu diễn hẹp. Quantization là quá trình ánh xạ các giá trị liên tục (float) sang một tập giá trị rời rạc (int) bằng cách xác định các “ô” (bin) – những giá trị gần nhau được gom về cùng một giá trị mới.</p>
+                    <p>Ví dụ: hai số 2.12234 và 2.934 ở float32 có thể cùng được ánh xạ về 23 ở int8 nếu cả hai nằm trong cùng một ô [2, 3].</p>
+
+                    <h2>II. Lợi ích của Quantization</h2>
+                    <ul>
+                        <li><strong>Giảm kích thước mô hình</strong> lên đến 4 lần (32-bit → 8-bit).</li>
+                        <li><strong>Giảm băng thông bộ nhớ</strong> khi đọc/ghi dữ liệu.</li>
+                        <li><strong>Tăng tốc độ suy luận</strong> từ 2 đến 4 lần (phụ thuộc phần cứng).</li>
+                        <li>Tiết kiệm năng lượng, đặc biệt trên thiết bị biên (edge devices).</li>
+                    </ul>
+
+                    <h2>III. Các phương pháp Quantization </h2>
+                    <p>Chúng ta cùng tìm hiểu về ba giải thuật quantization chính: <strong>Dynamic Quantization</strong>, <strong>Static Quantization (Post-Training)</strong>, và <strong>Quantization-Aware Training (QAT)</strong>.</p>
+
+                    <h3>1. Dynamic Quantization (Post-Training Quantization)</h3>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/Dynamic_Quantization.png" alt="" style="width: 80%;">
+                    </div>
+                    <p>Trong phương pháp này, trọng số (weights) được quantize ngay từ đầu, còn các giá trị activation được quantize <strong>trong lúc inference</strong> (dynamic). Việc chuyển đổi được thực hiện bằng cách nhân giá trị đầu vào với một hệ số tỷ lệ (scaling factor), làm tròn, và lưu trữ dưới dạng số nguyên.</p>
+                    <p><strong>Ưu điểm:</strong> Đơn giản, không cần dữ liệu calibration.  
+                    <strong>Nhược điểm:</strong> Hiệu quả không cao bằng static quantization.  
+                    <strong>Ứng dụng:</strong> Các mô hình có thời gian tải trọng số chi phối (LSTM, Transformer) hoặc khi không muốn tinh chỉnh.</p>
+
+                    <h3>2. Static Quantization (Post-Training Quantization)</h3>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/Static_Quantization.png" alt="" style="width: 80%;">
+                    </div>
+                    <p>Khác với dynamic, static quantization quantize cả <strong>weights và activations</strong> trước khi inference. Quá trình gồm:</p>
+                    <ul>
+                        <li><strong>Calibration:</strong> Chạy một vài batch dữ liệu để xác định khoảng giá trị của activations, từ đó tính scale và zero-point.</li>
+                        <li><strong>Fuse layers:</strong> Gộp các lớp như Conv + BatchNorm + ReLU thành một khối duy nhất để tăng hiệu quả tính toán.</li>
+                        <li><strong>Quantize và đánh giá:</strong> Có thể fine-tuning nhẹ sau quantization.</li>
+                    </ul>
+                    <p><strong>Lưu ý:</strong> Độ chính xác có thể phụ thuộc vào phần cứng (FBGEMM cho x86, QNNPACK cho ARM).</p>
+
+                    <h3>3. Quantization-Aware Training (QAT)</h3>
+                    <p>QAT mô phỏng ảnh hưởng của quantization ngay trong quá trình huấn luyện (fine-tuning) bằng cách chèn các lớp <strong>fake quantization</strong> vào mô hình. Các lớp này lượng tử hóa trong forward pass nhưng vẫn tính gradient ở dạng float (để cập nhật trọng số).</p>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/QAT.png" alt="" style="width: 80%;">
+                    </div>
+                    <p><strong>Quy trình QAT:</strong></p>
+                    <ol>
+                        <li>Huấn luyện mô hình float32.</li>
+                        <li>Chèn các lớp fake quantization vào trong mạng vừa được huấn luyện xong(ví dụ <code>torch.quantization.QuantStub</code>, <code>DeQuantStub</code>).</li>
+                        <li>Thực hiện Fine-tune mô hình (vẫn dùng float cho gradient).</li>
+                        <li>Chuyển đổi sang mô hình quantize thực sự (loại bỏ fake quantization).</li>
+                    </ol>
+                    <p>Hàm fake quantization thường có dạng:</p>
+                    <div class="formula">
+                        \[
+                        \text{fake\_quant}(x) = \frac{\text{round}\left(\frac{\text{clamp}(x, \text{min}, \text{max})}{s}\right)}{s}
+                        \]
+                    </div>
+                    <p>QAT cho kết quả tốt nhất, đặc biệt khi mô hình nhạy cảm với quantization.</p>
+
+                    <h2>IV. Quantization trong PyTorch – Chi tiết</h2>
+                    <p>PyTorch cung cấp hai chế độ quantization chính:</p>
+                    <ul>
+                        <li><strong>Eager Mode Quantization:</strong> Người dùng tự chỉ định các vị trí quantize, cần fuse layers thủ công. Chỉ hỗ trợ các module thuộc <code>torch.nn</code>.</li>
+                        <li><strong>FX Graph Mode Quantization:</strong> Tự động hóa hơn, hoạt động trên đồ thị FX, hỗ trợ cả hàm và module, nhưng yêu cầu mô hình phải được viết dưới dạng <code>torch.nn.Module</code> và có thể phải sửa nhẹ.</li>
+                    </ul>
+                    <p>Dưới đây là ví dụ tối thiểu cho static quantization (eager mode):</p>
+                    <pre><code class="language-python">import torch
+import torch.nn as nn
+import torch.quantization as quant
+
+# Giả sử đã có model đã huấn luyện
+model = MyModel()
+model.eval()
+
+# Fuse layers (ví dụ Conv + ReLU)
+model.fuse_model()  # tự định nghĩa hàm fuse
+
+# Cấu hình quantization
+model.qconfig = torch.quantization.get_default_qconfig('fbgemm')
+torch.quantization.prepare(model, inplace=True)
+
+# Calibration (chạy một vài batch dữ liệu)
+with torch.no_grad():
+    for data in calibration_loader:
+        model(data)
+
+# Chuyển sang mô hình quantized
+torch.quantization.convert(model, inplace=True)
+
+# Lưu model
+torch.save(model.state_dict(), 'quantized_model.pth')</code></pre>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📌 Lưu ý thực tế</h3>
+                        <ul>
+                            <li>Luôn đánh giá lại độ chính xác sau khi quantize (trên tập validation).</li>
+                            <li>Với các mô hình nhạy cảm (như mô hình ngôn ngữ nhỏ), QAT thường cho kết quả khả quan hơn static quantization.</li>
+                            <li>Khi triển khai lên thiết bị di động (ARM), dùng backend QNNPACK hoặc Vulkan.</li>
+                        </ul>
+                    </div>
+
+                    <h2>V. Kết luận</h2>
+                    <p>Quantization là một kỹ thuật mạnh mẽ, không thể thiếu khi triển khai mô hình học sâu lên các môi trường có tài nguyên hạn chế (điện thoại, IoT, nhúng). Tùy vào yêu cầu về độ chính xác và tốc độ, bạn có thể chọn dynamic quantization (nhanh, dễ), static quantization (cân bằng), hoặc QAT (chất lượng cao nhất). PyTorch cung cấp đầy đủ công cụ để áp dụng các phương pháp này một cách linh hoạt.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="pruning.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Cắt tỉa mô hình (Pruning)</strong>
+                        </a>
+                        <a href="bn_dropout_reg.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>BN, Dropout, Reg</strong>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Trang chủ</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="pruning.html">← Previous: Pruning</a>
+                    <a href="pytorch.html">Next: PyTorch cơ bản →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
