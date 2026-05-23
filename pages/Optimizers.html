@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Các thuật toán tối ưu - SGD, Momentum, Adam - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Các thuật toán tối ưu trong học sâu: SGD, Momentum, Adam</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 17/04/2026</span>
+                        <span>Chuyên mục: Deep Learning cơ bản</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#optimization</span>
+                        <span>#sgd</span>
+                        <span>#momentum</span>
+                        <span>#adam</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. SGD (Stochastic Gradient Descent)</h2>
+                    <h3>1. Định nghĩa</h3>
+                    <p><strong>SGD</strong> là thuật toán tối ưu cơ bản nhất cho huấn luyện mạng nơ-ron. Thay vì tính gradient trên toàn bộ tập dữ liệu (batch gradient descent), SGD cập nhật trọng số sau mỗi <strong>mẫu</strong> hoặc <strong>mini-batch</strong>, giúp hội tụ nhanh hơn và có thể thoát khỏi các điểm dừng cục bộ nhờ tính ngẫu nhiên. SGD là nền tảng cho các thuật toán tối ưu hiện đại hơn.</p>
+
+                    <h3>2. Toán học</h3>
+                    <p>Cho hàm mất mát \( J(\theta) \) với \(\theta\) là tập trọng số cần tối ưu. Gradient của \(J\) theo \(\theta\) tại mini-batch \(B\) được ký hiệu \(\nabla_\theta J(\theta; B)\). Quy tắc cập nhật SGD:</p>
+                    <div class="formula">
+                        \[
+                        \theta := \theta - \eta \, \nabla_\theta J(\theta; B)
+                        \]
+                    </div>
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li>\(\eta > 0\) là <strong>tốc độ học (learning rate)</strong>.</li>
+                        <li>\(B\) là mini-batch (thường 16, 32, 64, 128 mẫu).</li>
+                    </ul>
+                    <p>Nếu kích thước batch = 1, gọi là <strong>Stochastic Gradient Descent thuần</strong>; nếu batch = toàn bộ tập dữ liệu, gọi là <strong>Batch Gradient Descent</strong> (chậm, tốn bộ nhớ). Trong thực tế, "SGD" thường chỉ mini-batch SGD.</p>
+                    <p><strong>Điều kiện dừng:</strong> lặp đến khi loss hội tụ hoặc đủ số epoch.</p>
+
+                    <h2>II. Momentum (Gradient Descent với quán tính)</h2>
+                    <h3>1. Định nghĩa</h3>
+                    <p><strong>Momentum</strong> là cải tiến của SGD nhằm tăng tốc độ hội tụ, đặc biệt trên các bề mặt mất mát có độ dốc thay đổi (thung lũng hẹp). Nó tích lũy các gradient trong quá khứ dưới dạng "vận tốc", giúp bước nhảy lớn hơn ở vùng có gradient cùng hướng và giảm dao động ở vùng gradient đổi chiều. Thuật toán được đề xuất bởi Polyak (1964) và được áp dụng rộng rãi trong học sâu bởi Sutskever et al. (2013).</p>
+
+                    <h3>2. Toán học</h3>
+                    <p>Khởi tạo vận tốc \(v = 0\). Tại mỗi bước, tính gradient \(g = \nabla_\theta J(\theta; B)\). Sau đó:</p>
+                    <div class="formula">
+                        \[
+                        v := \beta v + (1-\beta) g
+                        \]
+                        \[
+                        \theta := \theta - \eta \, v
+                        \]
+                    </div>
+                    <p>Hoặc một dạng phổ biến khác (không có \((1-\beta)\) ở số hạng gradient):</p>
+                    <div class="formula">
+                        \[
+                        v := \beta v + g
+                        \]
+                        \[
+                        \theta := \theta - \eta \, v
+                        \]
+                    </div>
+                    <p>Trong cả hai dạng, \(\beta\) (thường = 0.9) là <strong>hệ số động lượng (momentum coefficient)</strong>. Dạng đầu tiên có lợi thế là không làm thay đổi tỷ lệ gradient theo \(\beta\).</p>
+                    <p>Momentum giúp vượt qua các điểm yên ngựa (saddle point) và giảm dao động, hội tụ nhanh hơn SGD thuần.</p>
+
+                    <h2>III. Adam (Adaptive Moment Estimation)</h2>
+                    <h3>1. Định nghĩa</h3>
+                    <p><strong>Adam</strong> (Kingma & Ba, 2014) là một trong những thuật toán tối ưu phổ biến nhất hiện nay, kết hợp ý tưởng của <strong>Momentum</strong> (giữ động lượng bậc nhất) và <strong>RMSprop</strong> (tự động điều chỉnh tốc độ học dựa trên động lượng bậc hai). Adam tự điều chỉnh tốc độ học riêng cho từng tham số, phù hợp với các bài toán có dữ liệu thưa (sparse) và nhiễu. Nó hội tụ nhanh và ổn định, thường được dùng làm mặc định cho hầu hết các mô hình học sâu.</p>
+
+                    <h3>2. Toán học</h3>
+                    <p>Khởi tạo \(m_0 = 0\) (momentum bậc 1), \(v_0 = 0\) (momentum bậc 2), và bước thời gian \(t=0\). Chọn các siêu tham số: \(\eta\) (learning rate, thường 0.001), \(\beta_1\) (thường 0.9), \(\beta_2\) (thường 0.999), \(\varepsilon\) (số nhỏ tránh chia 0, thường \(10^{-8}\)).</p>
+                    <p>Tại mỗi bước \(t\) (xử lý mini-batch), tính gradient \(g_t = \nabla_\theta J(\theta; B)\).</p>
+                    <div class="formula">
+                        \[
+                        m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t
+                        \]
+                        \[
+                        v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2
+                        \]
+                    </div>
+                    <p>Hiệu chỉnh lệch (bias correction) cho \(m_t\) và \(v_t\) do khởi tạo bằng 0:</p>
+                    <div class="formula">
+                        \[
+                        \hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}
+                        \]
+                    </div>
+                    <p>Cập nhật tham số:</p>
+                    <div class="formula">
+                        \[
+                        \theta_t = \theta_{t-1} - \frac{\eta}{\sqrt{\hat{v}_t} + \varepsilon} \, \hat{m}_t
+                        \]
+                    </div>
+                    <p>Adam rất ít khi phải điều chỉnh siêu tham số ngoài learning rate, hoạt động tốt trên nhiều bài toán.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📌 Mã minh họa (Python, đơn giản cho hàm 1D)</h3>
+                        <pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+# Hàm mất mát: f(x)=x^2 + 10*sin(x) (có nhiều local minima)
+def f(x): return x**2 + 10*np.sin(x)
+def grad_f(x): return 2*x + 10*np.cos(x)
+
+# SGD
+def sgd(x0, lr, epochs):
+    x = x0
+    hist = [x]
+    for _ in range(epochs):
+        x -= lr * grad_f(x)
+        hist.append(x)
+    return hist
+
+# Momentum
+def momentum(x0, lr, beta, epochs):
+    x = x0
+    v = 0
+    hist = [x]
+    for _ in range(epochs):
+        g = grad_f(x)
+        v = beta * v + (1-beta) * g  # dạng chuẩn
+        x -= lr * v
+        hist.append(x)
+    return hist
+
+# Adam
+def adam(x0, lr, beta1, beta2, eps, epochs):
+    x = x0
+    m = 0
+    v = 0
+    t = 0
+    hist = [x]
+    for _ in range(epochs):
+        t += 1
+        g = grad_f(x)
+        m = beta1 * m + (1-beta1) * g
+        v = beta2 * v + (1-beta2) * g**2
+        m_hat = m / (1 - beta1**t)
+        v_hat = v / (1 - beta2**t)
+        x -= lr * m_hat / (np.sqrt(v_hat) + eps)
+        hist.append(x)
+    return hist
+
+# Thử nghiệm
+x0 = 4.0
+epochs = 50
+sgd_hist = sgd(x0, lr=0.1, epochs=epochs)
+mom_hist = momentum(x0, lr=0.1, beta=0.9, epochs=epochs)
+adam_hist = adam(x0, lr=0.1, beta1=0.9, beta2=0.999, eps=1e-8, epochs=epochs)
+
+plt.plot(sgd_hist, label='SGD')
+plt.plot(mom_hist, label='Momentum')
+plt.plot(adam_hist, label='Adam')
+plt.legend()
+plt.title('So sánh hội tụ trên f(x)=x²+10sin(x)')
+plt.xlabel('bước lặp')
+plt.ylabel('x')
+plt.show()</code></pre>
+                    </div>
+
+                    <div style="background: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="mlp.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>MLP</strong>
+                            </a>
+                            <a href="backpropagation.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Backpropagation</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="activation_functions.html">← Previous: Activation Functions</a>
+                        <a href="regularization.html">Next: Regularization →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

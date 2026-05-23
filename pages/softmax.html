@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hàm Softmax - Softmax Function - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Hàm Softmax</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 14/04/2026</span>
+                        <span>Chuyên mục: Neural Networks & Deep Learning</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#softmax</span>
+                        <span>#activation-function</span>
+                        <span>#classification</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa</h2>
+                    <p><strong>Hàm Softmax</strong> là một hàm kích hoạt thường được sử dụng ở tầng đầu ra của mạng nơron cho bài toán <strong>phân loại đa lớp</strong> (multiclass classification). Nó nhận đầu vào là một vector giá trị thực (gọi là logits) \( \mathbf{z} = [z_1, z_2, \dots, z_K] \) và biến đổi thành một vector xác suất \( \mathbf{p} = [p_1, p_2, \dots, p_K] \) với các đặc tính:</p>
+                    <ul>
+                        <li>Mỗi phần tử \(0 < p_i < 1\).</li>
+                        <li>Tổng các phần tử \(\sum_{i=1}^K p_i = 1\).</li>
+                    </ul>
+                    <p>Softmax thường được kết hợp với <strong>cross-entropy loss</strong> trong quá trình huấn luyện.</p>
+
+                    <h2>II. Toán học</h2>
+                    <p>Cho logits \(z_1, z_2, \dots, z_K\) (K là số lớp), hàm softmax định nghĩa:</p>
+                    <div class="formula">
+                        \[
+                        p_i = \text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}, \quad i=1,\dots,K
+                        \]
+                    </div>
+                    <p>Trong thực tế, để tránh tràn số khi tính mũ, người ta thường trừ đi giá trị lớn nhất trong vector:</p>
+                    <div class="formula">
+                        \[
+                        p_i = \frac{e^{z_i - \max(z)}}{\sum_{j=1}^{K} e^{z_j - \max(z)}}
+                        \]
+                    </div>
+                    <p>Hàm softmax có thể được coi là mở rộng của sigmoid cho nhiều lớp. Khi \(K=2\), softmax cho ra hai xác suất, và nếu chỉ lấy một đầu ra, nó tương đương với sigmoid sau khi chuẩn hóa.</p>
+                    <p>Trong mạng nơron, tầng cuối cùng thường là một lớp tuyến tính với K nút (không có hàm kích hoạt), sau đó áp dụng softmax để có xác suất. Nhãn dự đoán là lớp có xác suất cao nhất: \(\hat{y} = \arg\max_i p_i\).</p>
+
+                    <h2>III. Tối ưu – Kết hợp với Cross-Entropy Loss</h2>
+                    <p>Khi sử dụng softmax cho phân loại đa lớp, hàm mất mát phổ biến là <strong>categorical cross-entropy</strong>. Với mỗi mẫu có nhãn one-hot \(\mathbf{y} = [y_1, \dots, y_K]\) (y_i = 1 cho lớp đúng, 0 cho còn lại), và xác suất dự đoán \(\mathbf{p} = \text{softmax}(\mathbf{z})\), loss được định nghĩa:</p>
+                    <div class="formula">
+                        \[
+                        L = -\sum_{i=1}^{K} y_i \log(p_i) = -\log(p_c)
+                        \]
+                    </div>
+                    <p>trong đó \(c\) là lớp đúng (vì chỉ có một y_i=1).</p>
+                    <p><strong>Đạo hàm của loss theo logit</strong> \(z_j\) rất đẹp:</p>
+                    <div class="formula">
+                        \[
+                        \frac{\partial L}{\partial z_j} = p_j - y_j
+                        \]
+                    </div>
+                    <p>Chứng minh:  
+                    \( \frac{\partial \log(p_i)}{\partial z_j} = \delta_{ij} - p_j \) (với \(\delta_{ij}=1\) nếu i=j).  
+                    Do đó \( \frac{\partial L}{\partial z_j} = -\sum_i y_i \frac{\partial \log(p_i)}{\partial z_j} = -\sum_i y_i (\delta_{ij} - p_j) = -y_j + (\sum_i y_i) p_j = p_j - y_j \) (vì \(\sum_i y_i = 1\)).</p>
+                    <p>Gradient đơn giản này giúp lan truyền ngược (backpropagation) hiệu quả. Khi huấn luyện mạng với softmax + cross-entropy, trọng số được cập nhật theo gradient descent.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📌 Ví dụ Python minh họa</h3>
+                        <pre><code class="language-python">import numpy as np
+
+def softmax(z):
+    z_shift = z - np.max(z, axis=-1, keepdims=True)
+    exp_z = np.exp(z_shift)
+    return exp_z / np.sum(exp_z, axis=-1, keepdims=True)
+
+def cross_entropy_loss(p, y):
+    # y là one-hot, p là xác suất
+    return -np.sum(y * np.log(p + 1e-8))  # +1e-8 tránh log(0)
+
+# Ví dụ: 3 lớp, 2 mẫu
+logits = np.array([[2.0, 1.0, 0.1], [0.5, 2.0, 0.3]])
+probs = softmax(logits)
+print("Xác suất:\n", probs)
+print("Tổng mỗi hàng:", probs.sum(axis=1))
+
+# Giả sử nhãn one-hot cho mẫu 0: lớp 0; mẫu 1: lớp 1
+y_true = np.array([[1, 0, 0], [0, 1, 0]])
+loss = cross_entropy_loss(probs, y_true)
+print("Cross-entropy loss:", loss)
+
+# Gradient: (probs - y_true) / m (cho m mẫu)
+grad = (probs - y_true) / len(probs)
+print("Gradient của loss theo logits:\n", grad)</code></pre>
+                    </div>
+
+                    <div style="background: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="logistic_regression.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Logistic Regression</strong>
+                            </a>
+                            <a href="perceptron.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Perceptron</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="perceptron.html">← Previous: Perceptron</a>
+                        <a href="mlp.html">Next: Multi-Layer Perceptron →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

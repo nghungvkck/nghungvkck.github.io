@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hồi quy Logistic - Logistic Regression - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Hồi quy Logistic (Logistic Regression)</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 12/04/2026</span>
+                        <span>Chuyên mục: Machine Learning cơ bản</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#logistic-regression</span>
+                        <span>#classification</span>
+                        <span>#sigmoid</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa</h2>
+                    <p><strong>Hồi quy Logistic</strong> là một thuật toán học có giám sát dùng cho bài toán <strong>phân loại nhị phân</strong> (hai lớp). Mặc dù tên gọi có "hồi quy", nhưng thực chất nó là mô hình phân loại. Đầu ra của mô hình là xác suất để một mẫu thuộc về một lớp nhất định (thường là lớp 1), sau đó dùng ngưỡng (thường là 0.5) để quyết định nhãn cuối cùng.</p>
+                    <p>Logistic Regression sử dụng hàm <strong>sigmoid</strong> (logistic function) để "ép" đầu ra của tổ hợp tuyến tính vào khoảng (0, 1), phù hợp để biểu diễn xác suất.</p>
+
+                    <h2>II. Toán học</h2>
+                    <p>Với mỗi mẫu đầu vào \(\mathbf{x} = [x_1, x_2, \dots, x_n]^T\), mô hình tính tổ hợp tuyến tính:</p>
+                    <div class="formula">
+                        \[
+                        z = \theta_0 + \theta_1 x_1 + \dots + \theta_n x_n = \boldsymbol{\theta}^T \mathbf{x}
+                        \]
+                    </div>
+                    <p>Sau đó áp dụng hàm sigmoid để chuyển \(z\) thành xác suất dự đoán lớp dương (y=1):</p>
+                    <div class="formula">
+                        \[
+                        h_{\boldsymbol{\theta}}(\mathbf{x}) = \sigma(z) = \frac{1}{1 + e^{-z}} = \frac{1}{1 + e^{-\boldsymbol{\theta}^T \mathbf{x}}}
+                        \]
+                    </div>
+                    <p>Hàm sigmoid có dạng chữ S, luôn nằm giữa 0 và 1.</p>
+                    <p>Xác suất dự đoán cho hai lớp:</p>
+                    <div class="formula">
+                        \[
+                        P(y=1|\mathbf{x};\boldsymbol{\theta}) = h_{\boldsymbol{\theta}}(\mathbf{x}), \quad P(y=0|\mathbf{x};\boldsymbol{\theta}) = 1 - h_{\boldsymbol{\theta}}(\mathbf{x})
+                        \]
+                    </div>
+                    <p>Hàm mất mát (loss function) được sử dụng là <strong>log loss (binary cross-entropy)</strong>:</p>
+                    <div class="formula">
+                        \[
+                        J(\boldsymbol{\theta}) = -\frac{1}{m} \sum_{i=1}^{m} \left[ y^{(i)} \log(h_{\boldsymbol{\theta}}(\mathbf{x}^{(i)})) + (1-y^{(i)}) \log(1 - h_{\boldsymbol{\theta}}(\mathbf{x}^{(i)})) \right]
+                        \]
+                    </div>
+                    <p>Hàm này có tính chất lồi (convex), đảm bảo có một điểm tối ưu toàn cục.</p>
+
+                    <h2>III. Tối ưu</h2>
+                    <p>Không có công thức dạng đóng (closed-form) cho nghiệm tối ưu của logistic regression như linear regression. Ta phải sử dụng các phương pháp tối ưu lặp. Phổ biến nhất là <strong>Gradient Descent</strong> và các biến thể (SGD, Mini-batch GD).</p>
+                    <p>Đạo hàm của hàm mất mát theo từng hệ số \(\theta_j\):</p>
+                    <div class="formula">
+                        \[
+                        \frac{\partial J}{\partial \theta_j} = \frac{1}{m} \sum_{i=1}^{m} (h_{\boldsymbol{\theta}}(\mathbf{x}^{(i)}) - y^{(i)}) x_j^{(i)}
+                        \]
+                    </div>
+                    <p>Cập nhật gradient descent (lặp đồng thời):</p>
+                    <div class="formula">
+                        \[
+                        \theta_j := \theta_j - \alpha \frac{\partial J}{\partial \theta_j}
+                        \]
+                    </div>
+                    <p>Với \(\alpha\) là tốc độ học.</p>
+                    <p>Ngoài gradient descent, có thể dùng các thuật toán tối ưu bậc hai như <strong>Newton-Raphson</strong> (hội tụ nhanh hơn nhưng tính Hessian tốn chi phí). Trong thực hành, các thư viện như scikit-learn dùng <strong>liblinear</strong> hoặc <strong>lbfgs</strong>.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📌 Ghi chú</h3>
+                        <ul>
+                            <li>Logistic regression thường dùng cho bài toán hai lớp, nhưng có thể mở rộng cho đa lớp bằng chiến lược one-vs-rest (OvR) hoặc softmax regression.</li>
+                            <li>Giống linear regression, logistic regression cũng có thể thêm regularization (L1, L2) để tránh overfitting.</li>
+                            <li>So với các mô hình phức tạp, logistic regression có ưu điểm là dễ giải thích, nhanh và hoạt động tốt với dữ liệu ít nhiễu.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="linear_regression.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Linear Regression</strong>
+                        </a>
+                        <a href="decision_tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Decision Tree</strong>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Trang chủ</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="linear_regression.html">← Previous: Linear Regression</a>
+                    <a href="svm.html">Next: SVM →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

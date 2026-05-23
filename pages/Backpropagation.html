@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lan truyền ngược - Backpropagation - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Lan truyền ngược (Backpropagation)</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 14/04/2026</span>
+                        <span>Chuyên mục: Deep Learning cơ bản</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#backpropagation</span>
+                        <span>#neural-network</span>
+                        <span>#gradient-descent</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa</h2>
+                    <p><strong>Lan truyền ngược (Backpropagation)</strong> là thuật toán cốt lõi để huấn luyện mạng nơron nhiều lớp. Nó tính toán <strong>gradient</strong> của hàm mất mát theo tất cả các trọng số trong mạng một cách hiệu quả bằng cách áp dụng <strong>quy tắc dây chuyền (chain rule)</strong> của đạo hàm. Các gradient này sau đó được dùng trong <strong>gradient descent</strong> (hoặc các biến thể) để cập nhật trọng số, giảm dần giá trị loss.</p>
+                    <p>Backpropagation gồm hai pha chính:</p>
+                    <ol>
+                        <li><strong>Lan truyền xuôi (forward pass)</strong>: Tính đầu ra của mạng và loss.</li>
+                        <li><strong>Lan truyền ngược (backward pass)</strong>: Tính đạo hàm của loss theo từng trọng số, bắt đầu từ tầng cuối cùng quay ngược về đầu.</li>
+                    </ol>
+                    <p>Thuật toán được đề xuất độc lập bởi nhiều nhà nghiên cứu (Rumelhart, Hinton, Williams, 1986) và trở thành nền tảng cho học sâu.</p>
+
+                    <h2>II. Toán học của Backpropagation</h2>
+                    <p>Xét mạng nơron gồm nhiều tầng, mỗi tầng thực hiện phép biến đổi:</p>
+                    <div class="formula">
+                        \[
+                        \mathbf{a}^{[l]} = f^{[l]}(\mathbf{z}^{[l]}), \quad \mathbf{z}^{[l]} = \mathbf{W}^{[l]} \mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}
+                        \]
+                    </div>
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li>\(\mathbf{a}^{[l]}\) là đầu ra (activation) của tầng \(l\), \(\mathbf{a}^{[0]} = \mathbf{x}\) (đầu vào).</li>
+                        <li>\(\mathbf{z}^{[l]}\) là đầu vào của hàm kích hoạt tại tầng \(l\).</li>
+                        <li>\(\mathbf{W}^{[l]}, \mathbf{b}^{[l]}\) là trọng số và bias của tầng \(l\).</li>
+                        <li>\(f^{[l]}\) là hàm kích hoạt (sigmoid, ReLU, softmax,...).</li>
+                    </ul>
+                    <p>Hàm mất mát \(L\) phụ thuộc vào đầu ra của tầng cuối \(\mathbf{a}^{[L]}\) và nhãn thực \(y\).</p>
+                    <p>Mục tiêu: tính \(\frac{\partial L}{\partial \mathbf{W}^{[l]}}\) và \(\frac{\partial L}{\partial \mathbf{b}^{[l]}}\) cho mọi \(l\).</p>
+
+                    <h3>1. Quy tắc dây chuyền (Chain Rule)</h3>
+                    <p>Đạo hàm của loss theo trọng số được tính bằng cách lan truyền "sai số" từ tầng cuối lên:</p>
+                    <div class="formula">
+                        \[
+                        \frac{\partial L}{\partial \mathbf{W}^{[l]}} = \frac{\partial L}{\partial \mathbf{z}^{[l]}} \cdot \frac{\partial \mathbf{z}^{[l]}}{\partial \mathbf{W}^{[l]}} = \delta^{[l]} \cdot (\mathbf{a}^{[l-1]})^T
+                        \]
+                    </div>
+                    <p>trong đó \(\delta^{[l]} = \frac{\partial L}{\partial \mathbf{z}^{[l]}}\) được gọi là <strong>gradient local</strong> hoặc "lỗi" tại tầng \(l\).</p>
+
+                    <h3>2. Tính δ từ tầng cuối về đầu</h3>
+                    <p><strong>Bước cơ sở (tầng cuối L):</strong>  
+                    Với softmax + cross-entropy, \(\delta^{[L]} = \mathbf{a}^{[L]} - \mathbf{y}\) (một kết quả rất đẹp).  
+                    Với các hàm loss và kích hoạt khác, ta tính trực tiếp:</p>
+                    <div class="formula">
+                        \[
+                        \delta^{[L]} = \frac{\partial L}{\partial \mathbf{a}^{[L]}} \odot f'^{[L]}(\mathbf{z}^{[L]})
+                        \]
+                    </div>
+                    <p>trong đó \(\odot\) là tích Hadamard (element-wise), \(f'\) là đạo hàm của hàm kích hoạt.</p>
+                    <p><strong>Lan truyền ngược sang tầng trước:</strong></p>
+                    <div class="formula">
+                        \[
+                        \delta^{[l]} = \left( (\mathbf{W}^{[l+1]})^T \delta^{[l+1]} \right) \odot f'^{[l]}(\mathbf{z}^{[l]})
+                        \]
+                    </div>
+                    <p>Giải thích: lỗi ở tầng sau được nhân với ma trận trọng số (chuyển vị) để "phân bố" lỗi về tầng trước, sau đó nhân với đạo hàm của kích hoạt tại tầng hiện tại.</p>
+
+                    <h3>3. Gradient cho trọng số và bias</h3>
+                    <div class="formula">
+                        \[
+                        \frac{\partial L}{\partial \mathbf{W}^{[l]}} = \delta^{[l]} \cdot (\mathbf{a}^{[l-1]})^T, \quad \frac{\partial L}{\partial \mathbf{b}^{[l]}} = \delta^{[l]}
+                        \]
+                    </div>
+                    <p>Với batch gradient descent, các gradient được lấy trung bình trên toàn bộ batch.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📌 Ví dụ cụ thể với mạng 1 lớp ẩn (tính tay)</h3>
+                        <p>Xét mạng: \(x \to \text{linear} \to h = \sigma(z_1) \to \text{linear} \to \hat{y} = \sigma(z_2)\) với loss MSE. Tính gradient cho từng bước.</p>
+                        <pre><code class="language-python">import numpy as np
+
+# Dữ liệu giả
+x = np.array([1.0, 2.0])
+y_true = 0.8
+W1 = np.array([[0.5, -0.2], [0.3, 0.7]])
+b1 = np.array([0.1, -0.1])
+W2 = np.array([0.4, 0.6])
+b2 = 0.0
+
+# Forward
+z1 = W1 @ x + b1
+h = 1 / (1 + np.exp(-z1))  # sigmoid
+z2 = np.dot(W2, h) + b2
+y_pred = 1 / (1 + np.exp(-z2))
+loss = 0.5 * (y_pred - y_true)**2
+
+# Backward: dL/dy_pred
+dy = y_pred - y_true
+# dL/dz2 = dy * sigmoid'(z2) = dy * y_pred*(1-y_pred)
+dz2 = dy * y_pred * (1 - y_pred)
+# dL/dW2 = dz2 * h^T
+dW2 = dz2 * h
+# dL/db2 = dz2
+# dL/dh = W2^T * dz2
+dh = W2 * dz2
+# dL/dz1 = dh * sigmoid'(z1)
+dz1 = dh * h * (1 - h)
+# dL/dW1 = dz1.reshape(-1,1) @ x.reshape(1,-1)
+dW1 = np.outer(dz1, x)
+db1 = dz1
+
+print("dW2:", dW2, "db2:", dz2)
+print("dW1:\n", dW1, "\ndb1:", db1)</code></pre>
+                    </div>
+
+                    <h3>4. Vấn đề biến mất/bùng nổ gradient</h3>
+                    <p>Trong mạng sâu, đạo hàm của các hàm kích hoạt như sigmoid/tanh có giá trị nhỏ (<0.25), nhân nhiều lần có thể làm gradient tiến về 0 → <strong>biến mất gradient</strong>. Ngược lại, ReLU có thể gây <strong>bùng nổ gradient</strong>. Các kỹ thuật như Batch Normalization, residual connections, gradient clipping giúp khắc phục.</p>
+
+                    <div style="background: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="perceptron.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Perceptron</strong>
+                            </a>
+                            <a href="softmax.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Softmax</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="softmax.html">← Previous: Softmax</a>
+                        <a href="optimizers.html">Next: Các thuật toán tối ưu →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

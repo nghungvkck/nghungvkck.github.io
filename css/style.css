@@ -19,6 +19,7 @@ body {
     background: var(--bg);
     color: var(--text);
     line-height: 1.55;
+    font-size: 0.92rem;
 }
 
 .navbar {
@@ -303,7 +304,7 @@ body {
     padding-top: 26px;
     border-top: 1px solid var(--line);
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 26px;
 }
 
@@ -355,7 +356,8 @@ body {
 
 .card-content h3 {
     font-family: "Merriweather", serif;
-    font-size: clamp(1.3rem, 1.8vw, 2rem);
+    font-size: 1.5rem;
+    /* font-size: clamp(1.1rem, 1.8vw, 2rem); */
     line-height: 1.24;
     margin-bottom: 12px;
 }

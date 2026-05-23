@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MLP - Multi-Layer Perceptron - Mạng nơ-ron nhiều lớp - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>MLP - Multi-Layer Perceptron (Mạng nơ-ron nhiều lớp)</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 15/04/2026</span>
+                        <span>Chuyên mục: Deep Learning cơ bản</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#mlp</span>
+                        <span>#neural-network</span>
+                        <span>#deep-learning</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa MLP</h2>
+                    <p><strong>MLP (Multi-Layer Perceptron)</strong> là một mạng nơ-ron nhân tạo gồm nhiều lớp: một lớp đầu vào, một hoặc nhiều lớp ẩn (hidden layers), và một lớp đầu ra. MLP là sự mở rộng của perceptron đơn lớp (Rosenblatt, 1958) với khả năng học các mối quan hệ <strong>phi tuyến</strong> phức tạp nhờ các hàm kích hoạt phi tuyến ở các lớp ẩn và thuật toán <strong>lan truyền ngược (backpropagation)</strong>.</p>
+                    <p>MLP là nền tảng của hầu hết các mô hình học sâu hiện đại, từ phân loại ảnh (CNN có thể coi là MLP đặc biệt) đến xử lý ngôn ngữ (các biến thể RNN, Transformer).</p>
+
+                    <h2>II. Kiến trúc và Lan truyền xuôi (Forward Propagation)</h2>
+                    <p>Một MLP với \(L\) lớp (tính cả đầu ra, không tính đầu vào) được định nghĩa như sau:</p>
+                    <ul>
+                        <li><strong>Lớp đầu vào</strong>: \(\mathbf{a}^{[0]} = \mathbf{x}\) (vector đặc trưng).</li>
+                        <li><strong>Các lớp ẩn và lớp đầu ra</strong> (l = 1..L):</li>
+                    </ul>
+                    <div class="formula">
+                        \[
+                        \mathbf{z}^{[l]} = \mathbf{W}^{[l]} \mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}
+                        \]
+                        \[
+                        \mathbf{a}^{[l]} = f^{[l]}(\mathbf{z}^{[l]})
+                        \]
+                    </div>
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li>\(\mathbf{W}^{[l]}\) là ma trận trọng số kích thước \(n_l \times n_{l-1}\) (nối từ lớp \(l-1\) sang lớp \(l\)).</li>
+                        <li>\(\mathbf{b}^{[l]}\) là vector bias kích thước \(n_l\).</li>
+                        <li>\(f^{[l]}\) là hàm kích hoạt (ReLU, sigmoid, tanh, softmax ở lớp cuối).</li>
+                    </ul>
+                    <p><strong>Hàm kích hoạt phổ biến cho lớp ẩn:</strong> ReLU (\(f(z)=\max(0,z)\)) hoặc tanh, sigmoid. Lớp đầu ra dùng softmax cho phân loại đa lớp, sigmoid cho nhị phân, hoặc linear cho hồi quy.</p>
+                    <p>MLP với ít nhất một lớp ẩn và hàm kích hoạt phi tuyến có thể xấp xỉ bất kỳ hàm liên tục nào (theo định lý xấp xỉ phổ dụng – Universal Approximation Theorem).</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📐 Ví dụ MLP đơn giản: 1 lớp ẩn, 3 lớp</h3>
+                        <p>Vào 2 nút → Ẩn 4 nút (ReLU) → Ra 3 nút (softmax).</p>
+                        <pre><code class="language-python">import numpy as np
+
+def relu(z):
+    return np.maximum(0, z)
+
+def softmax(z):
+    exp_z = np.exp(z - np.max(z))
+    return exp_z / np.sum(exp_z)
+
+# Khởi tạo ngẫu nhiên (thực tế cần khởi tạo nhỏ)
+W1 = np.random.randn(4, 2) * 0.01
+b1 = np.zeros((4, 1))
+W2 = np.random.randn(3, 4) * 0.01
+b2 = np.zeros((3, 1))
+
+# Forward cho một mẫu x (2,1)
+x = np.array([[1.0], [0.5]])
+z1 = W1 @ x + b1      # (4,1)
+a1 = relu(z1)
+z2 = W2 @ a1 + b2     # (3,1)
+a2 = softmax(z2)
+print("Xác suất các lớp:", a2.flatten())</code></pre>
+                    </div>
+
+                    <h2>III. Huấn luyện MLP – Backpropagation</h2>
+                    <p>Quá trình huấn luyện MLP sử dụng <strong>backpropagation</strong> (đã trình bày trong bài trước) kết hợp với gradient descent. Các bước chính:</p>
+                    <ol>
+                        <li><strong>Forward pass</strong>: Tính \(\mathbf{z}^{[l]}, \mathbf{a}^{[l]}\) cho toàn bộ mạng và loss \(L\).</li>
+                        <li><strong>Backward pass</strong>: Tính gradient của loss theo từng trọng số bắt đầu từ lớp cuối.</li>
+                        <li><strong>Cập nhật trọng số</strong> bằng gradient descent (hoặc Adam, RMSprop...).</li>
+                    </ol>
+                    <p>Công thức tổng quát cho một mẫu (hoặc batch) với <strong>mạng L lớp</strong>:</p>
+                    <div class="formula">
+                        \[
+                        \delta^{[L]} = \nabla_{\mathbf{a}^{[L]}} L \odot f'^{[L]}(\mathbf{z}^{[L]})
+                        \]
+                        \[
+                        \delta^{[l]} = \left( (\mathbf{W}^{[l+1]})^T \delta^{[l+1]} \right) \odot f'^{[l]}(\mathbf{z}^{[l]}) \quad \text{(l = L-1 ... 1)}
+                        \]
+                        \[
+                        \frac{\partial L}{\partial \mathbf{W}^{[l]}} = \delta^{[l]} (\mathbf{a}^{[l-1]})^T, \quad \frac{\partial L}{\partial \mathbf{b}^{[l]}} = \delta^{[l]}
+                        \]
+                    </div>
+                    <p><strong>Trường hợp đặc biệt:</strong> Nếu lớp cuối là softmax + cross-entropy, ta có \(\delta^{[L]} = \mathbf{a}^{[L]} - \mathbf{y}\) (rất đẹp). Với MSE + linear đầu ra, \(\delta^{[L]} = \mathbf{a}^{[L]} - \mathbf{y}\).</p>
+
+                    <h3>Ví dụ huấn luyện MLP 1 ẩn (từ đầu, không dùng framework)</h3>
+                    <pre><code class="language-python">import numpy as np
+
+# Dữ liệu XOR (phi tuyến)
+X = np.array([[0,0],[0,1],[1,0],[1,1]]).T   # (2,4)
+y = np.array([[0,1,1,0]])                    # (1,4)
+
+# Khởi tạo
+np.random.seed(1)
+W1 = np.random.randn(4,2) * 0.5
+b1 = np.zeros((4,1))
+W2 = np.random.randn(1,4) * 0.5
+b2 = np.zeros((1,1))
+
+lr = 0.5
+epochs = 10000
+
+def sigmoid(z):
+    return 1/(1+np.exp(-z))
+
+def sigmoid_deriv(a):
+    return a*(1-a)
+
+for epoch in range(epochs):
+    # Forward
+    z1 = W1 @ X + b1
+    a1 = sigmoid(z1)
+    z2 = W2 @ a1 + b2
+    a2 = sigmoid(z2)
+    
+    # Loss (MSE)
+    loss = np.mean((a2 - y)**2)
+    
+    # Backward
+    dL_da2 = 2*(a2 - y) / y.size
+    dL_dz2 = dL_da2 * sigmoid_deriv(a2)
+    dL_dW2 = dL_dz2 @ a1.T
+    dL_db2 = np.sum(dL_dz2, axis=1, keepdims=True)
+    
+    dL_da1 = W2.T @ dL_dz2
+    dL_dz1 = dL_da1 * sigmoid_deriv(a1)
+    dL_dW1 = dL_dz1 @ X.T
+    dL_db1 = np.sum(dL_dz1, axis=1, keepdims=True)
+    
+    # Cập nhật
+    W2 -= lr * dL_dW2
+    b2 -= lr * dL_db2
+    W1 -= lr * dL_dW1
+    b1 -= lr * dL_db1
+    
+    if epoch % 2000 == 0:
+        print(f"Epoch {epoch}, Loss: {loss:.4f}")
+
+# Dự đoán
+print("Kết quả sau huấn luyện:")
+print("Dự đoán:", a2.round().flatten())
+print("Nhãn thật:", y.flatten())</code></pre>
+
+                    <h2>IV. Các vấn đề và cải tiến trong MLP</h2>
+                    <ul>
+                        <li><strong>Overfitting</strong>: Dùng regularization (L1, L2), dropout, early stopping.</li>
+                        <li><strong>Biến mất / bùng nổ gradient</strong>: Dùng ReLU, batch normalization, gradient clipping, khởi tạo trọng số tốt (Xavier/He).</li>
+                        <li><strong>Tốc độ hội tụ</strong>: Dùng optimizer Adam thay vì SGD thuần.</li>
+                        <li><strong>Số lượng nút ẩn và số lớp</strong>: Tăng dần, dùng cross-validation.</li>
+                    </ul>
+
+                    <div style="background: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="perceptron.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Perceptron</strong>
+                            </a>
+                            <a href="backpropagation.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Backpropagation</strong>
+                            </a>
+                            <a href="softmax.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Softmax</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="backpropagation.html">← Previous: Backpropagation</a>
+                        <a href="optimizers.html">Next: Các thuật toán tối ưu (Optimizers) →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

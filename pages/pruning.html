@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cắt tỉa mô hình (Pruning) - Kỹ thuật tối ưu cho Deep Learning - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Cắt tỉa mô hình (Pruning) – Kỹ thuật tối ưu cho Deep Learning</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 20/04/2026</span>
+                        <span>Chuyên mục: Mô hình nhẹ & Triển khai</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#pruning</span>
+                        <span>#model-compression</span>
+                        <span>#pytorch</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa</h2>
+                    <p><strong>Cắt tỉa mô hình (Pruning)</strong> là kỹ thuật giảm kích thước và độ phức tạp của mạng nơ-ron bằng cách loại bỏ các tham số (trọng số, nơ-ron, kênh, bộ lọc) có đóng góp ít nhất đến hiệu suất. Khác với lượng tử hóa (giảm độ chính xác), cắt tỉa loại bỏ hoàn toàn tham số, tạo ra ma trận thưa (sparse) hoặc mô hình nhỏ gọn hơn về mặt cấu trúc, giúp giảm bộ nhớ, tăng tốc suy luận, và tiết kiệm năng lượng – đặc biệt quan trọng khi triển khai trên thiết bị biên (edge devices) hoặc môi trường tài nguyên hạn chế.</p>
+                    <p>Ý tưởng cốt lõi xuất phát từ quan sát: nhiều mạng nơ-ron lớn bị <strong>thừa tham số đáng kể</strong>. Chúng chứa các trọng số dư thừa hoặc thậm chí toàn bộ các đơn vị cấu trúc (nơ-ron, kênh) có thể được loại bỏ mà vẫn giữ được độ chính xác, đặc biệt sau giai đoạn <strong>tinh chỉnh (fine-tuning)</strong>. Điều này phù hợp với <strong>Giả thuyết Vé số (Lottery Ticket Hypothesis)</strong>: trong mạng dày đặc tồn tại một mạng con nhỏ hơn có thể đạt hiệu suất tương đương khi được huấn luyện riêng.</p>
+
+                    <h2>II. Chiến lược cắt tỉa</h2>
+                    <p>Có hai chiến lược chính: <strong>cắt tỉa không cấu trúc</strong> và <strong>cắt tỉa có cấu trúc</strong>. Mỗi loại có ưu nhược điểm riêng và phù hợp với các mục đích triển khai khác nhau.</p>
+
+                    <h3>1. Cắt tỉa không cấu trúc (Unstructured Pruning)</h3>
+                    <p>Cắt tỉa không cấu trúc: Phương pháp này bao gồm việc loại bỏ các trọng số riêng lẻ khỏi mạng dựa trên một số tiêu chí nhất định, thường là độ lớn của chúng. Các trọng số có giá trị gần bằng 0 ít ảnh hưởng hơn và được đặt chính xác bằng 0. Điều này tạo ra các ma trận trọng số thưa.</p>
+                    <ul>
+                        <li><strong>Ưu điểm</strong>: Có thể đạt tỷ lệ thưa thớt rất cao (90-99%) mà tổn thất độ chính xác tối thiểu sau khi tinh chỉnh.</li>
+                        <li><strong>Nhược điểm</strong>: Các ma trận thưa thu được thường không trực tiếp mang lại tốc độ xử lý nhanh hơn trên phần cứng tiêu chuẩn (CPU, GPU) khi sử dụng các thư viện nhân ma trận dày đặc thông thường (như cuBLAS). Để đạt được tốc độ xử lý nhanh hơn đáng kể thường cần đến các bộ tăng tốc phần cứng chuyên dụng hoặc các thư viện phần mềm được tối ưu hóa cho các phép tính ma trận thưa (ví dụ: torch.sparse). Việc giảm kích thước mô hình là đáng kể, điều này có lợi cho băng thông lưu trữ và bộ nhớ.</li>
+                    </ul>
+
+                    <h3>2. Cắt tỉa có cấu trúc (Structured Pruning)</h3>
+                    <p>Thay vì loại bỏ từng trọng số riêng lẻ, phương pháp này loại bỏ toàn bộ các thành phần cấu trúc như bộ lọc hoặc kênh trong các lớp tích chập, hoặc các nơron trong các lớp kết nối đầy đủ.</p>
+                    <ul>
+                        <li><strong>Ưu điểm</strong>: Tạo ra các mô hình nhỏ gọn hơn . Cấu trúc còn lại đều đặn và có thể được thực thi hiệu quả bằng phần cứng và thư viện tiêu chuẩn, thường dẫn đến tăng tốc độ suy luận trực tiếp và giảm mức sử dụng bộ nhớ mà không cần hỗ trợ chuyên dụng.</li>
+                        <li><strong>Nhược điểm</strong>: Thường đạt được mức độ thưa thớt thấp hơn so với việc cắt tỉa không cấu trúc trước khi độ chính xác bắt đầu giảm đáng kể. Việc xác định cấu trúc nào cần loại bỏ đòi hỏi phải phân tích cẩn thận các mối phụ thuộc (ví dụ: việc loại bỏ một kênh ảnh hưởng đến các lớp tiếp theo sử dụng kênh đó).</li>
+                    </ul>
+
+                    <h2>III. Quy trình cắt tỉa tổng quát</h2>
+                    <p>Quy trình làm việc thông thường gồm các bước lặp hoặc một lần:</p>
+                    <ol>
+                        <li><strong>Huấn luyện mô hình gốc</strong>: Bắt đầu với mô hình dày đặc, đã hội tụ.</li>
+                        <li><strong>Chọn chiến lược & tiêu chí</strong>: Quyết định unstructured/structured, tiêu chí (độ lớn, gradient, độ nhạy...), và tỷ lệ cắt tỉa mục tiêu.</li>
+                        <li><strong>Áp dụng cắt tỉa</strong>: Tính toán mặt nạ (mask) và đặt các tham số không quan trọng về 0.</li>
+                        <li><strong>Tinh chỉnh (Fine-tuning)</strong>: Huấn luyện lại mô hình đã cắt tỉa với tốc độ học nhỏ, để các trọng số còn lại thích nghi bù đắp.</li>
+                        <li><strong>(Tùy chọn) Lặp lại</strong>: Tăng dần tỷ lệ thưa thớt, lặp lại bước 3-4. Cắt tỉa lặp thường cho kết quả tốt hơn cắt một lần.</li>
+                    </ol>
+                    <p>Mục tiêu là tìm ra sự cân bằng tối ưu giữa độ thưa thớt (hoặc kích thước mô hình) và độ chính xác.</p>
+
+                    <h2>IV. Tiêu chí cắt tỉa</h2>
+                    <ul>
+                        <li><strong>Cắt tỉa dựa trên độ lớn (Magnitude-based)</strong>: Phổ biến nhất. Đối với unstructured, cắt các trọng số có giá trị tuyệt đối nhỏ nhất. Với structured, tính chuẩn \(L_p\) (thường \(L_1\) hoặc \(L_2\)) của nhóm tham số (ví dụ: chuẩn \(L_1\) của bộ lọc) và cắt nhóm có chuẩn thấp nhất.</li>
+                        <li><strong>Cắt tỉa dựa trên gradient</strong>: Sử dụng thông tin gradient, có thể kết hợp với độ lớn (ví dụ: tích magnitude * gradient). Phương pháp SynFlow (Tanaka et al.) có thể tìm mạng con quan trọng ngay từ khi khởi tạo.</li>
+                        <li><strong>Cắt tỉa dựa trên độ nhạy (Sensitivity)</strong>: Đo lường ảnh hưởng lên hàm mất mát nếu loại bỏ một tham số hoặc cấu trúc. Thường tốn kém vì cần nhiều forward/backward.</li>
+                    </ul>
+                    <p>Trong thực tế, cắt tỉa theo độ lớn (L1) rất hiệu quả và được triển khai sẵn trong PyTorch.</p>
+
+                    <h2>V. Thực hành cắt tỉa với PyTorch</h2>
+                    <p>PyTorch cung cấp module <code>torch.nn.utils.prune</code> hỗ trợ cả unstructured và structured pruning. Dưới đây là ví dụ minh họa:</p>
+
+                    <pre><code class="language-python">import torch
+import torch.nn as nn
+import torch.nn.utils.prune as prune
+
+# Tạo một lớp Conv2d mẫu
+layer = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3)
+
+# --- Cắt tỉa không cấu trúc ---
+# Cắt tỉa 30% trọng số có độ lớn L1 nhỏ nhất toàn cục
+prune.l1_unstructured(layer, name="weight", amount=0.3)
+
+# Mặt nạ (mask) đã được gắn vào layer
+print(hasattr(layer, 'weight_mask'))  # True
+print(layer.weight_mask)              # Tensor 0/1 với khoảng 30% số 0
+
+# --- Cắt tỉa có cấu trúc (ví dụ: cắt kênh đầu ra) ---
+structured_layer = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3)
+# Cắt tỉa 25% số kênh đầu ra (dim=0) dựa trên chuẩn L2 của mỗi bộ lọc
+prune.ln_structured(structured_layer, name="weight", amount=0.25, n=2, dim=0)
+print(hasattr(structured_layer, 'weight_mask'))  # True
+# Mặt nạ có cấu trúc: toàn bộ các hàng (kênh) bị zeroed
+
+# --- Làm cho việc cắt tỉa trở nên vĩnh viễn (sau khi tinh chỉnh) ---
+prune.remove(layer, 'weight')
+# Lúc này, layer.weight chứa trực tiếp các giá trị 0 (thay vì mask)
+print(torch.sum(layer.weight == 0))   # Đếm số trọng số đã bị cắt</code></pre>
+
+                    <p>Trong vòng lặp huấn luyện, bạn áp dụng cắt tỉa trước khi bắt đầu tinh chỉnh. Các gradient chỉ lan truyền qua các trọng số không bị che (unmasked). Hàm <code>prune.remove</code> sẽ loại bỏ mask và áp dụng vĩnh viễn các số 0, chuẩn bị cho triển khai.</p>
+
+                    <h2>VI. Sự đánh đổi (Trade-off)</h2>
+                    <p>Cắt tỉa luôn là bài toán cân bằng giữa <strong>độ chính xác</strong> và <strong>mức độ nén/tốc độ</strong>. Các yếu tố ảnh hưởng:</p>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/prunning.jpg" alt="">
+                    </div>
+                    <ul>
+                        <li><strong>Tỷ lệ cắt tỉa mục tiêu</strong>: Phụ thuộc vào kiến trúc, tập dữ liệu và tác vụ. Cần thử nghiệm để xác định ngưỡng mà độ chính xác bắt đầu giảm mạnh.</li>
+                        <li><strong>Tinh chỉnh (Fine-tuning)</strong>: Rất quan trọng để phục hồi độ chính xác. Số epoch và tốc độ học cần được chọn kỹ (thường là tốc độ học nhỏ). Việc tinh chỉnh có thể nhanh hơn do mô hình đã nhỏ, nhưng cần đủ thời gian để hội tụ.</li>
+                        <li><strong>Hỗ trợ phần cứng</strong>: Unstructured pruning chỉ thực sự có lợi khi dùng thư viện/phần cứng hỗ trợ tính toán thưa (sparse). Structured pruning cho tốc độ ngay lập tức trên CPU/GPU thông thường.</li>
+                        <li><strong>Kết hợp với các kỹ thuật khác</strong>: Có thể kết hợp cắt tỉa với lượng tử hóa (quantization) để đạt hiệu quả cao hơn.</li>
+                    </ul>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">Lưu ý thực tế</h3>
+                        <ul>
+                            <li>Luôn <strong>đánh giá mô hình đã cắt tỉa</strong> trên tập validation (hoặc test) sau mỗi bước tinh chỉnh.</li>
+                            <li>Cắt tỉa lặp (iterative pruning) – mỗi lần cắt một lượng nhỏ rồi tinh chỉnh – thường cho kết quả tốt hơn so với cắt một lần với tỷ lệ lớn.</li>
+                            <li>Với các mô hình lớn (ResNet, BERT), có thể cắt tỉa từ khi mới bắt đầu huấn luyện (pruning at initialization) dựa trên các phương pháp như SynFlow.</li>
+                        </ul>
+                    </div>
+
+                    <h2>VII. Kết luận</h2>
+                    <p>Cắt tỉa mô hình là một kỹ thuật mạnh mẽ để giảm kích thước và tăng tốc suy luận của mạng nơ-ron, đặc biệt quan trọng trong bối cảnh triển khai lên thiết bị biên hoặc hệ thống có tài nguyên hạn chế. Bằng cách lựa chọn chiến lược (cấu trúc hay không cấu trúc) và tiêu chí phù hợp, kết hợp với tinh chỉnh và lặp lại, bạn có thể đạt được mô hình nhẹ hơn đáng kể mà vẫn giữ được độ chính xác chấp nhận được. Thư viện PyTorch cung cấp các công cụ linh hoạt để tích hợp cắt tỉa vào quy trình huấn luyện một cách dễ dàng.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="quantization.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Lượng tử hóa (Quantization)</strong>
+                        </a>
+                        <a href="bn_dropout_reg.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>BN, Dropout, Regularization</strong>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Trang chủ</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="bn_dropout_reg.html">← Previous: BN, Dropout, Reg</a>
+                    <a href="quantization.html">Next: Lượng tử hóa →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

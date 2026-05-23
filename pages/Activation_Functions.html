@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Các hàm kích hoạt trong mạng nơ-ron - Activation Functions - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .activation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(255, 253, 248, 0.72);
+        }
+        .activation-table th, .activation-table td {
+            padding: 12px 14px;
+            border: 1px solid #d9d0c3;
+            text-align: left;
+            vertical-align: top;
+        }
+        .activation-table th {
+            background: rgba(23, 23, 23, 0.04);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Các hàm kích hoạt trong mạng nơ-ron</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 16/04/2026</span>
+                        <span>Chuyên mục: Deep Learning cơ bản</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#activation-functions</span>
+                        <span>#neural-network</span>
+                        <span>#relu</span>
+                        <span>#softmax</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa</h2>
+                    <p><strong>Hàm kích hoạt (Activation Function)</strong> là một hàm phi tuyến được áp dụng lên đầu ra của mỗi nơ-ron (sau phép biến đổi tuyến tính \(z = \mathbf{w}^T\mathbf{x}+b\)). Nó quyết định xem nơ-ron có "kích hoạt" hay không và giá trị đầu ra truyền sang tầng tiếp theo. Nếu không có hàm kích hoạt phi tuyến, mạng nơ-ron dù có nhiều lớp cũng chỉ tương đương với một phép biến đổi tuyến tính, không thể học các mối quan hệ phức tạp.</p>
+                    <p>Hàm kích hoạt thường được yêu cầu: khả vi (để backpropagation), đơn điệu, và ổn định về mặt số học.</p>
+
+                    <h2>II. Các hàm kích hoạt phổ biến</h2>
+                    
+                    <h3>1. Sigmoid (Logistic)</h3>
+                    <div class="formula">
+                        \[
+                        \sigma(z) = \frac{1}{1 + e^{-z}}, \quad \sigma'(z) = \sigma(z)(1 - \sigma(z))
+                        \]
+                    </div>
+                    <p><strong>Đồ thị:</strong> Dạng chữ S, đầu ra trong khoảng (0, 1).  
+                    <strong>Ưu điểm:</strong> Trơn, khả vi, đầu ra có ý nghĩa xác suất.  
+                    <strong>Nhược điểm:</strong> Bão hòa (gradient rất nhỏ khi |z| lớn → vanishing gradient), không zero-centered (gây khó hội tụ).  
+                    <strong>Dùng:</strong> Tầng đầu ra của phân loại nhị phân (kết hợp BCE loss).</p>
+
+                    <h3>2. Tanh (Hyperbolic Tangent)</h3>
+                    <div class="formula">
+                        \[
+                        \tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}} = 2\sigma(2z) - 1, \quad \tanh'(z) = 1 - \tanh^2(z)
+                        \]
+                    </div>
+                    <p><strong>Đồ thị:</strong> Dạng S đối xứng tâm, đầu ra (-1, 1), zero-centered.  
+                    <strong>Ưu điểm:</strong> Khắc phục được zero-centered của sigmoid, gradient mạnh hơn khi z gần 0.  
+                    <strong>Nhược điểm:</strong> Vẫn bão hòa và vanishing gradient ở hai đầu.  
+                    <strong>Dùng:</strong> Thường dùng trong RNN (ít hơn hiện nay) hoặc lớp ẩn nhỏ.</p>
+
+                    <h3>3. ReLU (Rectified Linear Unit)</h3>
+                    <div class="formula">
+                        \[
+                        \text{ReLU}(z) = \max(0, z), \quad \text{ReLU}'(z) = \begin{cases} 1 & \text{nếu } z>0 \\ 0 & \text{nếu } z \le 0 \end{cases}
+                        \]
+                    </div>
+                    <p><strong>Đồ thị:</strong> 0 với z≤0, tuyến tính với z>0.  
+                    <strong>Ưu điểm:</strong> Tính toán nhanh, không bão hòa ở vùng dương (giải quyết vanishing gradient), thúc đẩy sparse activation.  
+                    <strong>Nhược điểm:</strong> Chết ReLU (Dying ReLU) – nếu nhiều z≤0, nơ-ron không bao giờ kích hoạt → gradient 0.  
+                    <strong>Dùng:</strong> Là mặc định cho hầu hết các tầng ẩn trong CNN, MLP.</p>
+
+                    <h3>4. Leaky ReLU và Parametric ReLU (PReLU)</h3>
+                    <div class="formula">
+                        \[
+                        \text{LeakyReLU}(z) = \begin{cases} z & \text{nếu } z>0 \\ \alpha z & \text{nếu } z \le 0 \end{cases}, \quad \alpha \text{ nhỏ (0.01)}
+                        \]
+                    </div>
+                    <p>PReLU coi \(\alpha\) là tham số học được.  
+                    <strong>Ưu điểm:</strong> Khắc phục Dying ReLU (vẫn có gradient khi z<0).  
+                    <strong>Nhược điểm:</strong> Thêm một tham số (PReLU) hoặc chọn α (Leaky).  
+                    <strong>Dùng:</strong> Khi gặp hiện tượng nhiều nơ-ron chết.</p>
+
+
+                    <h3>5. Softmax (cho tầng cuối đa lớp)</h3>
+                    <div class="formula">
+                        \[
+                        \text{softmax}(\mathbf{z})_i = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}
+                        \]
+                    </div>
+                    <p><strong>Đồ thị:</strong> Biến vector logits thành phân phối xác suất.  
+                    <strong>Ưu điểm:</strong> Đầu ra có tổng bằng 1, có ý nghĩa xác suất.  
+                    <strong>Dùng:</strong> Bắt buộc ở tầng cuối của phân loại đa lớp, kết hợp cross-entropy.</p>
+
+                    <h2>III. So sánh và hướng dẫn chọn</h2>
+                    <table class="activation-table">
+                        <thead>
+                            <tr><th>Hàm</th><th>Công thức</th><th>Khoảng đầu ra</th><th>Ưu điểm chính</th><th>Nhược điểm chính</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Sigmoid</td><td>\(1/(1+e^{-z})\)</td><td>(0,1)</td><td>Xác suất, trơn</td><td>Vanishing gradient, không zero-centered</td></tr>
+                            <tr><td>Tanh</td><td>\((e^z-e^{-z})/(e^z+e^{-z})\)</td><td>(-1,1)</td><td>Zero-centered</td><td>Vẫn vanishing</td></tr>
+                            <tr><td>ReLU</td><td>\(\max(0,z)\)</td><td>[0,∞)</td><td>Nhanh, không bão hòa dương</td><td>Dying ReLU</td></tr>
+                            <tr><td>Leaky ReLU</td><td>\(\max(z,0.01z)\)</td><td>(-∞,∞)</td><td>Tránh chết neuron</td><td>Chọn α</td></tr>
+                            <tr><td>ELU</td><td>z>0: z; else α(e^z-1)</td><td>(-α,∞)</td><td>Gần zero-centered, gradient âm mượt</td><td>Tốn exp</td></tr>
+                            <tr><td>Swish</td><td>\(z\cdot\sigma(z)\)</td><td>(-0.28,∞)</td><td>Outperform ReLU</td><td>Tính toán nặng hơn</td></tr>
+                            <tr><td>GELU</td><td>\(z\Phi(z)\)</td><td>(-∞,∞)</td><td>Dùng trong Transformer</td><td>Phức tạp</td></tr>
+                            <tr><td>Softmax</td><td>\(e^{z_i}/\sum e^{z_j}\)</td><td>(0,1), tổng 1</td><td>Phân phối xác suất</td><td>Chỉ tầng cuối</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Hướng dẫn chọn:</strong></p>
+                    <ul>
+                        <li><strong>Lớp ẩn:</strong> Bắt đầu với ReLU. Nếu có Dying ReLU, chuyển sang Leaky ReLU hoặc ELU.</li>
+                        <li><strong>Lớp đầu ra cho hồi quy:</strong> Không dùng kích hoạt (linear).</li>
+                        <li><strong>Lớp đầu ra cho phân loại nhị phân:</strong> Sigmoid.</li>
+                        <li><strong>Lớp đầu ra cho phân loại đa lớp:</strong> Softmax.</li>
+                        <li><strong>Mô hình sâu, lớn:</strong> Có thể thử Swish hoặc GELU (tốn thời gian tính).</li>
+                    </ul>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📌 Mã minh họa vẽ đồ thị các hàm (dùng matplotlib)</h3>
+                        <pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+def sigmoid(z): return 1/(1+np.exp(-z))
+def tanh(z): return np.tanh(z)
+def relu(z): return np.maximum(0,z)
+def leaky_relu(z, alpha=0.01): return np.where(z>0, z, alpha*z)
+def elu(z, alpha=1.0): return np.where(z>0, z, alpha*(np.exp(z)-1))
+def swish(z): return z * sigmoid(z)
+
+z = np.linspace(-5,5,200)
+plt.figure(figsize=(12,8))
+plt.plot(z, sigmoid(z), label='Sigmoid')
+plt.plot(z, tanh(z), label='Tanh')
+plt.plot(z, relu(z), label='ReLU')
+plt.plot(z, leaky_relu(z), label='Leaky ReLU (0.01)')
+plt.plot(z, elu(z), label='ELU (α=1)')
+plt.plot(z, swish(z), label='Swish')
+plt.legend()
+plt.grid(True)
+plt.title("Các hàm kích hoạt")
+plt.show()</code></pre>
+                    </div>
+
+                    <div style="background: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="mlp.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>MLP</strong>
+                            </a>
+                            <a href="backpropagation.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Backpropagation</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="mlp.html">← Previous: MLP</a>
+                        <a href="optimizers.html">Next: Các thuật toán tối ưu →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

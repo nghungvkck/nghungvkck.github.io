@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NLTK - Thư viện Xử lý Ngôn ngữ Tự nhiên cho Python (Chi tiết) - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <!-- Highlight.js cho tô màu code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        pre code.hljs {
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>NLTK: Thư viện Xử lý Ngôn ngữ Tự nhiên cho Python (Chi tiết)</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 11/04/2026</span>
+                        <span>Chuyên mục: Xử lý Ngôn ngữ Tự nhiên (NLP)</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#nltk</span>
+                        <span>#nlp</span>
+                        <span>#python</span>
+                        <span>#tokenization</span>
+                        <span>#wordnet</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa NLTK</h2>
+                    <p><strong>NLTK (Natural Language Toolkit)</strong> là thư viện mã nguồn mở hàng đầu cho Python trong lĩnh vực <strong>Xử lý Ngôn ngữ Tự nhiên (NLP)</strong>. Được phát triển từ năm 2001 tại Đại học Pennsylvania, NLTK cung cấp các công cụ và tài nguyên để xử lý văn bản, phân tích ngữ nghĩa, và xây dựng hệ thống xử lý ngôn ngữ. Thư viện bao gồm các mô-đun cho tokenization, stemming, tagging, parsing, classification, và nhiều ngữ liệu (corpora) mẫu như sách, báo, từ điển WordNet.</p>
+                    <pre><code class="language-bash"># Cài đặt NLTK
+pip install nltk
+
+# Sau khi cài, cần tải dữ liệu (corpora, tokenizers, v.v.)
+python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('averaged_perceptron_tagger'); nltk.download('brown'); nltk.download('reuters'); nltk.download('gutenberg'); nltk.download('conll2000')"</code></pre>
+
+                    <!-- <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📚 So sánh NLTK với các thư viện NLP khác</h3>
+                        <ul>
+                            <li><strong>NLTK</strong>: Toàn diện, nhiều tài nguyên, phù hợp học tập và nghiên cứu, nhưng chậm hơn.</li>
+                            <li><strong>SpaCy</strong>: Nhanh, tối ưu cho sản xuất, hỗ trợ deep learning, ít ngữ liệu hơn.</li>
+                            <li><strong>TextBlob</strong>: Đơn giản, xây dựng trên NLTK, dễ dùng cho tác vụ cơ bản.</li>
+                            <li><strong>Transformers (Hugging Face)</strong>: Mô hình tiền huấn luyện mạnh mẽ (BERT, GPT), xử lý ngữ cảnh tốt.</li>
+                        </ul>
+                    </div> -->
+
+                    <h2>II. Vai trò của NLTK trong NLP</h2>
+                    <ul>
+                        <li><strong>Cung cấp các bước tiền xử lý văn bản</strong>: tokenization, loại bỏ stopwords, stemming/lemmatization.</li>
+                        <li><strong>Hỗ trợ gán nhãn từ loại (POS tagging)</strong> và phân tích cú pháp (parsing).</li>
+                        <li><strong>Tích hợp WordNet</strong> – cơ sở dữ liệu từ vựng tiếng Anh, hỗ trợ tìm đồng nghĩa, trái nghĩa, siêu từ.</li>
+                        <li><strong>Các mô hình phân loại văn bản</strong> (Naive Bayes, Maximum Entropy, Decision Tree).</li>
+                        <li><strong>Kho ngữ liệu mẫu phong phú</strong> (báo, sách, hội thoại, luận án) để thực hành.</li>
+                        <li><strong>Phân tích thống kê ngôn ngữ</strong>: tần số từ, collocations, n-grams, concordance.</li>
+                    </ul>
+
+                    <h2>III. Các cú pháp cơ bản </h2>
+                    <p>Dưới đây là các thao tác phổ biến và nâng cao khi làm việc với NLTK.</p>
+
+                    <h3>1. Tokenization – Tách câu và từ</h3>
+                    <pre><code class="language-python">import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+
+nltk.download('punkt')
+text = "NLTK is a great library. It helps process natural language. Don't you like it?"
+sentences = sent_tokenize(text)
+words = word_tokenize(text)
+print("Sentences:", sentences)
+print("Words:", words)</code></pre>
+
+                    <h3>2. Loại bỏ Stopwords và dấu câu</h3>
+                    <pre><code class="language-python">from nltk.corpus import stopwords
+import string
+
+nltk.download('stopwords')
+stop_words = set(stopwords.words('english'))
+# Loại bỏ stopwords và dấu câu
+clean_words = [w for w in words if w.lower() not in stop_words and w not in string.punctuation]
+print("Clean words:", clean_words)</code></pre>
+
+                    <h3>3. FreqDist – Đếm tần số từ</h3>
+                    <pre><code class="language-python">from nltk.probability import FreqDist
+
+fdist = FreqDist(clean_words)
+print("Top 5 common words:", fdist.most_common(5))
+# Vẽ biểu đồ tần số (cần matplotlib)
+import matplotlib.pyplot as plt
+fdist.plot(10)
+plt.show()</code></pre>
+
+                    <h3>4. N-grams và Collocations – Cụm từ phổ biến</h3>
+                    <pre><code class="language-python">from nltk.util import ngrams
+from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder
+from nltk.metrics import BigramAssocMeasures
+
+# Tạo bigrams
+tokens = word_tokenize("Natural language processing is fun and useful. NLP is everywhere.")
+bigrams = list(ngrams(tokens, 2))
+print("Bigrams:", bigrams[:5])
+
+# Tìm collocations (cụm từ có ý nghĩa)
+finder = BigramCollocationFinder.from_words(tokens)
+finder.apply_freq_filter(2)  # chỉ lấy bigram xuất hiện >=2 lần
+print("Bigram collocations:", finder.nbest(BigramAssocMeasures.pmi, 5))</code></pre>
+
+                    <h3>5. Concordance – Tra ngữ cảnh của từ</h3>
+                    <pre><code class="language-python">from nltk.book import text1  # Moby Dick
+# text1 là một corpus có sẵn (cần import)
+text1.concordance("whale")  # hiển thị dòng chứa từ "whale"</code></pre>
+
+                    <h3>6. Stemming và Lemmatization</h3>
+                    <pre><code class="language-python">from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+stemmer = PorterStemmer()
+lemmatizer = WordNetLemmatizer()
+words_sample = ["running", "ran", "easily", "better", "geese"]
+print("Stemming:", [stemmer.stem(w) for w in words_sample])
+print("Lemmatization (verb):", [lemmatizer.lemmatize(w, pos='v') for w in words_sample])</code></pre>
+
+                    <h3>7. POS Tagging – Gán nhãn từ loại</h3>
+                    <pre><code class="language-python">nltk.download('averaged_perceptron_tagger')
+tagged = nltk.pos_tag(word_tokenize("The quick brown fox jumps over the lazy dog"))
+print(tagged)
+# [('The', 'DT'), ('quick', 'JJ'), ('brown', 'NN'), ('fox', 'NN'), ('jumps', 'VBZ'), ...]</code></pre>
+
+                    <h3>8. WordNet nâng cao – Đồng nghĩa, trái nghĩa, siêu từ</h3>
+                    <pre><code class="language-python">from nltk.corpus import wordnet as wn
+
+# Lấy synset (tập hợp từ đồng nghĩa)
+syn = wn.synsets('good')[0]
+print("Definition:", syn.definition())
+print("Example:", syn.examples())
+print("Hypernyms (siêu từ):", syn.hypernyms())
+print("Hyponyms (hạ từ):", syn.hyponyms()[:3])
+print("Antonyms (trái nghĩa):", syn.lemmas()[0].antonyms())  # cần có antonyms
+
+# Tìm tất cả đồng nghĩa của 'car'
+car_synsets = wn.synsets('car')
+for s in car_synsets:
+    print(s.name(), s.definition())</code></pre>
+
+                    <h3>9. Chunking – Phân đoạn cụm danh từ</h3>
+                    <pre><code class="language-python">from nltk.chunk import ne_chunk
+sentence = "Mark Zuckerberg founded Facebook in 2004."
+tagged = nltk.pos_tag(word_tokenize(sentence))
+# Phát hiện thực thể (Named Entity Recognition)
+entities = ne_chunk(tagged)
+print(entities)  # in ra cây có gán nhãn PERSON, ORGANIZATION, DATE</code></pre>
+
+                    <h3>10. Thực hành với Corpus có sẵn – Reuters, Gutenberg, Brown</h3>
+                    <pre><code class="language-python">from nltk.corpus import reuters, gutenberg, brown
+
+# Reuters corpus: các bài báo kinh tế
+print("Reuters categories:", reuters.categories()[:5])
+print("First fileid:", reuters.fileids()[0])
+print("Content:", reuters.raw(reuters.fileids()[0])[:200])
+
+# Gutenberg corpus: sách văn học
+print("Gutenberg books:", gutenberg.fileids())
+print("Word count in 'shakespeare-hamlet.txt':", len(gutenberg.words('shakespeare-hamlet.txt')))
+
+# Brown corpus: phân loại thể loại
+print("Brown categories:", brown.categories())
+print("News text sample:", brown.words(categories='news')[:20])</code></pre>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #1976D2;">💡 Lưu ý quan trọng</h3>
+                        <ul>
+                            <li>Nếu chưa có dữ liệu, dùng <code>nltk.download('tên_package')</code> để tải.</li>
+                            <li>Các corpus lớn (như reuters, brown) có thể mất vài trăm MB, cân nhắc khi tải.</li>
+                            <li>Để xử lý tiếng Việt, cần tokenizer riêng (pyvi, underthesea) và stopwords tiếng Việt.</li>
+                            <li>NLTK chậm hơn SpaCy, thích hợp cho học tập và xử lý dữ liệu nhỏ.</li>
+                        </ul>
+                    </div>
+
+                    <h2>IV. Kết luận</h2>
+                    <p>Với các cú pháp trên, bạn đã có thể bắt đầu phân tích và xử lý văn bản bằng NLTK: từ tokenization, loại bỏ stopwords, đếm tần số, phân tích n-gram, tra ngữ cảnh, stemming, lemmatization, gán nhãn từ loại, nhận diện thực thể, và khai thác các corpus chuẩn. NLTK là công cụ tuyệt vời để học NLP và xây dựng prototype. Phần tiếp theo sẽ giới thiệu <strong>SpaCy</strong> – thư viện nhanh hơn cho các ứng dụng thực tế.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="spacy.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>SpaCy</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Thư viện NLP hiệu suất cao</p>
+                        </a>
+                        <a href="fastapi.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>FastAPI</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Web Framework hiện đại</p>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center; transition: 0.3s; display: block;">
+                            <strong>Trang chủ</strong>
+                            <p style="font-size: 0.9em; margin: 5px 0 0 0;">Xem toàn bộ bài viết</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="conda.html">← Previous: Conda</a>
+                    <a href="spacy.html">Next: SpaCy →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

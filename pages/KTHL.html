@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Batch Normalization, Dropout, Regularization - Kỹ thuật huấn luyện mạng nơ-ron - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Batch Normalization, Dropout, Regularization – Kỹ thuật huấn luyện mạng nơ-ron</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 18/04/2026</span>
+                        <span>Chuyên mục: Deep Learning nâng cao</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#batchnorm</span>
+                        <span>#dropout</span>
+                        <span>#regularization</span>
+                        <span>#overfitting</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Batch Normalization (BN)</h2>
+                    <h3>1. Định nghĩa</h3>
+                    <p><strong>Batch Normalization</strong> (Ioffe & Szegedy, 2015) là một kỹ thuật chuẩn hóa đầu ra của các tầng trung gian trong mạng nơ-ron theo từng batch, nhằm ổn định phân phối dữ liệu (giảm <em>internal covariate shift</em>). Nhờ đó, BN cho phép sử dụng tốc độ học cao hơn, giảm phụ thuộc vào khởi tạo, và có tác dụng như một dạng regularization yếu. BN thường được đặt trước hàm kích hoạt (hoặc sau, tùy cách cài đặt).</p>
+
+                    <h3>2. Toán học</h3>
+                    <p>Xét một batch gồm \(m\) mẫu, tại một nơ-ron (hoặc một kênh), đầu vào \(z^{(1)}, z^{(2)}, \dots, z^{(m)}\). BN thực hiện:</p>
+                    <div class="formula">
+                        \[
+                        \mu_B = \frac{1}{m}\sum_{i=1}^{m} z^{(i)}, \quad \sigma_B^2 = \frac{1}{m}\sum_{i=1}^{m} (z^{(i)} - \mu_B)^2
+                        \]
+                        \[
+                        \hat{z}^{(i)} = \frac{z^{(i)} - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}
+                        \]
+                        \[
+                        \tilde{z}^{(i)} = \gamma \hat{z}^{(i)} + \beta
+                        \]
+                    </div>
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li>\(\mu_B, \sigma_B^2\): trung bình và phương sai của batch.</li>
+                        <li>\(\epsilon\): số nhỏ (ví dụ \(10^{-8}\)) tránh chia 0.</li>
+                        <li>\(\gamma\) (scale) và \(\beta\) (shift): các tham số học được, cho phép BN học lại phân phối phù hợp.</li>
+                    </ul>
+                    <p>Trong quá trình <strong>dự đoán (inference)</strong>, BN sử dụng trung bình và phương sai trượt (running average) tính từ toàn bộ tập huấn luyện thay vì batch hiện tại.</p>
+                    <p>BN làm giảm internal covariate shift, cho phép gradient truyền ổn định hơn, hội tụ nhanh hơn.</p>
+
+                    <h2>II. Dropout</h2>
+                    <h3>1. Định nghĩa</h3>
+                    <p><strong>Dropout</strong> (Srivastava et al., 2014) là kỹ thuật <strong>regularization</strong> nhằm chống overfitting. Trong mỗi bước huấn luyện, Dropout tạm thời "tắt" (set về 0) một tỷ lệ \(p\) các nơ-ron của tầng (cùng với đầu ra và gradient của chúng) một cách ngẫu nhiên. Điều này buộc mạng không phụ thuộc quá nhiều vào một vài nơ-ron, tạo ra các mô hình con (sub-networks) và tăng tính tổng quát. Khi dự đoán, Dropout không được áp dụng (hoặc nhân đầu ra với \(1-p\)).</p>
+
+                    <h3>2. Toán học</h3>
+                    <p>Trong huấn luyện, với xác suất \(p\) (thường 0.5 cho tầng ẩn), đầu ra của một nơ-ron bị đặt về 0; với xác suất \(1-p\), nó giữ nguyên. Sau đó, đầu ra được chia cho \(1-p\) để giữ nguyên kỳ vọng (inverted dropout, cách cài đặt phổ biến).</p>
+                    <p>Giả sử tầng ẩn có vector đầu ra \(\mathbf{h}\). Tạo mask \(\mathbf{r}\) với mỗi phần tử được lấy từ phân phối Bernoulli(\(p\)) (xác suất 1 = tồn tại).</p>
+                    <div class="formula">
+                        \[
+                        \tilde{\mathbf{h}} = \mathbf{r} \odot \mathbf{h}
+                        \]
+                    </div>
+                    <p>Sau đó chia \(\tilde{\mathbf{h}}\) cho \(1-p\) (inverted dropout):</p>
+                    <div class="formula">
+                        \[
+                        \mathbf{h}_{\text{train}} = \frac{\tilde{\mathbf{h}}}{1-p}
+                        \]
+                    </div>
+                    <p>Trong quá trình dự đoán, không có mask: \(\mathbf{h}_{\text{test}} = \mathbf{h}\).</p>
+                    <p>Về lý thuyết, Dropout tương đương với việc huấn luyện một tập hợp các mô hình con và lấy trung bình chúng, làm giảm overfitting và tăng độ bền.</p>
+
+                    <h2>III. Regularization (L1, L2)</h2>
+                    <h3>1. Định nghĩa</h3>
+                    <p><strong>Regularization</strong> là kỹ thuật thêm một số hạng phạt vào hàm mất mát để hạn chế độ phức tạp của mô hình, ngăn chặn overfitting. Hai dạng phổ biến nhất là <strong>L1 (Lasso)</strong> và <strong>L2 (Ridge)</strong>. Regularization áp dụng lên các trọng số (không áp lên bias).</p>
+
+                    <h3>2. Toán học</h3>
+                    <p>Hàm mất mát tổng quát:</p>
+                    <div class="formula">
+                        \[
+                        J_{\text{total}}(\theta) = J_{\text{original}}(\theta) + \lambda \cdot \Omega(\theta)
+                        \]
+                    </div>
+                    <p>Với \(\Omega(\theta)\) là số hạng regularization.</p>
+                    <ul>
+                        <li><strong>L2 Regularization (Ridge)</strong>:
+                            <div class="formula">\[ \Omega(\theta) = \frac{1}{2} \|\mathbf{w}\|_2^2 = \frac{1}{2} \sum_j w_j^2 \]</div>
+                            Làm cho các trọng số nhỏ nhưng không triệt tiêu về 0. Gradient cập nhật: \(\mathbf{w} := \mathbf{w} - \eta (\nabla J_{\text{original}} + \lambda \mathbf{w})\).</li>
+                        <li><strong>L1 Regularization (Lasso)</strong>:
+                            <div class="formula">\[ \Omega(\theta) = \|\mathbf{w}\|_1 = \sum_j |w_j| \]</div>
+                            Khuyến khích trọng số thưa (nhiều trọng số bằng 0), dùng cho chọn đặc trưng. Gradient cập nhật (subgradient): \(\mathbf{w} := \mathbf{w} - \eta (\nabla J_{\text{original}} + \lambda \cdot \text{sign}(\mathbf{w}))\).</li>
+                    </ul>
+                    <p>Tham số \(\lambda > 0\) kiểm soát mức độ phạt. L2 thường được dùng trong các mạng nơ-ron vì tính ổn định và dễ tối ưu; L1 thích hợp khi muốn tạo ra mô hình thưa.</p>
+
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">📌 Tóm tắt so sánh nhanh</h3>
+                        <ul>
+                            <li><strong>Batch Normalization</strong>: Chuẩn hóa theo batch, tăng tốc hội tụ, cho phép learning rate lớn.</li>
+                            <li><strong>Dropout</strong>: Ngẫu nhiên bỏ qua nơ-ron, chống overfitting.</li>
+                            <li><strong>L2 Regularization</strong>: Phạt trọng số lớn, giảm overfitting.</li>
+                            <li><strong>L1 Regularization</strong>: Tạo trọng số thưa, chọn đặc trưng.</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="optimizers.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>SGD, Momentum, Adam</strong>
+                            </a>
+                            <a href="mlp.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>MLP</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="optimizers.html">← Previous: Optimizers</a>
+                        <a href="cnn.html">Next: Convolutional Neural Networks →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
