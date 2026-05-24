@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CNN - Convolutional Neural Networks (Hướng dẫn chi tiết từng bước) - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .matrix {
+            font-family: monospace;
+            text-align: center;
+            background: #f8f4ec;
+            padding: 10px;
+            display: inline-block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Convolutional Neural Networks (CNN) – Hướng dẫn chi tiết từng bước</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 25/05/2026</span>
+                        <span>Chuyên mục: Deep Learning</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#cnn</span>
+                        <span>#convolution</span>
+                        <span>#computer-vision</span>
+                        <span>#deep-learning</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Giới thiệu</h2>
+                    <p>Trong lĩnh vực thị giác máy tính, việc xử lý hình ảnh đòi hỏi máy tính không chỉ nhận biết được giá trị của từng điểm ảnh (pixel) mà còn phải hiểu được mối quan hệ không gian giữa chúng. Trước khi sự ra đời của Convolutional Neural Networks (CNN), các mạng nơ‑ron truyền thống (Fully Connected Networks – FC) thường gặp khó khăn lớn khi đối mặt với dữ liệu hình ảnh. Vấn đề cốt lõi nằm ở việc mạng FC yêu cầu đầu vào phải được “duỗi phẳng” (flatten) thành một vector một chiều, vô tình phá vỡ cấu trúc không gian 2D/3D tự nhiên của ảnh, làm mất thông tin về hình dạng và vị trí tương đối của các vật thể. Hơn nữa, với một bức ảnh màu kích thước trung bình (ví dụ 200×200×3), số lượng tham số trong mạng FC sẽ lên tới hàng triệu, dẫn đến chi phí tính toán khổng lồ và nguy cơ overfitting rất cao. CNN ra đời với tư duy mô phỏng cơ chế thị giác của con người, tập trung vào việc trích xuất các đặc trưng cục bộ như cạnh, góc, và mảng màu thông qua các bộ lọc (filters).</p>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <p><strong>Hình 1:</strong> So sánh FC Network (phá vỡ cấu trúc không gian) và CNN (bảo toàn cấu trúc).</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/SoSanhMangFCvaCNN.jpg" alt="">
+                        </div>
+                    </div>
+                    <p>Chúng ta sẽ bắt đầu với khái niệm nền tảng là phép tích chập, tìm hiểu cách các tham số như Stride và Padding ảnh hưởng đến kích thước đầu ra. Tiếp theo, ta sẽ khám phá kỹ thuật Pooling để giảm chiều dữ liệu nhưng vẫn giữ lại đặc trưng quan trọng, và cuối cùng là kết nối tất cả thông qua lớp Flatten để đưa vào mô hình phân loại. Để đơn giản và các bạn có thể làm theo, bài đọc này sẽ sử dụng ảnh xám (số channel là 1), và sau đó sẽ mở rộng ra ảnh màu ở cuối bài.</p>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <p><strong>Hình 2:</strong> Luồng xử lý của mạng CNN.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/Luong_Xu_ly_cua_1_mang_CNN.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <h2>II. Tại sao cần CNN cho hình ảnh?</h2>
+                    <p>Mạng FC có hai nhược điểm lớn khi xử lý ảnh:</p>
+                    <ul>
+                        <li><strong>Mất cấu trúc không gian:</strong> “Duỗi phẳng” làm mất mối quan hệ giữa các pixel lân cận.</li>
+                        <li><strong>Bùng nổ tham số:</strong> Ảnh 200×200×3 ⇒ 120.000 đầu vào, nếu lớp ẩn có 1000 nơ‑ron ⇒ 120 triệu trọng số, dễ overfit.</li>
+                    </ul>
+                    <p>CNN khắc phục bằng cơ chế <strong>chia sẻ tham số</strong> và <strong>kết nối cục bộ</strong>, giữ nguyên cấu trúc không gian 3D (chiều cao, rộng, sâu).</p>
+
+                    <h2>III. Phép tích chập (Convolution)</h2>
+                    <p>Trong xử lý ảnh, ta sử dụng một ma trận nhỏ gọi là <strong>Kernel (hoặc Filter)</strong> đóng vai trò như một cửa sổ trượt (sliding window) quét qua toàn bộ bức ảnh đầu vào. Tại mỗi vị trí mà Kernel ghé qua, ta thực hiện phép nhân từng phần tử giữa Kernel và vùng ảnh tương ứng, sau đó cộng tổng lại để tạo ra một điểm ảnh mới trên Feature Map.</p>
+                    <div class="formula">
+                        \[
+                        \text{Output}(i,j) = \sum_{u=0}^{K_h-1}\sum_{v=0}^{K_w-1} \text{Input}(i+u, j+v) \cdot \text{Kernel}(u,v) + \text{bias}
+                        \]
+                    </div>
+                    <div>Giả sử ta có:</div>
+                    <ul>
+                        <li>Input I: Ma trận 3 × 3</li>
+                        <li>Kernel K: Ma trận 2 × 2 được thiết kế để phát hiện một đặc trưng cụ thể.</li>
+                    </ul>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/Minhhoa1.jpg" alt="">
+                    </div>
+                    <div>Ta thực hiện tính toán cho vị trí đầu tiên (góc trái trên):</div>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/MinhHoa2.jpg" alt="">
+                    </div>
+                    <p>Kết quả của phép tính này không chỉ là những con số vô tri. Giá trị của Kernel được thiết kế đặc biệt để làm nổi bật các đặc trưng quan trọng của ảnh như cạnh (edges), góc (corners), hoặc các vân bề mặt (textures). Những vùng ảnh khớp với mẫu của Kernel sẽ cho ra giá trị lớn trên Feature Map, và ngược lại.</p>
+                    <pre><code class="language-python">import torch
+import torch.nn as nn
+input_img = torch.tensor([[[[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]]]])
+conv = nn.Conv2d(1,1,kernel_size=2,bias=False)
+conv.weight.data = torch.tensor([[[[1.,0.],[0.,1.]]]])
+output = conv(input_img)
+print(output)  # tensor([[[[ 6., 8.],[12.,14.]]]])</code></pre>
+
+                    <h2>IV. Stride (bước trượt)</h2>
+                    <p><strong>Stride</strong> là khoảng cách kernel di chuyển mỗi bước. Stride = 1: trượt từng ô; Stride = 2: nhảy cóc 2 ô, làm giảm kích thước output. Có thể đặt stride khác nhau theo chiều dọc (SH) và ngang (SW). Công thức tính kích thước đầu ra:</p>
+                    <div class="formula">
+                        \[
+                        H_{\text{out}} = \left\lfloor \frac{H_{\text{in}} + 2P_H - K_H}{S_H} \right\rfloor + 1, \quad
+                        W_{\text{out}} = \left\lfloor \frac{W_{\text{in}} + 2P_W - K_W}{S_W} \right\rfloor + 1
+                        \]
+                    </div>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <p><strong>Hình 3:</strong> Minh họa Stride = (1, 2). Kernel di chuyển từng ô một theo chiều dọc, nhưng nhảy cóc 2 ô theo chiều ngang.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/Stride.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <h2>V. Padding</h2>
+                    <p>Khi thực hiện phép tích chập liên tục trên một bức ảnh mà không có biện pháp can thiệp, ta sẽ gặp phải hai vấn đề lớn. Thứ nhất là “sự thu hẹp kích thước”, cứ qua mỗi lớp tích chập, kích thước Feature Map lại nhỏ dần đi, giới hạn độ sâu của mạng nơ-ron. Thứ hai là “mất mát thông tin các cạnh”, các điểm ảnh ở góc và cạnh chỉ được Kernel quét qua ít lần hơn so với các điểm ảnh ở trung tâm, dẫn đến việc bỏ sót các đặc trưng quan trọng ở viền ảnh.</p>
+                    <p>Padding thêm các giá trị (thường là 0) quanh ảnh để giải quyết vấn đề thu hẹp kích thước và mất thông tin biên. <strong>Valid padding</strong> (P=0) làm output nhỏ hơn. <strong>Same padding</strong> tính P sao cho output = input (khi stride=1). Công thức chung với padding P:</p>
+                    <div class="formula">
+                        \[
+                        \text{Output size} = \left\lfloor \frac{\text{Input} + 2P - \text{Kernel}}{S} \right\rfloor + 1
+                        \]
+                    </div>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <p><strong>Hình 4:</strong> Minh họa Zero-padding: Thêm một viền giá trị 0 (P=1) quanh ảnh Input 4x4 để giữ nguyên kích thước khi qua Kernel 3x3.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/MinhHoaPadding.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <h2>VI. Pooling</h2>
+                    <p>Sau khi trích xuất đặc trưng bằng Convolution, ta thu được các Feature Map chứa thông tin chi tiết về vị trí của các đặc trưng (ví dụ: mắt ở toạ độ x, y). Tuy nhiên, trong nhiều bài toán nhận diện, ta chỉ cần biết “có mắt hay không” chứ không cần vị trí chính xác tuyệt đối. Quá nhiều chi tiết không gian sẽ làm tăng số lượng tính toán không cần thiết và dễ gây Overfitting.</p>
+                    <p>Lớp Pooling ra đời nhằm mục đích giảm chiều dữ liệu, giúp mạng trở nên nhẹ hơn và bất biến với các dịch chuyển nhỏ (Translation Invariance). Khác với Convolution, lớp Pooling không có tham số trọng số nào để học, nó chỉ áp dụng một công thức cố định. Có hai loại Pooling phổ biến nhất:</p>
+                    <ul>
+                        <li><strong>Max Pooling:</strong> hoạt động bằng cách chia ảnh thành các vùng nhỏ và chỉ giữ lại giá trị lớn nhất trong vùng đó. Ý nghĩa của việc này là chỉ giữ lại đặc trưng nổi bật nhất (ví dụ: biên cạnh rõ nhất, màu sáng nhất) và loại bỏ các thông tin nhiễu xung quanh. Đây là phương pháp được sử dụng phổ biến nhất hiện nay.</li>
+                        <li><strong>Average Pooling:</strong> tính giá trị trung bình của các phần tử trong vùng trượt. Phương pháp này có tác dụng làm mượt (smooth) hình ảnh và đặc trưng. Ngày nay, Average Pooling thường ít được dùng ở giữa mạng mà hay được dùng ở lớp cuối cùng (Global Average Pooling) để thay thế cho lớp Fully Connected.</li>
+                    </ul>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <p><strong>Hình 5:</strong> So sánh kết quả của Max Pooling và Average Pooling trên cùng một vùng dữ liệu.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/MinhHoaPooling.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <h2>VII. Flatten</h2>
+                    <p>Sau khi dữ liệu đi qua một chuỗi các lớp Convolution và Pooling, ta thu được một khối tensor 3D chứa các đặc trưng cấp cao đã được cô đọng. Tuy nhiên, để thực hiện bài toán phân loại, ta cần đưa dữ liệu này vào một mạng nơ-ron truyền thống, nơi yêu cầu đầu vào phải là vector 1 chiều.</p>
+                    <p>Lớp Flatten đóng vai trò là “cây cầu” nối giữa phần trích xuất đặc trưng và phần phân loại. Nhiệm vụ của nó đơn giản là duỗi thẳng toàn bộ khối tensor đa chiều thành một vector dài liên tục.</p>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <p><strong>Hình 6:</strong> Minh họa quá trình Flatten: Biến đổi Tensor 3D thành Vector 1D để đưa vào lớp Fully Connected.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/MinhHoaFlattent.jpg" alt="">
+                        </div>
+                    </div>
+                    <pre><code class="language-python">import torch
+import torch.nn as nn
+feature_map = torch.rand(1, 64, 4, 4)
+flatten = nn.Flatten()
+vector = flatten(feature_map)
+print(vector.shape)  # torch.Size([1, 1024])</code></pre>
+
+                    <h2>VIII. Kênh màu trong CNN</h2>
+                    <p>Ảnh RGB có 3 kênh. Kernel cũng có độ sâu tương ứng (ví dụ 3×3×3). Phép tích chập trên ảnh màu: nhân từng kênh với lớp kernel tương ứng, cộng tổng các kênh và cộng bias để ra một giá trị trên feature map. Nếu muốn output có nhiều kênh (ví dụ 64), ta dùng 64 filter khác nhau.</p>
+                    <div class="formula">
+                        \[
+                        O(i,j) = \sum_{c=1}^{C_{in}} \left( \sum_{u=0}^{K-1}\sum_{v=0}^{K-1} I_c(i+u,j+v) \cdot K_c(u,v) \right) + b
+                        \]
+                    </div>
+
+                    <h2>IX. Kết luận</h2>
+                    <p>CNN đã cách mạng hóa lĩnh vực thị giác máy tính. Hiểu rõ từng phép toán cơ bản – từ tích chập, stride, padding đến pooling và flatten – giúp bạn nắm vững cách xây dựng và tinh chỉnh mạng nơ‑ron tích chập cho các bài toán như phân loại ảnh, phát hiện vật thể, hay phân đoạn ảnh. Các bước tính toán thủ công trong bài cho thấy dù có vẻ phức tạp, bản chất của CNN chỉ là những phép nhân ma trận và lấy giá trị lớn nhất, kết hợp với các tầng phi tuyến. Hy vọng bài viết này cung cấp cho bạn nền tảng vững chắc để tiếp cận các kiến trúc hiện đại hơn như ResNet, EfficientNet, YOLO, v.v.</p>
+
+                    <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="mlp.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>MLP (Multi‑Layer Perceptron)</strong>
+                            </a>
+                            <a href="activation_functions.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Activation Functions</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="mlp.html">← Previous: MLP</a>
+                        <a href="resnet.html">Next: ResNet →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
