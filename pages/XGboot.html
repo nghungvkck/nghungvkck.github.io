@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XGBoost - Extreme Gradient Boosting: Hồi quy và Phân loại - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>XGBoost – Extreme Gradient Boosting: Hồi quy và Phân loại</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 24/05/2026</span>
+                        <span>Chuyên mục: Machine Learning nâng cao</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#xgboost</span>
+                        <span>#gradient-boosting</span>
+                        <span>#regression</span>
+                        <span>#classification</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Định nghĩa XGBoost</h2>
+                    <p><strong>XGBoost (Extreme Gradient Boosting)</strong> là thư viện học máy mã nguồn mở triển khai thuật toán Gradient Boosting với các cải tiến về hiệu năng, độ chính xác và khả năng xử lý dữ liệu lớn. XGBoost hỗ trợ cả hai dạng bài toán: <strong>hồi quy (regression)</strong> và <strong>phân loại (classification)</strong>, thông qua các hàm mất mát và tham số tương ứng.</p>
+
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images//XGboot_img.jpg" alt="Minh họa XGBoost" style="width: 80%;">
+                    </div>
+
+                    <h2>II. Nguyên lý hoạt động chung</h2>
+                    <p>XGBoost xây dựng tuần tự các cây quyết định (CART) để dự đoán phần dư (residual) của các cây trước, kết hợp với learning rate nhằm kiểm soát tốc độ học. Mỗi cây mới được tối ưu dựa trên <strong>gradient (đạo hàm bậc nhất)</strong> và <strong>hessian (đạo hàm bậc hai)</strong> của hàm mất mát, giúp hội tụ nhanh hơn các phiên bản GBDT thuần.</p>
+                    <p>Dự đoán cuối cùng là tổng có trọng số của tất cả các cây:</p>
+                    <div class="formula">\[ \hat{y}_i = \sum_{k=1}^K \eta \cdot f_k(x_i) \]</div>
+                    <p>với \(\eta\) là learning rate, \(f_k\) là cây thứ \(k\).</p>
+
+                    <h2>III. Toán học cốt lõi</h2>
+                    <p>Hàm mục tiêu của XGBoost tại vòng lặp thứ \(t\) là:</p>
+                    <div class="formula">\[ \mathcal{L}^{(t)} = \sum_{i=1}^n l(y_i, \hat{y}_i^{(t-1)} + f_t(x_i)) + \Omega(f_t) \]</div>
+                    <p>Khai triển Taylor bậc hai quanh \(\hat{y}_i^{(t-1)}\):</p>
+                    <div class="formula">\[ \mathcal{L}^{(t)} \approx \sum_{i=1}^n \left[ g_i f_t(x_i) + \frac{1}{2} h_i f_t^2(x_i) \right] + \Omega(f_t) \]</div>
+                    <p>với \(g_i = \partial_{\hat{y}} l(y_i, \hat{y})\), \(h_i = \partial^2_{\hat{y}} l(y_i, \hat{y})\).</p>
+                    <p>Thành phần điều chuẩn cho một cây \(f\):</p>
+                    <div class="formula">\[ \Omega(f) = \gamma T + \frac{1}{2} \lambda \sum_{j=1}^T w_j^2 + \alpha \sum_{j=1}^T |w_j| \]</div>
+                    <p>Trong đó \(T\) là số lá, \(w_j\) là trọng số tại lá \(j\).</p>
+
+                    <!-- ==================== PHẦN HỒI QUY ==================== -->
+                    <h2>IV. XGBoost cho bài toán Hồi quy (Regression)</h2>
+                    <p>XGBoost rất hiệu quả cho các bài toán hồi quy, nơi mục tiêu là dự đoán một giá trị liên tục. Mô hình được huấn luyện để tối thiểu hóa sai số giữa dự đoán và giá trị thực tế (thường dùng MSE hoặc MAE). Cơ chế boosting xây dựng các cây nhỏ, mỗi cây tập trung “sửa chữa” phần sai số của các cây trước. </p>
+
+                    <h3>Bước 1: Khởi tạo</h3>
+                    <p>Khởi tạo giá trị dự đoán \(f_0\) cho toàn bộ tập huấn luyện bằng <strong>giá trị trung bình của biến mục tiêu \(Y\)</strong>. Đây là dự đoán ban đầu cho mọi mẫu.</p>
+
+                    <h3>Bước 2: Tính Similarity Score của root</h3>
+                    <div class="formula">
+                        \[
+                        \text{Similarity Score} = \frac{(\text{Sum of Residuals})^2}{\text{Number of Residuals} + \lambda}
+                        \]
+                    </div>
+                    <ul>
+                        <li><strong>Sum of Residuals:</strong> \(\sum (Y - f_0)\) – tổng các sai số (residual) tại node hiện tại.</li>
+                        <li><strong>Number of Residuals:</strong> Số lượng mẫu (còn gọi là \(n\) hoặc \(|node|\)) trong node.</li>
+                        <li><strong>\(\lambda\):</strong> Tham số regularization (giảm overfitting).</li>
+                    </ul>
+
+                    <h3>Bước 3: Chọn điều kiện root và tính Similarity Score cho node con</h3>
+                    <p>Xét từng điểm split (có thể lấy trung bình hai giá trị liền kề của thuộc tính). Với mỗi split, chia tập dữ liệu thành nhánh trái và phải, sau đó tính Similarity Score cho từng nhánh theo công thức ở bước 2 (áp dụng trên tập con tương ứng).</p>
+
+                    <h3>Bước 4: Tính Gain và chọn split tốt nhất</h3>
+                    <div class="formula">
+                        \[
+                        \text{Gain} = \text{Left Similarity} + \text{Right Similarity} - \text{Root Similarity}
+                        \]
+                    </div>
+                    <p>Chọn điều kiện split có Gain lớn nhất. Nếu Gain ≤ 0, không nên chia nhánh (cắt tỉa sớm).</p>
+
+                    <h3>Bước 5: Lặp lại và tính Output cho node lá</h3>
+                    <p>Quá trình chia nhánh được lặp lại cho đến khi đạt độ sâu tối đa hoặc không thể tăng Gain. Sau khi xây dựng xong cây, giá trị <strong>Output</strong> tại mỗi lá được tính theo công thức:</p>
+                    <div class="formula">
+                        \[
+                        \text{Output} = \frac{\text{Sum of Residuals}}{\text{Number of Residuals} + \lambda}
+                        \]
+                    </div>
+                    <p>Output này thể hiện mức điều chỉnh cần cộng thêm cho các mẫu rơi vào lá đó.</p>
+
+                    <h3>Bước 6: Cập nhật dự đoán và tiếp tục lặp</h3>
+                    <p>Dự đoán mới cho mỗi mẫu được cập nhật bằng công thức:</p>
+                    <div class="formula">
+                        \[
+                        \hat{y}_{\text{new}} = f_0 + \eta \times \text{Output}
+                        \]
+                    </div>
+                    <p>Trong đó \(\eta\) là learning rate. Sau khi cập nhật, giá trị dự đoán mới này trở thành \(f_0\) cho vòng lặp tiếp theo. Quá trình từ bước 2 đến bước 6 được lặp lại cho mỗi cây cho đến khi đạt số cây mong muốn hoặc early stopping.</p>
+                    
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h4>📌 Ví dụ nhanh (Python) – Hồi quy:</h4>
+                        <pre><code class="language-python">import xgboost as xgb
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+X, y = make_regression(n_samples=1000, n_features=10, noise=0.1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = xgb.XGBRegressor(objective='reg:squarederror',
+                         n_estimators=100,
+                         learning_rate=0.1,
+                         max_depth=5,
+                         subsample=0.8,
+                         colsample_bytree=0.8)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("MSE:", mean_squared_error(y_test, y_pred))</code></pre>
+                    </div>
+
+                    <!-- ==================== PHẦN PHÂN LOẠI ==================== -->
+                    <h2>V. XGBoost cho bài toán Phân loại (Classification)</h2>
+                    <p>Trong bài toán phân loại, XGBoost giúp dự đoán xác suất mà một mẫu dữ
+                        liệu thuộc về một nhóm nào đó. Cụ thể, nó sẽ tính toán xác suất mẫu đó
+                        thuộc về lớp 1 hay lớp 0 (phân loại nhị phân). Sau khi có xác suất này, chúng
+                        ta sẽ so sánh nó với một ngưỡng (thường là 0.5 cho phân loại nhị phân). Nếu
+                        xác suất cao hơn 0.5, mẫu dữ liệu sẽ được phân loại vào lớp 1, còn nếu xác
+                        suất nhỏ hơn hoặc bằng 0.5, mẫu sẽ được phân loại vào lớp 0.</p>
+
+                    <h3>Bước 1: Khởi tạo giá trị dự đoán ban đầu (\(f_0\))</h3>
+                    <p>Ban đầu, XGBoost khởi tạo một giá trị dự đoán \(f_0\) cho tất cả các mẫu trong bộ dữ liệu. Đối với bài toán phân loại nhị phân, giá trị này thường là 0.5 (xác suất trung lập). Việc khởi tạo này giúp mô hình bắt đầu với một "điểm xuất phát" trung lập, không nghiêng về lớp nào.</p>
+
+                    <h3>Bước 2: Tính toán Similarity Score của root</h3>
+                    <div>Tại bước này, thuật toán tính toán Similarity Score cho root (nút gốc của
+cây quyết định). Đây là một phép đo cho biết độ "tương đồng"giữa các mẫu
+trong tập dữ liệu. Similarity Score được tính theo công thức:</div>
+                    <div class="formula">
+                        \[
+                        \text{Similarity Score} = \frac{(\text{Sum of Residuals})^2}{\sum [\text{Previous Probability} \times (1 - \text{Previous Probability})] + \lambda}
+                        \]
+                    </div>
+                    <ul>
+                        <li><strong>Sum of Residuals:</strong> tổng các sai số giữa giá trị thực tế và giá trị dự đoán của mẫu (\(y - \hat{y}\)).</li>
+                        <li><strong>Previous Probability:</strong> xác suất dự đoán của mô hình trước khi huấn luyện cây mới (với phân loại nhị phân, đây là xác suất mẫu thuộc lớp 1).</li>
+                        <li><strong>\(\lambda\) (lambda):</strong> tham số điều chỉnh (regularization).</li>
+                    </ul>
+
+                    <h3>Bước 3: Chọn điều kiện split và tính Similarity Score cho các node con</h3>
+                    <p>Có nhiều cách chọn điều kiện phân tách (split), cách cơ bản nhất là lấy trung bình của hai giá trị liền kề của một thuộc tính số (hoặc xét từng giá trị đối với thuộc tính phân loại). Sau đó, tính Similarity Score cho node con bên trái và bên phải (hoặc nhiều nhánh) theo cùng công thức trên.</p>
+
+                    <h3>Bước 4: Tính Gain cho từng điều kiện split và chọn best split</h3>
+                    <div>Sau khi có các điều kiện chia nhánh, XGBoost tính toán Gain cho mỗi điều
+                        kiện (split). Gain giúp đánh giá mức độ cải thiện mô hình khi chia nhánh tại
+                        một điểm cụ thể. Gain được tính bằng công thức:</div>
+                    <div class="formula">
+                        \[
+                        \text{Gain} = \text{Left Similarity} + \text{Right Similarity} - \text{Root Similarity}
+                        \]
+                    </div>
+                    <p>XGBoost sẽ chọn điều kiện split có Gain lớn nhất, tức là phân tách mang lại sự cải thiện nhiều nhất.</p>
+
+                    <h3>Bước 5: Xây dựng cây và tính Output cho mỗi lá</h3>
+                    <div>XGBoost sẽ tiếp tục lặp lại quá trình trên cho mỗi cây quyết định trong mô
+                        hình. Mỗi cây mới học từ các sai số của cây trước đó, giúp mô hình dần dần
+                        cải thiện khả năng phân loại. Mỗi cây mới sẽ đưa ra một Output giúp cập
+                        nhật giá trị dự đoán.
+                        Output được tính theo công thức:</div>
+                    <div class="formula">
+                        \[
+                        \text{Output} = \frac{\text{Sum of Residuals}}{\sum [\text{Previous Probability} \times (1 - \text{Previous Probability})]}
+                        \]
+                    </div>
+                    <p>Đây là giá trị giúp điều chỉnh dự đoán của mô hình tại mỗi bước.</p>
+                    <p>Giá trị Output này thường được nhân với learning rate để kiểm soát bước cập nhật.</p>
+
+                    <h3>Bước 6: Cập nhật dự đoán và tính xác suất cuối cùng</h3>
+                    <div>Cuối cùng, sau khi các cây quyết định được xây dựng, XGBoost sẽ tính toán
+                        xác suất dự đoán cho từng mẫu dữ liệu trong tập huấn luyện. Điều này được
+                        thực hiện bằng cách thay thế giá trị f0 ban đầu và tính toán xác suất mới.
+                        Để dự đoán xác suất cuối cùng của một mẫu, XGBoost sử dụng công thức:</div>
+                    <div class="formula">
+                        \[
+                        \text{LogPrediction}_{new} = \log\left(\frac{\text{Previous Probability}}{1 - \text{Previous Probability}}\right) + \eta \cdot \text{Output}
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        \text{Probability} = \frac{e^{\text{LogPrediction}_{new}}}{1 + e^{\text{LogPrediction}_{new}}}
+                        \]
+                    </div>
+                    <p>Quá trình từ bước 2 đến bước 6 được lặp lại cho mỗi cây tiếp theo. Sau khi xây dựng toàn bộ các cây, mô hình đưa ra quyết định phân loại dựa trên xác suất cuối cùng (nếu xác suất ≥ 0.5 thì thuộc lớp 1, ngược lại lớp 0).</p>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h4>📌 Lưu ý về các công thức</h4>
+                        <ul>
+                            <li>Similarity Score và Output được tính riêng cho từng node; mẫu số có thể hiểu là tổng trọng số Hessian (với logistic loss, Hessian = p*(1-p)).</li>
+                            <li>Tham số \(\lambda\) trong Similarity Score giúp ổn định và chống overfitting.</li>
+                            <li>Việc tính toán như trên là cách hiểu đơn giản; trong thực tế XGBoost tối ưu bằng đạo hàm bậc hai và sử dụng các kỹ thuật xấp xỉ histogram để tăng tốc.</li>
+                        </ul>
+                    </div>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h4>📌 Ví dụ nhanh (Python) – Phân loại:</h4>
+                        <pre><code class="language-python">import xgboost as xgb
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+data = load_breast_cancer()
+X, y = data.data, data.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = xgb.XGBClassifier(objective='binary:logistic',
+                          n_estimators=100,
+                          learning_rate=0.1,
+                          max_depth=3,
+                          subsample=0.8)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))</code></pre>
+                    </div>
+
+                    <h2>VI. Các tham số quan trọng</h2>
+                    <ul>
+                        <li><code>n_estimators</code>: Số cây (thường 100–1000, kết hợp early stopping).</li>
+                        <li><code>learning_rate (eta)</code>: Tốc độ học (0.01–0.3). Giảm learning rate → cần nhiều cây hơn.</li>
+                        <li><code>max_depth</code>: Độ sâu tối đa (3–10).</li>
+                        <li><code>min_child_weight</code>: Tổng hessian tối thiểu để tạo node con.</li>
+                        <li><code>subsample</code>: Tỉ lệ mẫu dùng cho mỗi cây (0.5–1).</li>
+                        <li><code>colsample_bytree</code>: Tỉ lệ đặc trưng dùng cho mỗi cây.</li>
+                        <li><code>gamma (min_split_loss)</code>: Ngưỡng giảm loss tối thiểu để phân tách.</li>
+                        <li><code>reg_lambda (L2)</code>, <code>reg_alpha (L1)</code>: Điều chuẩn.</li>
+                        <li><code>early_stopping_rounds</code>: Dừng sớm khi validation không cải thiện.</li>
+                    </ul>
+
+                    <h2>VII. Kết luận</h2>
+                    <p>XGBoost là một thuật toán mạnh mẽ, linh hoạt, hỗ trợ cả hồi quy và phân loại với nhiều hàm mục tiêu khác nhau. Nhờ sự kết hợp giữa gradient boosting, regularization, và tối ưu hóa hiệu suất, XGBoost xứng đáng là lựa chọn hàng đầu cho các bài toán với dữ liệu dạng bảng. Tuy nhiên, cần đầu tư thời gian tinh chỉnh siêu tham số để tránh overfitting và đạt kết quả tốt nhất.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="random-forest.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Random Forest</strong>
+                        </a>
+                        <a href="ensemble-learning.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Ensemble Learning</strong>
+                        </a>
+                        <a href="decision-tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Decision Tree</strong>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Trang chủ</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="random-forest.html">← Previous: Random Forest</a>
+                    <a href="lightgbm.html">Next: LightGBM →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>

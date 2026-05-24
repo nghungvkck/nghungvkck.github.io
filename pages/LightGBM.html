@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LightGBM - Gradient Boosting siêu tốc và tiết kiệm bộ nhớ - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>LightGBM – Gradient Boosting siêu tốc và tiết kiệm bộ nhớ</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 24/05/2026</span>
+                        <span>Chuyên mục: Machine Learning nâng cao</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#lightgbm</span>
+                        <span>#gradient-boosting</span>
+                        <span>#goss</span>
+                        <span>#efb</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Tổng quan về LightGBM</h2>
+                    <p><strong>LightGBM (Light Gradient Boosting Machine)</strong> là một biến thể của GBDT (Gradient Boosting Decision Tree) do Microsoft giới thiệu, tập trung vào việc tối ưu hóa tốc độ huấn luyện và khả năng mở rộng trên dữ liệu lớn. Thư viện này đặc biệt phù hợp với các bài toán có số lượng mẫu và đặc trưng rất lớn, nhờ hai kỹ thuật then chốt: <strong>Gradient‑based One‑Side Sampling (GOSS)</strong> và <strong>Exclusive Feature Bundling (EFB)</strong>.</p>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <ul>
+                            <li><strong>GOSS:</strong> ưu tiên giữ lại các mẫu có độ lớn gradient cao, lấy mẫu ngẫu
+                                nhiên một phần từ phần còn lại, rồi tái trọng số khi ước lượng độ lợi
+                                thông tin (information gain) để hạn chế sai lệch.</li>
+                            <li><strong>EFB:</strong> thay vì dùng các phép biến đổi như PCA để giảm chiều, LightGBM
+                                hạ chi phí theo số đặc trưng bằng cách gộp những đặc trưng hầu như
+                                không cùng kích hoạt (hiếm khi đồng thời có giá trị khác 0) thông qua
+                                bài toán tô màu đồ thị (graph coloring).</li>
+                        </ul>
+                    </div>
+                    <h2>II. Gradient‑based One‑Side Sampling (GOSS)</h2>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/goss.jpg" alt="Minh họa GOSS" style="width: 70%;">
+                    </div>
+                    <p><strong>Ý tưởng:</strong> Độ dốc (gradient) của từng mẫu dữ liệu thể hiện mức độ “chưa
+                        được giải quyết” của mô hình. Những điểm có gradient nhỏ đóng góp rất ít
+                        vào cập nhật tham số, nên có thể giảm tần suất xuất hiện của chúng mà vẫn
+                        giữ nguyên hướng học. LightGBM khai thác điều này bằng Gradient-based
+                        One-Side Sampling (GOSS): giữ trọn các mẫu có gradient lớn, chỉ lấy
+                        ngẫu nhiên một phần nhỏ trong nhóm gradient thấp, rồi hiệu chỉnh trọng số
+                        để không làm sai lệch phép đánh giá split gain.</p>
+                    <h3>Quy trình GOSS</h3>
+                    <ol>
+                        <li>Sắp xếp các mẫu theo độ lớn gradient \(|g_i|\), giữ lại \(a \cdot n\) điểm có \(|g_i|\) lớn nhất (thường \(a = 0.2\)).</li>
+                        <li>Lấy ngẫu nhiên \(b \cdot n\) điểm từ phần còn lại (thường \(b = 0.1\)).</li>
+                        <li>Nhân trọng số các mẫu lấy ở bước (2) với hệ số \(\frac{1-a}{b}\) để tăng cường đóng góp của các mẫu gradient nhỏ, tránh mất cân bằng.</li>
+                        <li>Huấn luyện cây quyết định trên tập dữ liệu gộp lại (các mẫu giữ lại + các mẫu ngẫu nhiên đã được tái trọng số).</li>
+                    </ol>
+                    <p><strong>Lợi ích:</strong> Giảm mạnh số mẫu phải xử lý khi xây dựng histogram (từ \(n\) xuống còn \(a \cdot n + b \cdot n\)), nhưng vẫn bảo toàn ước lượng Gain gần đúng nhờ tái trọng số. Điều này đặc biệt hữu ích khi số mẫu rất lớn (hàng triệu).</p>
+
+                    <h2>III. Exclusive Feature Bundling (EFB)</h2>
+                    <div style="display: flex; justify-content: center;">
+                        <img src="../images/EFB.jpg" alt="Minh họa EFB với graph coloring" style="width: 70%;">
+                    </div>
+                    <p><strong>Ý tưởng:</strong> Nhiều đặc trưng rời rạc (sparse features) hầu như không cùng khác 0 (ví dụ: one‑hot encoding). Ta có thể gom chúng vào một “bundle” duy nhất, sao cho mỗi bản ghi chỉ kích hoạt đúng một (hoặc rất ít) thành phần trong bundle. Khi đó thay vì xây histogram cho từng đặc trưng riêng lẻ, ta chỉ xây cho các bundle.</p>
+                    <h3>Quy trình EFB</h3>
+                    <ol>
+                        <li>Xây dựng đồ thị xung đột giữa các đặc trưng: hai đặc trưng có xung đột nếu chúng cùng khác 0 trên bất kỳ mẫu nào.</li>
+                        <li>Thực hiện greedy bundling với một ngưỡng xung đột nhỏ \(\gamma\) (cho phép một số xung đột nhỏ để tăng số lượng bundle).</li>
+                        <li>Map các đặc trưng trong cùng một bundle vào các dải bin không chồng lấn (bằng cách cộng offset).</li>
+                    </ol>
+                    <p><strong>Lợi ích:</strong> Độ phức tạp xây dựng histogram giảm từ \(O(N \cdot F)\) xuống \(O(N \cdot B)\), với \(B \ll F\) (\(F\) là số đặc trưng ban đầu, \(B\) là số bundle sau khi gom). Nhờ đó LightGBM xử lý được các bộ dữ liệu có hàng trăm nghìn đặc trưng (ví dụ click‑through rate prediction) mà không bị quá tải bộ nhớ.</p>
+
+                    <h2>IV. Các bước huấn luyện LightGBM cho bài toán Hồi quy</h2>
+                    <p>Dưới đây là quy trình chi tiết huấn luyện mô hình LightGBM cho bài toán hồi quy (ví dụ với loss L2 – Mean Squared Error). Các bước có tích hợp GOSS và EFB.</p>
+
+                    <h3>Bước 0: Tiền xử lý đặc trưng (đặc trưng của LightGBM)</h3>
+                    <ul>
+                        <li><strong>Lượng tử hóa (binning):</strong> Mỗi đặc trưng liên tục được chia thành \(K\) bin (thường \(K = 255\)). Việc này giúp việc xây dựng histogram rất nhanh.</li>
+                        <li><strong>(Tuỳ chọn) EFB:</strong> Gộp các đặc trưng hiếm khi cùng khác 0 để giảm số chiều.</li>
+                    </ul>
+
+                    <h3>Bước 1: Khởi tạo</h3>
+                    <div class="formula">
+                        \[
+                        f^{(0)} = \frac{1}{n} \sum_{i=1}^{n} y_i
+                        \]
+                    </div>
+                    <p>Khởi tạo dự đoán ban đầu bằng trung bình của biến mục tiêu \(y\) (phù hợp với L2 loss).</p>
+
+                    <h3>Bước 2: Tính gradient và hessian tại node hiện tại</h3>
+                    <p>Với L2 loss: \(L(y, \hat{y}) = \frac{1}{2}(y - \hat{y})^2\), ta có:</p>
+                    <div class="formula">
+                        \[
+                        g_i = \hat{y}_i - y_i, \quad h_i = 1
+                        \]
+                    </div>
+                    <p>Tại node \(T\) (tập mẫu thuộc node đó), tổng gradient và tổng hessian là:</p>
+                    <div class="formula">
+                        \[
+                        G_T = \sum_{i \in T} g_i, \quad H_T = \sum_{i \in T} h_i = |T|
+                        \]
+                    </div>
+
+                    <h3>Bước 3: (Tuỳ chọn) Áp dụng GOSS</h3>
+                    <ol>
+                        <li>Giữ lại tất cả các mẫu có \(|g_i|\) lớn nhất (top \(a \cdot n\) mẫu).</li>
+                        <li>Lấy ngẫu nhiên \(b \cdot n\) mẫu từ phần còn lại (các mẫu gradient nhỏ).</li>
+                        <li>Gán trọng số cho các mẫu gradient nhỏ được lấy là \(\frac{1-a}{b}\) để bù đắp.</li>
+                        <li>Chỉ sử dụng tập mẫu đã chọn để xây dựng cây (các mẫu gradient lớn + mẫu gradient nhỏ đã lấy).</li>
+                    </ol>
+
+                    <h3>Bước 4: Xây dựng histogram và chọn split</h3>
+                    <p>Độ lợi (Gain) khi phân tách một node thành hai node con L và R (với dữ liệu đã được GOSS) được tính bởi:</p>
+                    <div class="formula">
+                        \[
+                        \text{Gain} = \frac{1}{2} \left( \frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - \frac{G_T^2}{H_T + \lambda} \right) - \gamma
+                        \]
+                    </div>
+                    <p>Trong đó \(\lambda\) là tham số regularization L2, \(\gamma\) là ngưỡng cắt tỉa (min_split_gain). Chọn split có Gain lớn nhất.</p>
+                    <p><em>Lưu ý:</em> Nhờ histogram, việc tính \(G_L, H_L, G_R, H_R\) cho mỗi bin có độ phức tạp \(O(\#\text{bins})\) thay vì \(O(n)\).</p>
+
+                    <h3>Bước 5: Mở rộng cây theo chiến lược leaf‑wise (best‑first)</h3>
+                    <ul>
+                        <li>Khởi tạo cây chỉ với node gốc.</li>
+                        <li>Đưa các node con vào hàng đợi ưu tiên theo Gain tiềm năng.</li>
+                        <li>Lặp lại bước 2–4 trên node có Gain lớn nhất trong hàng đợi.</li>
+                        <li>Dừng khi không còn Gain dương hoặc đạt đến giới hạn <code>num_leaves</code> (số lá tối đa) hoặc <code>max_depth</code>.</li>
+                    </ul>
+
+                    <h3>Bước 6: Tính giá trị tại lá (Newton step)</h3>
+                    <p>Giá trị dự đoán của mỗi lá (output) được tính tối ưu dựa trên gradient và hessian:</p>
+                    <div class="formula">
+                        \[
+                        v_L = -\frac{G_L}{H_L + \lambda}
+                        \]
+                    </div>
+                    <p>Với L2 loss, \(v_L = -\frac{\sum (g_i)}{|T| + \lambda}\) (chính là âm của tổng gradient chia cho số mẫu + \(\lambda\)).</p>
+
+                    <h3>Bước 7: Cập nhật dự đoán</h3>
+                    <p>Sau khi xây dựng cây thứ \(m\), dự đoán được cập nhật theo công thức:</p>
+                    <div class="formula">
+                        \[
+                        f^{(m)}(x) = f^{(m-1)}(x) + \eta \cdot v_L(x)
+                        \]
+                    </div>
+                    <p>trong đó \(v_L(x)\) là giá trị lá mà mẫu \(x\) rơi vào, \(\eta\) là learning rate.</p>
+
+                    <h3>Bước 8: Dự đoán cuối cùng</h3>
+                    <p>Sau khi xây dựng đủ \(M\) cây, dự đoán cho mẫu \(x\) là:</p>
+                    <div class="formula">
+                        \[
+                        \hat{y}(x) = f^{(0)}(x) + \sum_{m=1}^{M} \eta \, v^{(m)}_{L_m}(x)
+                        \]
+                    </div>
+                    <p>Đây chính là tổng có trọng số của tất cả các cây.</p>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h4>📌 Ví dụ code Python (LightGBM cho hồi quy)</h4>
+                        <pre><code class="language-python">import lightgbm as lgb
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+# Tạo dữ liệu
+X, y = make_regression(n_samples=100000, n_features=20, noise=0.1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Tạo dataset LightGBM
+train_data = lgb.Dataset(X_train, label=y_train)
+test_data = lgb.Dataset(X_test, label=y_test, reference=train_data)
+
+# Tham số
+params = {
+    'objective': 'regression',
+    'boosting': 'gbdt',
+    'num_leaves': 31,
+    'learning_rate': 0.05,
+    'feature_fraction': 0.9,
+    'bagging_fraction': 0.8,
+    'bagging_freq': 5,
+    'verbose': 0,
+    'lambda_l2': 1e-5
+}
+
+# Huấn luyện
+model = lgb.train(params, train_data, valid_sets=[test_data],
+                  num_boost_round=100, callbacks=[lgb.early_stopping(10)])
+
+# Dự đoán
+y_pred = model.predict(X_test)
+print("MSE:", mean_squared_error(y_test, y_pred))</code></pre>
+                    </div>
+
+                    <h2>V. So sánh LightGBM với XGBoost</h2>
+                    <ul>
+                        <li><strong>Tốc độ huấn luyện:</strong> LightGBM nhanh hơn nhờ GOSS (giảm số mẫu) và EFB (giảm số đặc trưng), cùng với histogram và leaf‑wise growth.</li>
+                        <li><strong>Bộ nhớ:</strong> LightGBM tiết kiệm hơn do lưu trữ đặc trưng dưới dạng bin (int8) và chỉ lấy mẫu con.</li>
+                        <li><strong>Độ chính xác:</strong> Nhìn chung tương đương, có khi LightGBM tốt hơn trên dữ liệu rất lớn, nhưng dễ overfit hơn nếu không điều chỉnh kỹ <code>num_leaves</code> và <code>min_data_in_leaf</code>.</li>
+                        <li><strong>Xử lý missing values:</strong> Cả hai đều tự động xử lý.</li>
+                        <li><strong>Tính năng đặc biệt:</strong> LightGBM hỗ trợ categorical features (chỉ cần khai báo <code>categorical_feature</code>) mà không cần one‑hot encoding.</li>
+                    </ul>
+                    <div style="background: #fffaf2; border: 1px solid #ffe0a8; border-radius: 10px; padding: 16px; margin: 20px 0;">
+                        <p><strong>Khuyến nghị:</strong> Với dữ liệu trung bình (hàng chục nghìn mẫu, vài trăm đặc trưng), XGBoost và LightGBM đều tốt. Với dữ liệu lớn (hàng triệu mẫu, hàng nghìn đặc trưng), LightGBM vượt trội về tốc độ và bộ nhớ. Cần đặc biệt chú ý tránh overfit khi dùng leaf‑wise bằng cách giới hạn <code>num_leaves</code> (thường 15–255) và sử dụng <code>min_data_in_leaf</code> (10–100).</p>
+                    </div>
+
+                    <h2>VI. Kết luận</h2>
+                    <p>LightGBM là một trong những thư viện boosting mạnh nhất hiện nay, đặc biệt thích hợp cho các bài toán với dữ liệu quy mô lớn. Nhờ các kỹ thuật GOSS và EFB, nó đạt được tốc độ huấn luyện và hiệu quả bộ nhớ vượt trội so với XGBoost trong nhiều tình huống. Các bước huấn luyện được trình bày ở trên giúp hiểu rõ cơ chế hoạt động bên trong của LightGBM, từ khởi tạo, xây dựng histogram, chọn split leaf‑wise, đến cập nhật dự đoán cuối cùng. Với những ai cần một giải pháp nhanh, nhẹ và chính xác cho dữ liệu dạng bảng, LightGBM là lựa chọn hàng đầu.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="xgboost.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>XGBoost</strong>
+                        </a>
+                        <a href="random-forest.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Random Forest</strong>
+                        </a>
+                        <a href="decision-tree.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Decision Tree</strong>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Trang chủ</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="xgboost.html">← Previous: XGBoost</a>
+                    <a href="catboost.html">Next: CatBoost →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
