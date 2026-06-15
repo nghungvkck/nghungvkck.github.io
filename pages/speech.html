@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ngữ âm học và Trích xuất đặc trưng tiếng nói - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .matrix {
+            font-family: monospace;
+            text-align: center;
+            background: #f8f4ec;
+            padding: 10px;
+            display: inline-block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Ngữ âm học và âm thanh</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 09/06/2026</span>
+                        <span>Chuyên mục: Xử lý ngôn ngữ & Tiếng nói</span>
+                    </div>
+
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Khái niệm cơ bản về Ngữ âm học</h2>
+                    <p><strong>Ngữ âm học (Phonetics)</strong> là ngành nghiên cứu các âm thanh lời nói trong ngôn ngữ, cách chúng được tạo ra bởi cơ quan phát âm, đặc tính âm học và cách chúng được số hóa, xử lý.</p>
+                    <ul>
+                        <li><strong>Phone (Âm đoạn):</strong> Đơn vị âm thanh lời nói cơ bản, thường được biểu diễn bằng các ký hiệu trừu tượng để mô tả cách phát âm của một từ.</li>
+                        <li><strong>IPA (Bảng ký âm quốc tế):</strong> Tiêu chuẩn biểu diễn ngữ âm dùng để ký âm cho các ngôn ngữ trên thế giới.</li>
+                        <li><strong>ARPAbet:</strong> Một bảng chữ cái ngữ âm đơn giản sử dụng các ký tự ASCII để biểu diễn các âm đoạn tiếng Anh Mỹ, thường dùng trong tính toán.</li>
+                        <figure style="display: flex; flex-direction: column; align-items: center;">
+                            <img src="../images/speech/BangARPA.jpg" alt="Bảng ARPAbet" style="width: 70%;">
+                            <figcaption style="font-size: 0.85rem; color: #6d6257; margin-top: 8px;">Hình 1: Bảng ký hiệu ARPAbet cho tiếng Anh Mỹ</figcaption>
+                        </figure>                    
+                    </ul>
+
+                    <h2>II. Ngữ âm học cấu âm (Articulatory Phonetics)</h2>
+                    <p><strong>Ngữ âm học cấu âm </strong> là môn học nghiên cứu cách các âm vị này được tạo ra khi các cơ quan cấu tạo âm vị khác nhau trong miệng, họng và mũi điều chỉnh luồng không khí từ phổi.</p>
+                    <ul>
+                        <li><strong>Thanh môn (Glottis):</strong> Khoảng trống giữa hai dây thanh âm trong thanh quản.</li>
+                        <li><strong>Âm hữu thanh (Voiced):</strong> Âm được tạo ra khi dây thanh âm rung động (ví dụ: [b], [d], [v]).</li>
+                        <li><strong>Âm vô thanh (Unvoiced/Voiceless):</strong> Âm được tạo ra khi dây thanh âm không rung (ví dụ: [p], [t], [f]).</li>
+                        <li><strong>Phụ âm (Consonant):</strong> Âm thanh được tạo ra bằng cách hạn chế hoặc chặn luồng không khí.</li>
+                        <li><strong>Nguyên âm (Vowel):</strong> Âm thanh có ít sự cản trở luồng khí hơn, thường là âm hữu thanh, to hơn và dài hơn phụ âm.</li>
+                        <li><strong>Vị trí cấu âm (Place of Articulation):</strong> Điểm cản trở luồng khí tối đa để tạo phụ âm (như môi, răng, nướu, ngạc).</li>
+                        <li><strong>Phương thức cấu âm (Manner of Articulation):</strong> Cách luồng khí bị cản trở (như âm tắc - stop, âm mũi - nasal, âm xát - fricative).</li>
+                        <li><strong>Âm tiết (Syllable):</strong> Sự kết hợp giữa một nguyên âm (hạt nhân) và các phụ âm xung quanh (phần đầu và phần cuối).</li>
+                    </ul>
+
+                    <h2>III. Prosody</h2>
+                    <p>Nghiên cứu về các khía cạnh ngữ điệu và nhịp điệu của ngôn ngữ.</p>
+                    <ul>
+                        <li><strong>Trọng âm từ (Lexical Stress):</strong> Đặc tính phát âm của một từ, trong đó một âm tiết sẽ to hơn hoặc dài hơn các âm tiết khác.</li>
+                        <li><strong>Nhấn mạnh (Pitch Accent):</strong> Sự làm nổi bật một từ hoặc âm tiết trong câu thông qua cường độ, độ dài hoặc sự thay đổi cao độ.</li>
+                        <li><strong>Giai điệu (Tune):</strong> Sự lên và xuống của tần số cơ bản (F0) theo thời gian trong một câu nói.</li>
+                    </ul>
+
+                    <h2>IV. Speech Sound Waves (Sóng âm thanh)</h2>
+                    <ul>
+                        <li>  
+                            <strong>Waves (Sóng)</strong>
+                            <p><strong>Âm thanh</strong> là các dao động cơ học (biến đổi vị trí qua lại) của các phân tử, nguyên tử hay các hạt làm nên vật chất và lan truyền trong vật chất như các sóng. Âm thanh, giống như nhiều sóng, được đặc trưng bởi tần số, bước sóng, chu kỳ, biên độ và vận tốc lan truyền (tốc độ âm thanh).</p>
+                            <p>Khi phân tích âm thanh thì ta dựa trên các hàm sin hoặc hàm sóng</p>  
+                            <div class="formula">
+                                \[ y = A \cdot \sin(2\pi f t) \]
+                            </div>
+                            <figure style="display: flex; flex-direction: column; align-items: center;">
+                                <img src="../images/speech/HamSin.jpg" alt="Bảng ARPAbet" style="width: 70%;">
+                                <figcaption style="font-size: 0.85rem; color: #6d6257; margin-top: 8px;">Hình 2: Hàm sóng: chu kì T = 0.1s, Biên độ A = 1.0</figcaption>
+                            </figure>                 
+                            
+                            <ul>
+                                <li><strong>F là Tần số (Frequency):</strong> Số lần sóng âm lặp lại trong một giây, đơn vị là Hertz (Hz).</li>
+                                <li><strong>A là Biên độ (Amplitude):</strong> Giá trị cực đại trên trục Y của sóng âm, liên quan đến áp suất không khí.</li>
+                                <li><strong>Tần số cơ bản (F0):</strong> Tần số rung của dây thanh âm, biểu hiện dưới dạng cao độ (pitch) mà con người cảm nhận được.</li>
+                                <p><strong>Chu kỳ \(T\):  </strong>   liên hệ với tần số:       \(T = \frac{1}{f}\).</p>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <strong>Speech Sound Waves (Sóng âm thanh) </strong>
+                            <p>Đầu vào của bộ nhận dạng giọng nói, giống như đầu vào của tai người, là một chuỗi phức tạp các thay đổi về áp suất không khí.
+                                    Những thay đổi về áp suất không khí này rõ ràng bắt nguồn từ người nói và được gây ra
+                                    bởi cách thức cụ thể mà không khí đi qua thanh quản và thoát ra khỏi khoang miệng hoặc khoang mũi.
+                                    Chúng ta biểu diễn sóng âm thanh bằng cách vẽ đồ thị sự thay đổi áp suất không khí theo thời gian.
+                                   </p>
+                            <figure style="display: flex; flex-direction: column; align-items: center;">
+                                <img src="../images/speech/SongAmThanh.jpg" alt="Bảng ARPAbet" style="width: 90%;">
+                                <figcaption style="font-size: 0.85rem; color: #6d6257; margin-top: 8px;">Hình 3: Đồ thị sóng âm thanh</figcaption>
+                            </figure>  
+                        </li>
+                        <li>
+                            <strong>Số hóa âm thanh</strong>
+                            <p>Âm thanh là dạng tín hiệu liên tục, máy tính của chúng ta thì làm việc với dữ liệu rời rạc. Đó là lý do chúng ta 
+                                xử lý âm thanh thành dạng số để thuận tiện lưu trữ và truyền tải 
+                                Chính là những file audio với định dạng mp3, wav chúng ta thường nghe trên máy tính hoặc điện thoại.</p>
+                            <ul>
+                                <p><strong>Các đặc trưng âm thanh</strong></p>
+                                <li>Sample rate: tần số lấy mẫu trên giây (đơn vị hz). Sample rate càng cao, chất lượng càng tốt. Một bản nhạc có sample rate là 36000 Hz thì mỗi giây nhạc sẽ được lấy mẫu 36000 lần. 
+                                    Sample rate trong nhận dạng giọng nói thường là 16000Hz.Về mặt toán học, để biến một sóng âm thanh thành số, 
+                                    chúng ta chỉ cần ghi lại chiều cao của sóng tại các điểm cách đều nhau.
+                                    <p>Tần số Nyquist: Tần số cao nhất mà bạn có thể ghi lại chính xác ki lấy mẫu tín hiệu (sampling rate):</p>
+                                    <p>fs: là tần số lấy mẫu</p>
+                                <div class="formula">
+                                \[ f_{\text{Nyquist}} = \frac{f_s}{2} \]
+                                </div>
+                                </li>
+
+
+                                <li>Channels: mô phỏng âm thanh trong không gian, chanel càng cao, âm thanh càng sống động, giúp ta hình dung giống như cảm nhận được vị trí âm phát ra trong không gian.</li>
+                                <li>Stereo là một tập tin âm thanh tích hợp hai kênh âm thanh riêng biệt, chính là biểu tượng cho tai trái và tai phải người. Trong khi đó, Mono là một tập tin âm thanh đơn kênh.</li>
+                                <li>Bitrate: là đơn vị cơ bản để nói đến mức dung lượng mà thiết bị lưu trữ cần có để xử lý một giây âm thanh (đơn vị kbps - kilobit per second).
+Bitrate càng cao sẽ ghi nhận đầy đủ những loại âm thanh, chất lượng tập tin cũng cao hơn do đó dung lượng tập tin cũng sẽ lớn hơn. Ngược lại, bitrate càng thấp thì âm thanh bị lược bỏ càng nhiều nên chất lượng thấp hơn do đó dung lượng tập tin nhỏ hơn.</li>
+                            </ul>
+                        </li>
+
+                        <!-- <li><strong>Cường độ (Intensity):</strong> Năng lượng âm thanh được chuẩn hóa theo ngưỡng nghe của con người, đo bằng decibel (dB).</li>
+                        <li><strong>Phổ (Spectrum):</strong> Biểu diễn các thành phần tần số khác nhau và biên độ của chúng tại một thời điểm.</li>
+                        <li><strong>Phổ đồ (Spectrogram):</strong> Cách hình dung ba chiều (thời gian × tần số × biên độ) của sóng âm.</li>
+                        <li><strong>Formant:</strong> Các dải tần số tối (đỉnh phổ) được khuếch đại bởi khoang miệng, là đặc trưng quan trọng nhất để nhận dạng nguyên âm.</li> -->
+                    </ul>
+
+                    <h2>V. Phổ và miền tần số</h2>
+
+                    <h3>1. Spectrum (Phổ)</h3>
+                    <p><strong>Spectrum (Phổ):</strong> là biểu diễn các thành phần tần số khác nhau và biên độ của chúng tại một thời điểm.</p>
+                    <figure style="display: flex; flex-direction: column; align-items: center;">
+                        <img src="../images/speech/VD_Spectrum.webp" alt="Ví dụ Spectrum" style="width: 80%;">
+                        <figcaption style="font-size: 0.85rem; color: #6d6257; margin-top: 8px;">Hình 4: Spectrum của một đoạn nhạc</figcaption>
+                    </figure>
+                    <p>Hãy tưởng tượng bạn nghe một đoạn nhạc. Âm thanh bạn nghe thấy thực chất là sự kết hợp của nhiều tần số khác nhau. Mỗi tần số này đóng góp một phần vào âm thanh tổng thể. Spectrum sẽ cho bạn biết những tần số nào đang có mặt trong âm thanh đó và cường độ của từng tần số.</p>
+
+                    <h3>2. Spectrogram (Phổ thời gian - tần số)</h3>
+                    <p><strong>Spectrogram</strong> của một tín hiệu biểu diễn spectrum của nó theo thời gian, giống như một “bức ảnh” của tín hiệu. Spectrogram hiển thị thời gian trên trục x và tần số trên trục y. Nó giống như chúng ta chụp spectrum nhiều lần tại các thời điểm khác nhau, sau đó ghép chúng lại thành một biểu đồ duy nhất.</p>
+                    <figure style="display: flex; flex-direction: column; align-items: center;">
+                        <img src="../images/speech/Song.png" alt="Sóng âm" style="width: 80%;">
+                        <figcaption style="font-size: 0.85rem; color: #6d6257; margin-top: 8px;">Dạng sóng âm miền thời gian</figcaption>
+                    </figure>
+                    <figure style="display: flex; flex-direction: column; align-items: center;">
+                        <img src="../images/speech/Pho_Spectrogram.png" alt="Spectrogram" style="width: 80%;">
+                        <figcaption style="font-size: 0.85rem; color: #6d6257; margin-top: 8px;">Hình 5: Spectrogram của một đoạn âm thanh gõ sầu riêng</figcaption>
+                    </figure>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                        <div>
+                            <p><strong>Spectrogram thể hiện:</strong></p>
+                            <ul>
+                                <li><strong>Trục ngang:</strong> Thời gian.</li>
+                                <li><strong>Trục dọc:</strong> Tần số.</li>
+                                <li><strong>Màu sắc:</strong> Biên độ (độ mạnh của tín hiệu).</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p><strong>Phổ này giữ lại được:</strong></p>
+                            <ul>
+                                <li>Thông tin tần số.</li>
+                                <li>Cường độ của từng tần số.</li>
+                                <li>Cấu trúc hạ âm (nhận diện giọng nói, phân biệt nhạc cụ).</li>
+                                <li>Đặc trưng âm (feature).</li>
+                                <li>Sự thay đổi nhanh/chậm của tín hiệu.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p>Thang đo Mel (Mel scale) chuyển đổi tần số vật lý \(f\) (Hz) sang tần số cảm nhận \(m\) (mel):</p>
+                    <div class="formula">
+                        \[ m = 1127 \ln\left(1 + \frac{f}{700}\right) \]
+                    </div>
+
+
+                    <!-- <h2>VI. Các công thức quan trọng trong xử lý tiếng nói</h2>
+                    
+                    <h3>1. Đặc tính cơ bản của sóng âm</h3>
+
+
+                    <h3>2. Số hóa và nén âm thanh</h3>
+                    <p><strong>Tần số Nyquist:</strong> Tần số tối đa có thể đo được chính xác bằng một nửa tỷ lệ lấy mẫu (sampling rate):</p>
+
+                    <p><strong>Nén μ-law:</strong> Thuật toán nén logarit giúp biểu diễn các giá trị nhỏ chính xác hơn (thường dùng μ=255 cho 8-bit). Với \(-1 \le x \le 1\):</p>
+                    <div class="formula">
+                        \[ F(x) = \operatorname{sgn}(x) \cdot \frac{\ln(1 + \mu |x|)}{\ln(1 + \mu)} \]
+                    </div>
+
+                    <h3>3. Đo lường năng lượng và cường độ âm thanh</h3>
+                    <p><strong>Biên độ RMS (Root Mean Square):</strong> Giá trị biên độ trung bình của một đoạn tín hiệu (N mẫu):</p>
+                    <div class="formula">
+                        \[ \text{RMS} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} x_i^2} \]
+                    </div>
+                    <p><strong>Công suất (Power):</strong></p>
+                    <div class="formula">
+                        \[ \text{Power} = \frac{1}{N} \sum_{i=1}^{N} x_i^2 \]
+                    </div>
+                    <p><strong>Cường độ (Intensity) tính theo dB:</strong></p>
+                    <div class="formula">
+                        \[ I_{\text{dB}} = 10 \log_{10} \left( \frac{1}{P_0} \cdot \frac{1}{N} \sum_{i=1}^{N} x_i^2 \right) \]
+                    </div>
+                    <p>với \(P_0 \approx 2 \times 10^{-5}\) Pa là ngưỡng áp suất của thính giác người.</p>
+
+                    <h3>4. Cảm nhận cao độ – Thang đo Mel</h3>
+                    <div class="formula">
+                        \[ m = 1127 \ln\left(1 + \frac{f}{700}\right) \]
+                    </div>
+                    <p>Chuyển đổi từ tần số vật lý \(f\) (Hz) sang tần số cảm nhận (mel).</p>
+
+                    <h3>5. Xử lý tín hiệu và trích xuất đặc trưng</h3>
+                    <p><strong>Cửa sổ Hamming:</strong> Với chiều dài cửa sổ \(L\):</p>
+                    <div class="formula">
+                        \[ w[n] = 0.54 - 0.46 \cos\left( \frac{2\pi n}{L} \right), \quad 0 \le n \le L-1 \]
+                    </div>
+                    <p><strong>Biến đổi Fourier rời rạc (DFT):</strong></p>
+                    <div class="formula">
+                        \[ X[k] = \sum_{n=0}^{N-1} x[n] \, e^{-j\frac{2\pi}{N}kn} \]
+                    </div>
+                    <p><strong>Cepstrum:</strong> (biến đổi Fourier ngược của log biên độ DFT)</p>
+                    <div class="formula">
+                        \[ c[n] = \sum_{k=0}^{N-1} \log\left( \left| \sum_{n=0}^{N-1} x[n] e^{-j\frac{2\pi}{N}kn} \right| \right) e^{j\frac{2\pi}{N}kn} \]
+                    </div>
+                    <p><strong>Năng lượng trong một khung (frame):</strong></p>
+                    <div class="formula">
+                        \[ E = \sum_{t=l_1}^{l_2} x^2[t] \]
+                    </div>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h4 style="margin-top: 0;">📌 Ví dụ minh họa: Trích xuất MFCC với Python (librosa)</h4>
+                        <pre><code class="language-python">import librosa
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Đọc file âm thanh
+y, sr = librosa.load('speech.wav', sr=16000)  # sampling rate 16kHz
+
+# Trích xuất MFCC (13 hệ số + delta + delta2 = 39)
+mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13, n_fft=512, hop_length=256)
+mfcc_delta = librosa.feature.delta(mfcc)
+mfcc_delta2 = librosa.feature.delta(mfcc, order=2)
+mfcc_features = np.vstack([mfcc, mfcc_delta, mfcc_delta2])  # shape (39, time_frames)
+
+print("Kích thước MFCC:", mfcc_features.shape)
+
+# Minh họa phổ đồ (spectrogram)
+D = librosa.amplitude_to_db(np.abs(librosa.stft(y)), ref=np.max)
+plt.figure(figsize=(10, 4))
+librosa.display.specshow(D, sr=sr, x_axis='time', y_axis='hz')
+plt.colorbar(format='%+2.0f dB')
+plt.title('Phổ đồ (Spectrogram)')
+plt.tight_layout()
+plt.show()</code></pre>
+                        <p>Ví dụ trên dùng thư viện <code>librosa</code> để tính MFCC – bộ đặc trưng phổ biến nhất trong nhận dạng tiếng nói (ASR).</p>
+                    </div> -->
+
+                    <h2>VII. Kết luận</h2>
+                    <p>Ngữ âm học và xử lý tiếng nói là lĩnh vực giao thoa giữa ngôn ngữ học, âm học và xử lý tín hiệu. Nắm vững các khái niệm cấu âm, các đặc tính âm học và các công thức biến đổi (DFT, cửa sổ hóa, thang Mel, MFCC) là nền tảng để xây dựng các hệ thống nhận dạng giọng nói, tổng hợp tiếng nói và các ứng dụng xử lý giọng nói thông minh khác. Các đặc trưng MFCC cho phép chuyển đổi tín hiệu âm thanh thô thành dạng mà các mô hình học máy có thể khai thác.</p>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="nltk.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>NLTK – Xử lý ngôn ngữ tự nhiên</strong>
+                        </a>
+                        <a href="fastapi.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>FastAPI – Xây dựng API giọng nói</strong>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Trang chủ</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="nltk.html">← Previous: NLTK</a>
+                    <a href="speech-recognition.html">Next: Nhận dạng tiếng nói →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
