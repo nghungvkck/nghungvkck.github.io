@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trích xuất đặc trưng âm thanh - Audio Feature Extraction - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .step-box {
+            background: #f8fbff;
+            border: 1px solid #dce9ff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        .step-box h4 { margin-top: 0; color: #1976d2; }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Trích xuất đặc trưng âm thanh (Audio Feature Extraction)</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 16/06/2026</span>
+                        <span>Chuyên mục: Xử lý âm thanh & Tín hiệu</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#audio-processing</span>
+                        <span>#mfcc</span>
+                        <span>#feature-extraction</span>
+                        <span>#speech-processing</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Giới thiệu</h2>
+                    <p><strong>Trích xuất đặc trưng âm thanh</strong> là quá trình chuyển đổi tín hiệu âm thanh thô (dạng sóng) thành một tập hợp các đặc trưng số có ý nghĩa (hay còn gọi là số hóa âm thanh), có thể sử dụng cho các bài toán học máy như nhận dạng giọng nói, phân loại nhạc, phát hiện sự kiện âm thanh, v.v. Việc chọn lọc đặc trưng phù hợp giúp giảm chiều dữ liệu, loại bỏ nhiễu và tập trung vào các khía cạnh quan trọng nhất của âm thanh (cao độ, âm sắc, cường độ...).</p>
+                    <div style="background: #f8fbff; border: 1px solid #dce9ff; border-radius: 10px; padding: 18px; margin: 20px 0;">
+                        <h3 style="margin-top: 0;">🎯 Tại sao cần trích xuất đặc trưng?</h3>
+                        <ul>
+                            <li>Tín hiệu âm thanh thô có dung lượng lớn và nhiều thông tin dư thừa.</li>
+                            <li>Các thuật toán học máy hoạt động tốt trên dữ liệu có cấu trúc, số chiều thấp.</li>
+                            <li>Đặc trưng giúp “cô đọng” kiến thức: ví dụ thay vì 16000 mẫu/giây, ta chỉ cần 39 hệ số MFCC mỗi khung.</li>
+                        </ul>
+                    </div>
+
+                    <h2>II. Các loại đặc trưng âm thanh</h2>
+                    <p>Đặc trưng âm thanh có thể được phân thành ba nhóm chính dựa trên miền biểu diễn: <strong>miền thời gian</strong>, <strong>miền tần số</strong> và <strong>miền cepstral</strong>.</p>
+                    <ul>
+                        <li><strong>Miền thời gian:</strong> Energy, Zero‑Crossing Rate (ZCR), RMS, Autocorrelation.</li>
+                        <li><strong>Miền tần số:</strong> Spectral Centroid, Spectral Rolloff, Spectral Bandwidth, Mel Spectrogram.</li>
+                        <li><strong>Miền cepstral:</strong> MFCC (Mel‑Frequency Cepstral Coefficients) – phổ biến nhất trong nhận dạng tiếng nói.</li>
+                    </ul>
+                    <p>Các đặc trưng miền thời gian và tần số thường được dùng làm bổ sung, còn MFCC là cốt lõi cho hầu hết các hệ thống ASR.</p>
+
+                    <h2>III. Quy trình trích xuất đặc trưng chi tiết (lấy MFCC làm ví dụ)</h2>
+                    <p>Quy trình dưới đây là pipeline chuẩn để trích xuất MFCC, đồng thời cũng là cách để tính bất kỳ đặc trưng miền tần số nào.</p>
+
+                    <div class="step-box">
+                        <h4>Bước 1: Tiền xử lý & Lấy mẫu (Pre‑emphasis & Sampling)</h4>
+                        <p><strong>Pre‑emphasis:</strong> Tín hiệu âm thanh thường có năng lượng tập trung ở vùng tần số thấp. Để tăng cường tần số cao (giúp dễ nhận dạng phụ âm), ta áp dụng bộ lọc:  
+                        \[ y[n] = x[n] - \alpha \cdot x[n-1] \quad \text{với } \alpha \approx 0.97 \]  
+                        <strong>Lấy mẫu:</strong> Chuyển tín hiệu tương tự sang số với tần số lấy mẫu \(f_s\) (thường 16 kHz hoặc 44.1 kHz).</p>
+                    </div>
+
+                    <div class="step-box">
+                        <h4>Bước 2: Chia khung (Framing)</h4>
+                        <p>Chia tín hiệu thành các khung (frame) chồng lấp, mỗi khung dài khoảng 25 ms, bước nhảy 10 ms. Số mẫu mỗi khung: \(N = f_s \times 0.025\).  
+                        Việc chồng lấp giúp không bị mất thông tin ở biên.</p>
+                    </div>
+
+                    <div class="step-box">
+                        <h4>Bước 3: Cửa sổ hóa (Windowing)</h4>
+                        <p>Nhân mỗi khung với một cửa sổ để giảm hiệu ứng Gibbs ở hai đầu. Cửa sổ Hamming được dùng phổ biến:  
+                        \[ w[n] = 0.54 - 0.46 \cos\left(\frac{2\pi n}{N-1}\right) \]  
+                        Kết quả: \(x_{\text{windowed}}[n] = x[n] \cdot w[n]\).</p>
+                    </div>
+
+                    <div class="step-box">
+                        <h4>Bước 4: Biến đổi Fourier (FFT/DFT)</h4>
+                        <p>Chuyển mỗi khung sang miền tần số bằng FFT:  
+                        \[ X[k] = \sum_{n=0}^{N-1} x[n] e^{-j\frac{2\pi}{N}kn} \]  
+                        Ta thu được phổ biên độ (hoặc phổ năng lượng) \( |X[k]|^2 \).</p>
+                    </div>
+
+                    <div class="step-box">
+                        <h4>Bước 5: Áp dụng bộ lọc Mel (Mel Filter Banks)</h4>
+                        <p>Chiếu phổ năng lượng lên thang Mel. Sử dụng khoảng 20–40 bộ lọc hình tam giác, phân bố đều trên thang Mel. Năng lượng đầu ra mỗi bộ lọc:  
+                        \[ S_k = \sum_{f} |X[f]|^2 \cdot H_k(f) \]  
+                        với \(H_k(f)\) là đáp ứng của bộ lọc thứ \(k\).</p>
+                    </div>
+
+                    <div class="step-box">
+                        <h4>Bước 6: Logarit</h4>
+                        <p>Lấy log tự nhiên (hoặc log cơ số 10) của \(S_k\) để nén dải động và bắt chước cảm nhận âm lượng của tai người:  
+                        \[ L_k = \log(S_k) \]</p>
+                    </div>
+
+                    <div class="step-box">
+                        <h4>Bước 7: Biến đổi DCT (Discrete Cosine Transform)</h4>
+                        <p>Áp dụng DCT lên \(L_k\) để khử tương quan, giữ lại 13 hệ số đầu tiên:  
+                        \[ c_i = \sum_{k=1}^{K} L_k \cos\left( i (k - 0.5) \frac{\pi}{K} \right) \]  
+                        Các hệ số này là **MFCC tĩnh (static)**.</p>
+                    </div>
+
+                    <div class="step-box">
+                        <h4>Bước 8: Tính Delta & Delta‑Delta</h4>
+                        <p>Để bổ sung thông tin động, tính đạo hàm bậc nhất (delta) và bậc hai (delta‑delta) theo thời gian:  
+                        \[ \Delta c_i(t) = \frac{\sum_{j=1}^{J} j \cdot (c_i(t+j) - c_i(t-j))}{2\sum_{j=1}^{J} j^2} \]  
+                        (với \(J\) thường là 2).  
+                        Kết quả cuối cùng: 13 MFCC + 13 delta + 13 delta‑delta = **39 đặc trưng** mỗi khung.</p>
+                    </div>
+
+                    <p>Ma trận đặc trưng có kích thước (số khung × 39), sẵn sàng để đưa vào mô hình học máy.</p>
+
+                    <h2>IV. Các đặc trưng phổ biến khác</h2>
+                    <ul>
+                        <li><strong>Chroma:</strong> 12 hệ số biểu diễn năng lượng các nốt nhạc, dùng cho phân tích hợp âm.</li>
+                        <li><strong>Spectral Contrast:</strong> Sự khác biệt giữa đỉnh và đáy phổ, phản ánh âm sắc.</li>
+                        <li><strong>Tonnetz:</strong> Biểu diễn mối quan hệ quãng giữa các nốt.</li>
+                        <li><strong>Zero‑Crossing Rate:</strong> Tỷ lệ đổi dấu, phân biệt âm hữu thanh/vô thanh.</li>
+                        <li><strong>RMS Energy:</strong> Cường độ âm thanh trung bình trong khung.</li>
+                    </ul>
+
+                    <h2>V. Ứng dụng và Kết luận</h2>
+                    <ul>
+                        <li><strong>Nhận dạng giọng nói (ASR):</strong> MFCC + HMM hoặc deep learning.</li>
+                        <li><strong>Phân loại nhạc:</strong> Thể loại, nghệ sĩ, cảm xúc.</li>
+                        <li><strong>Phát hiện sự kiện âm thanh:</strong> Giám sát an ninh, IoT.</li>
+                        <li><strong>Chẩn đoán y tế:</strong> Phân tích tiếng tim, phổi.</li>
+                    </ul>
+                    <p>Trích xuất đặc trưng là cầu nối giữa tín hiệu thô và mô hình học máy. Hiểu rõ từng bước giúp bạn tối ưu hóa hệ thống và chọn đặc trưng phù hợp. Thư viện `librosa` trong Python hỗ trợ hầu hết các đặc trưng kể trên, giúp bạn triển khai nhanh chóng.</p>
+
+                    <div style="background-color: #f7f7f7; border-left: 5px solid #2196F3; padding: 18px; margin: 20px 0; border-radius: 8px;">
+                        <h4 style="margin-top: 0;">📌 Code ví dụ với librosa</h4>
+                        <pre><code class="language-python">import librosa
+import numpy as np
+
+y, sr = librosa.load('speech.wav', sr=16000)
+mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13, n_fft=512, hop_length=256)
+delta = librosa.feature.delta(mfcc)
+delta2 = librosa.feature.delta(mfcc, order=2)
+features = np.vstack([mfcc, delta, delta2])
+print(features.shape)  # (39, T)</code></pre>
+                    </div>
+                </div>
+
+                <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="phonetics.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Ngữ âm học và tiếng nói</strong>
+                        </a>
+                        <a href="mfcc.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>MFCC chi tiết</strong>
+                        </a>
+                        <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                            <strong>Trang chủ</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="phonetics.html">← Previous: Ngữ âm học</a>
+                    <a href="audio-deep-learning.html">Next: Audio Deep Learning →</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
