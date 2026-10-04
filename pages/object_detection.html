@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Object Detection - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .matrix {
+            font-family: monospace;
+            text-align: center;
+            background: #f8f4ec;
+            padding: 10px;
+            display: inline-block;
+            margin: 10px auto;
+        }
+        .highlight-box {
+            background: #f8fbff;
+            border: 1px solid #dce9ff;
+            border-radius: 10px;
+            padding: 18px;
+            margin: 20px 0;
+        }
+        .note-box {
+            background-color: #fff9e6;
+            border-left: 5px solid #f0b400;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .warn-box {
+            background-color: #fff0f0;
+            border-left: 5px solid #d9534f;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        table.comparison {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.comparison th, table.comparison td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table.comparison th {
+            background: #f4f4f4;
+        }
+
+        /* ==== Căn đều 2 bên cho nội dung bài viết ==== */
+        .post-content p,
+        .post-content li,
+        .post-content .note-box p,
+        .post-content .warn-box p,
+        .post-content .highlight-box p {
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+        }
+        .post-content p {
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body class="article-page">
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Object Detection: bài toán nhận diện đối tượng</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 4/10/2026</span>
+                        <span>Chuyên mục: Deep Learning</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#object-detection</span>
+                        <span>#r-cnn</span>
+                        <span>#iou</span>
+                        <span>#nms</span>
+                        <span>#computer-vision</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Bài toán Object Detection là gì?</h2>
+                    <p>Trong thị giác máy tính, bài toán <strong>Object Detection (phát hiện đối tượng)</strong> là sự kết hợp của hai bài toán con tưởng chừng độc lập nhưng lại có mối liên hệ chặt chẽ với nhau:</p>
+                    <ul>
+                        <li><strong>Định vị đối tượng (Localization):</strong> Xác định vị trí của đối tượng trong ảnh. Vị trí này thường được biểu diễn bằng một <em>bounding box</em> – một hình chữ nhật bao quanh đối tượng, được mô tả bởi 4 tham số \((x, y, w, h)\) hoặc \((x_1, y_1, x_2, y_2)\): toạ độ góc trên-trái và kích thước chiều rộng, chiều cao (hoặc toạ độ góc dưới-phải).</li>
+                        <li><strong>Phân loại đối tượng (Classification):</strong> Trả lời câu hỏi "đối tượng trong bounding box đó là cái gì?" – ví dụ: chó, mèo, xe hơi, người… Trong nhiều hệ thống, còn có thêm một lớp đặc biệt là <em>background</em> (nền) để chỉ rằng vùng đó không chứa đối tượng nào cả.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 1:</strong> Sự khác biệt giữa Classification, Localization và Object Detection.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/object-detection-vs-image-classification_3.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <p>Nói cách khác, output của một mô hình Object Detection không chỉ là một nhãn duy nhất cho toàn bộ bức ảnh (như Classification thuần), mà là một danh sách các bounding box, mỗi bounding box đi kèm với một nhãn lớp và một <em>độ tin cậy (confidence score)</em>:</p>
+
+                    <div class="formula">
+                        \[
+                        \text{Output} = \left\{ (b_1, c_1, s_1), (b_2, c_2, s_2), \ldots, (b_N, c_N, s_N) \right\}
+                        \]
+                    </div>
+
+                    <p>Trong đó \(b_i\) là bounding box thứ \(i\), \(c_i\) là nhãn lớp và \(s_i \in [0,1]\) là độ tin cậy (xác suất) mà mô hình gán cho dự đoán đó.</p>
+
+                    <p>Điểm khó của bài toán này nằm ở chỗ: số lượng đối tượng trong ảnh là không biết trước, kích thước và tỉ lệ của các đối tượng có thể rất khác nhau (từ một chiếc xe tải lớn đến một con chim nhỏ ở xa), chúng có thể chồng lấn lên nhau (occlusion), và bị ảnh hưởng bởi điều kiện ánh sáng, góc chụp, và chất lượng ảnh.</p>
+
+                    <h2>II. Bài toán với một đối tượng (Single Object Detection)</h2>
+                    <p>Trường hợp đơn giản nhất là khi trong ảnh chỉ có duy nhất một đối tượng cần phát hiện. 
+                        Về bản chất, ta có thể xem đây là bài toán <em>Multi-task Learning</em> – mô hình cần thực hiện 
+                        hai bài toán là bài toán phân loại đối tượng và toán ước lượng vị trí của đối tượng trong ảnh</p>
+                    <ul>
+                        <li>Loss cho Localization: Hàm loss này được dùng để cải thiện sai số giữa bounding box thực tế và bounding box dự 
+                        đoán.</li>
+                        <li>Loss cho Classification: dùng Cross-Entropy loss cho bài toán phân loại đối tượng.</li>
+                    </ul>
+
+                    <div class="formula">
+                        \[
+                        \mathcal{L}_{\text{total}} = \lambda_{\text{loc}} \cdot \mathcal{L}_{\text{loc}}(b_{\text{pred}}, b_{\text{gt}}) + \lambda_{\text{cls}} \cdot \mathcal{L}_{\text{cls}}(c_{\text{pred}}, c_{\text{gt}})
+                        \]
+                    </div>
+
+                    <p>Trong đó \(\lambda_{\text{loc}}\), \(\lambda_{\text{cls}}\) là các hệ số cân bằng đóng góp giữa hai loại loss (thường được chọn thủ công hoặc học được).</p>
+                    <p>Nhược điểm lớn nhất của cách tiếp cận này là nó chỉ hoạt động khi biết chắc trong ảnh chỉ có một đối tượng. Trong thực tế, hầu hết các bức ảnh đều chứa nhiều đối tượng, và ta không thể áp dụng trực tiếp mô hình này.</p>
+
+                    <h2>III. Bài toán với nhiều đối tượng (Multiple Object Detection)</h2>
+                    <p>Trong thực tế thì chúng ta rất hiếm khi thấy 1 bức ảnh có 1 đối tượng bên trong.
+                        Bức ảnh có thể gồm nhiều đối tượng 
+                        và khi đó đầu ra bài toán của chúng ta sẽ là dự đoán ra nhiều đối tượng trong 1 khung ảnh.
+                        Vậy làm sao để mô hình có thể "tìm" ra đâu là những vùng chứa đối tượng và phân loại chúng? và làm sao tận
+                        dụng được sức mạnh của các mô hình image classification cho bài toán object detection? đây chính là 
+                    vấn đề chúng ta sẽ xử lý trong bài toán object detection</p>
+
+                    <h2>a. Xử dụng cửa sổ trượt (Sliding Window)</h2>
+                    <p>Ý tưởng đơn giản nhất để tìm đối tượng trong ảnh là: trượt một cửa sổ có kích thước cố định
+                         qua toàn bộ bức ảnh, tại mỗi vị trí, ta cắt vùng ảnh tương ứng ra và đưa vào một mô hình phân loại (Classifier). Khi
+                         này từ bài toán phát hiện đối tượng, bài toán của chúng ta sẽ chuyển sang bài toán image classification.
+                         Nếu mô hình dự đoán vùng đó chứa một đối tượng (ví dụ: "mèo") với xác suất cao, 
+                         ta ghi nhận lại vị trí đó như một phát hiện tiềm năng.</p>
+
+                    <p>Để xử lý các đối tượng có kích thước khác nhau, ta phải sử dụng nhiều kích thước cửa sổ khác nhau (scale pyramid). Ngoài ra, nếu bước trượt (stride) quá lớn thì sẽ bỏ sót đối tượng, còn nếu quá nhỏ thì số lượng vùng cần phân loại sẽ bùng nổ.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 2:</strong> Sliding Window quét qua ảnh.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/sliding-window-300x200.gif" alt="">
+                        </div>
+                    </div>
+
+                    <p>Giả sử ảnh có kích thước \(H \times W\). Với một cửa sổ kích thước \(k \times k\) và stride \(s\), số lượng vị trí cửa sổ cần quét là:</p>
+
+                    <div class="formula">
+                        \[
+                        N_{\text{windows}} = \left( \left\lfloor \frac{H - k}{s} \right\rfloor + 1 \right) \times \left( \left\lfloor \frac{W - k}{s} \right\rfloor + 1 \right)
+                        \]
+                    </div>
+
+                    <p>Ví dụ với ảnh \(800 \times 600\), cửa sổ \(100 \times 100\), stride \(s = 20\), ta có:</p>
+
+                    <div class="formula">
+                        \[
+                        N = \left( \left\lfloor \frac{800 - 100}{20} \right\rfloor + 1 \right) \times \left( \left\lfloor \frac{600 - 100}{20} \right\rfloor + 1 \right) = 36 \times 26 = 936 \text{ windows}
+                        \]
+                    </div>
+
+                    <p>Chỉ với một kích thước cửa sổ đã gần 1000 vùng cần phân loại. Nếu dùng 5 tỉ lệ kích thước khác nhau, số vùng tăng lên gần 5000. Mỗi vùng phải chạy qua một mạng CNN (như AlexNet) để phân loại, nghĩa là hàng nghìn lần forward cho một bức ảnh. Đây là lý do Sliding Window có chi phí tính toán cực kỳ lớn và hầu như không dùng được trong thực tế với các mô hình deep learning.</p>
+
+                    <div class="warn-box">
+                        <p><strong>Nhược điểm của Sliding Window:</strong></p>
+                        <ul>
+                            <li><strong>Chi phí tính toán khổng lồ:</strong> Hàng nghìn đến hàng chục nghìn vùng phải xử lý cho mỗi ảnh.</li>
+                            <li><strong>Không linh hoạt về tỉ lệ:</strong> Phải thử rất nhiều kích thước cửa sổ, dẫn đến việc dư thừa.</li>
+                            <li><strong>Bỏ sót đối tượng có tỉ lệ khác thường:</strong> Ví dụ một con rắn nằm ngang hoặc một cái thang dài.</li>
+                            <li><strong>Rất nhiều false positive:</strong> Vì mọi vùng đều được phân loại độc lập, nên sẽ có nhiều vùng trùng lặp cùng được dự đoán.</li>
+                        </ul>
+                    </div>
+
+                    <p>Chính vì những hạn chế này, các nhà nghiên cứu đã tìm cách 
+                        giảm số lượng vùng đề xuất bằng cách khai thác thông tin trong chính bức ảnh – 
+                        dẫn đến sự ra đời của Selective Search.</p>
+
+                    <h2>b.  Selective Search</h2>
+                    <p>Ý tưởng đơn giản đó là
+                        nếu chúng ta có thể lọc ra các vùng có khả năng có đối tượng cao thì có phải là sẽ giảm thời gian tính toán toán và độ chính xác sẽ cao hơn nhiều hay không
+                         và đó chính là ý tưởng mà Selective Search và region proposer ra đời. Region proposer được định nghĩa là 
+                         vùng có khả năng chứa object. Selective Search dựa trên đặc trưng thị giác cấp thấp (màu sắc, kết cấu, kích thước, mức độ chồng lấn) để <em>hợp nhất dần</em> các vùng ảnh nhỏ thành các vùng lớn có ý nghĩa, tạo ra khoảng 2000 vùng đề xuất (region proposals) chất lượng cao hơn nhiều so với Sliding Window.</p>
+
+                    <h3>Cách mà Selective Search hoạt động: </h3>
+                    <ol>
+                        <li>Khởi tạo: Đầu tiên, ta dùng một thuật toán <em>phân vùng ảnh</em> để chia bức ảnh 
+                        thành nhiều mảnh nhỏ, sao cho mỗi mảnh là một vùng có màu sắc và kết cấu tương đối đồng nhất. 
+                        Có thể hình dung giống như việc ta tô màu: những điểm ảnh gần giống nhau về màu sẽ được gom lại 
+                        thành một mảnh, còn chỗ nào có sự thay đổi rõ rệt  thì 
+                        bị cắt ra thành hai mảnh khác nhau. Kết quả là ta có hàng trăm mảnh nhỏ ban đầu, mỗi mảnh là một 
+                        "ứng viên" tiềm năng để sau này hợp nhất lại thành các vùng lớn hơn.</li>
+                        <li>Tính độ tương đồng: Với mỗi cặp vùng kề nhau, tính 4 loại tương đồng:
+                            <ul>
+                                <li><em>Màu sắc (Color):</em> So sánh histogram màu của hai vùng.</li>
+                                <li><em>Kết cấu (Texture):</em> So sánh histogram gradient (SIFT-like).</li>
+                                <li><em>Kích thước (Size):</em> Ưu tiên hợp nhất các vùng nhỏ trước.</li>
+                                <li><em>Độ chồng lấn (Fill):</em> Ưu tiên các vùng có hình dạng "khít" với bounding box của chúng.</li>
+                            </ul>
+                            Điểm tương đồng tổng hợp:
+                            <div class="formula">
+                                \[
+                                S(a, b) = w_1 S_{\text{color}}(a,b) + w_2 S_{\text{texture}}(a,b) + w_3 S_{\text{size}}(a,b) + w_4 S_{\text{fill}}(a,b)
+                                \]
+                            </div>
+                        </li>
+                        <li>Hợp nhất: Chọn cặp vùng có \(S(a,b)\) lớn nhất, gộp chúng lại thành một vùng mới. Cập nhật lại tương đồng với các vùng kề.</li>
+                        <li>Lặp lại: Lặp bước 3 cho đến khi toàn bộ ảnh trở thành một vùng duy nhất. Trong suốt quá trình, mỗi vùng được tạo ra đều được ghi lại làm một region proposal.</li>
+                    </ol>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 3:</strong> Selective Search hợp nhất dần các vùng nhỏ thành các vùng lớn có ý nghĩa.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/opencv_selective_search_superpixel_segmentation.webp" alt="">
+                        </div>
+                    </div>
+
+                    <p>Kết quả cuối cùng: Selective Search tạo ra các vùng đề xuất cho mỗi ảnh, bao phủ hầu hết các đối tượng có thể có, với đủ kích thước và tỉ lệ khác nhau. </p>
+
+                    <p>Selective Search không học (không có tham số được tối ưu bằng gradient descent) – nó là một thuật toán thị giác máy tính cổ điển kết hợp màu sắc, kết cấu, và hình học. Đây chính là "region proposer" được dùng trong phiên bản R-CNN đầu tiên.</p>
+
+                    <h2>III. R-CNN (Region-based Convolutional Neural Network)</h2>
+                    <p><strong>Thuật toán R-CNN</strong> – một bước ngoặt lớn của Object Detection, 
+                        khi lần đầu tiên áp dụng thành công CNN để giải quyết bài toán phát hiên vật thể</p>
+                    <div class="highlight-box">
+                        <p><strong>Hình 4:</strong> Kiến trúc R-CNN: Selective Search → Warp → CNN → SVM + Bounding Box Regression.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/R-cnn.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <p>Kiến trúc R-CNN gồm 4 bước chính:</p>
+                    <ol>
+                        <li>Region Proposal: Dùng Selective Search để sinh ra khoảng 2000 vùng đề xuất (region proposals) vùng 
+                            khả năng chứa đối tượng cho mỗi ảnh.</li>
+                        <li>Resize: Vì các vùng đề xuất có kích thước và tỉ lệ khác nhau, 
+                            mà đầu vào CNN (ví dụ AlexNet) yêu cầu kích thước cố định (như 227×227), 
+                            ta phải <em>biến đổi</em> mỗi vùng về cùng kích thước.</li>
+                        <li>Feature Extraction: Mỗi vùng đã warp được đưa qua một CNN (như AlexNet pre-trained trên ImageNet) để trích xuất vector đặc trưng (4096 chiều với AlexNet).</li>
+                        <li>Classification + Bounding Box Regression: Vector đặc trưng được đưa qua:
+                            <ul>
+                                <li>Một bộ phân loại SVM (một SVM nhị phân cho mỗi lớp) để dự đoán lớp của vùng.</li>
+                                <li>Một bộ hồi quy tuyến tính (linear regression) để tinh chỉnh lại bounding box (giảm sai số vị trí).</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                        <h3>a. Bounding box regression:</h3>
+
+                        <p> Sau khi Selective Search tạo ra các Region Proposal  
+                        đề xuất ra các vùng có khả năng chứa đối tượng, các vùng này thường chỉ <em>bao quanh đại khái</em> 
+                        đối tượng chứ chưa khớp chính xác với nó. Ví dụ, một vùng đề xuất có thể bao gồm cả chú chó lẫn một 
+                        phần nền xung quanh, hoặc cắt cụt mất chân sau của chú chó. Nếu ta dùng nguyên vùng đó làm kết quả 
+                        cuối cùng, độ chính xác  sẽ rất thấp. Bounding box regression ra đời để 
+                        tinh chỉnh vùng đề xuất, kéo nó "khít" hơn với đối tượng thực sự.</p>
+
+                        <p>Cách biểu diễn bounding box. Ta biểu diễn mỗi bounding box bằng 4 tham số: 
+                        \((x, y)\) là toạ độ tâm, và \((w, h)\) là chiều rộng và chiều cao. Cách biểu diễn tâm-kích-thước này 
+                        thuận tiện hơn so với toạ độ góc (x₁, y₁, x₂, y₂) vì nó tách biệt rõ ràng giữa <em>vị trí</em> (tâm) và 
+                        <em>kích thước</em> (rộng, cao), giúp mạng học hai khía cạnh này độc lập với nhau.</p>
+
+                        <p>Gọi:</p>
+                        <ul>
+                            <li>\(P = (P_x, P_y, P_w, P_h)\): vùng đề xuất (proposal) – đầu vào của bước regression.</li>
+                            <li>\(G = (G_x, G_y, G_w, G_h)\): ground truth – bounding box đúng mà ta muốn hướng tới.</li>
+                            <li>\(\hat{G} = (\hat{G}_x, \hat{G}_y, \hat{G}_w, \hat{G}_h)\): bounding box dự đoán – đầu ra của mạng.</li>
+                        </ul>
+
+                        <p>Ý tưởng cốt lõi: Thay vì bắt mạng dự đoán trực tiếp toạ độ tuyệt đối của bounding box 
+                        ta chỉ cần mạng dự đoán 4 phép biến đổi nhỏ \((t_x, t_y, t_w, t_h)\) để dịch chuyển và thay đổi 
+                        kích thước vùng đề xuất \(P\) thành vùng dự đoán \(\hat{G}\). Cách làm này ổn định hơn nhiều trong huấn luyện.</p>
+
+                        <div class="formula">
+                            \[
+                            \hat{G}_x = P_w \cdot t_x + P_x, \qquad
+                            \hat{G}_y = P_h \cdot t_y + P_y
+                            \]
+                            \[
+                            \hat{G}_w = P_w \cdot \exp(t_w), \qquad
+                            \hat{G}_h = P_h \cdot \exp(t_h)
+                            \]
+                        </div>
+
+                        <p>Giải thích từng công thức:</p>
+                        <ul>
+                            <li>Toạ độ tâm \((\hat{G}_x, \hat{G}_y)\): Ta dịch chuyển tâm của vùng đề xuất đi 
+                            một khoảng bằng \(t_x\) lần chiều rộng và \(t_y\) lần chiều cao của vùng đó. Ở đây \(t_x, t_y\) 
+                            được đo theo <em>tỉ lệ</em> so với kích thước vùng đề xuất, chứ không phải theo pixel tuyệt đối. 
+                            Điều này giúp mạng bất biến với kích thước ảnh và kích thước vùng đề xuất.</li>
+                            <li>Chiều rộng và chiều cao \((\hat{G}_w, \hat{G}_h)\): Ta nhân kích thước vùng 
+                            đề xuất với một hệ số tỉ lệ. Hàm \(\exp(\cdot)\) được dùng vì hai lý do: (1) đảm bảo kích thước 
+                            dự đoán luôn <em>dương</em> (vì \(\exp(t) > 0\) với mọi \(t \in \mathbb{R}\)), và (2) biến phép 
+                            nhân tỉ lệ thành phép cộng trong không gian log, giúp mạng học ổn định hơn.</li>
+                        </ul>
+
+                        <p>Vậy mạng cần học cái gì? Mạng không học trực tiếp \((t_x, t_y, t_w, t_h)\) từ dữ liệu 
+                        một cách mù quáng, mà được cung cấp <em>nhãn mục tiêu</em> \((t_x^*, t_y^*, t_w^*, t_h^*)\) tính từ 
+                        ground truth \(G\) và vùng đề xuất \(P\) như sau:</p>
+
+                        <div class="formula">
+                            \[
+                            t_x^* = \frac{G_x - P_x}{P_w}, \qquad
+                            t_y^* = \frac{G_y - P_y}{P_h}
+                            \]
+                            \[
+                            t_w^* = \log\!\left(\frac{G_w}{P_w}\right), \qquad
+                            t_h^* = \log\!\left(\frac{G_h}{P_h}\right)
+                            \]
+                        </div>
+
+                        <p>Đây chính là phép biến đổi ngược của công thức dự đoán ở trên: nếu mạng dự đoán chính 
+                        xác \(t_x = t_x^*, t_y = t_y^*, t_w = t_w^*, t_h = t_h^*\), thì \(\hat{G}\) sẽ trùng khít với \(G\). 
+                        Nói cách khác, mục tiêu huấn luyện là <em>bắt mạng dự đoán ra đúng các phép biến đổi cần thiết để biến 
+                        vùng đề xuất thành ground truth</em>.</p>
+
+                        <p>Hàm loss: Mạng được huấn luyện để tối thiểu hoá sai số giữa dự đoán và nhãn mục tiêu. 
+                        Trong R-CNN gốc, người ta dùng Ridge regression (L2 loss có regularization):</p>
+
+                        <div class="formula">
+                            \[
+                            \mathcal{L}_{\text{reg}} = \sum_{i \in \{x, y, w, h\}} \left( t_i^* - d_i(P) \right)^2 + \lambda \|\mathbf{w}\|^2
+                            \]
+                        </div>
+
+                        <p>Trong đó \(d_i(P)\) là giá trị mạng dự đoán cho thành phần thứ \(i\) (chính là \(t_i\) ở trên), 
+                        \(\lambda\) là hệ số regularization, và \(\mathbf{w}\) là trọng số của lớp regression. Sau này, các 
+                        kiến trúc như Fast R-CNN và Faster R-CNN thay L2 bằng Smooth L1 loss để ổn định hơn 
+                        khi có outlier (vùng đề xuất lệch quá xa ground truth).</p>
+
+                        <div class="note-box">
+                            <p><strong>Lưu ý quan trọng:</strong> Bounding box regression chỉ được huấn luyện trên các vùng đề xuất 
+                            <em>có IoU ≥ 0.6 với một ground truth, trong phần tiếp theo chúng ta sẽ cùng tìm hiểu về chỉ số 
+                                IoU
+                            </em> (positive proposals). Những vùng có IoU thấp hơn được coi 
+                            là background và bị bỏ qua khi tính loss regression, vì việc "kéo" một vùng background về phía một 
+                            đối tượng nào đó là vô nghĩa và sẽ làm hỏng mạng.</p>
+                        </div>
+
+                        <p>Bounding box regression là một kỹ thuật đơn giản nhưng cực kỳ hiệu quả: 
+                        thay vì bắt mạng học toạ độ tuyệt đối, ta chỉ cần mạng học các phép biến đổi tương đối so với vùng 
+                        đề xuất. Chính nhờ bước này mà các mô hình Object Detection hiện đại có thể đạt độ chính xác vị trí 
+                        rất cao, kể cả khi vùng đề xuất ban đầu chỉ "đại khái" bao quanh đối tượng.</p>
+
+                    
+                    <h2>b. Chỉ số Intersection over Union (IoU)</h2>
+                    <p>IoU (Intersection over Union) – còn gọi là Jaccard Index – là thước đo mức độ chồng lấn giữa hai bounding box. Nó được dùng để:</p>
+                    <ul>
+                        <li>Đánh giá bounding box dự đoán khớp với ground truth đến mức nào.</li>
+                        <li>Xác định một dự đoán là True Positive hay False Positive (dựa trên ngưỡng IoU, thường là 0.5).</li>
+                        <li>Làm tiêu chí trong NMS để loại bỏ các bounding box trùng lặp.</li>
+                    </ul>
+
+                    <p>Công thức:</p>
+
+                    <div class="formula">
+                        \[
+                        \text{IoU} = \frac{\text{Area of Intersection}}{\text{Area of Union}} = \frac{|A \cap B|}{|A \cup B|}
+                        \]
+                    </div>
+
+                    <p>Trong đó \(A\) và \(B\) là hai bounding box. IoU luôn nằm trong khoảng \([0, 1]\):</p>
+                    <ul>
+                        <li>\(\text{IoU} = 0\): hai box không chồng lấn chút nào.</li>
+                        <li>\(\text{IoU} = 1\): hai box trùng khít hoàn toàn.</li>
+                        <li>Thông thường, ngưỡng \(\text{IoU} \geq 0.5\) được coi là "khớp" (một dự đoán đúng).</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 5:</strong> Minh họa IoU: phần giao (Intersection) chia cho phần hợp (Union).</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/IoU.jpg" alt="">
+                        </div>
+                    </div>
+                    
+
+                    <h2>c. Non-Maximum Suppression (NMS)</h2>
+                    <p>Sau khi mô hình đưa ra dự đoán, ta thường có rất nhiều bounding box trùng lặp 
+                        cho cùng một đối tượng. Ví dụ, với một chú chó trong ảnh, 
+                        mô hình có thể đưa ra 20 bounding box khác nhau, tất cả đều bao quanh chú chó đó, 
+                        mỗi cái với một confidence score khác nhau. Ta cần một thuật toán để 
+                        giữ lại bounding box tốt nhất và loại bỏ những cái trùng lặp – đó chính là Non-Maximum Suppression.</p>
+
+                    <p>Ý tưởng:</p>
+                    <p>Nếu hai bounding box cùng chỉ về một đối tượng, chúng sẽ có IoU cao. Ta giữ lại box có confidence score cao nhất, và loại bỏ tất cả các box khác có IoU với nó vượt ngưỡng \(\text{IoU}_{\text{threshold}}\) (thường là 0.5).</p>
+
+                    <p>Thuật toán NMS chi tiết:</p>
+                    <ol>
+                        <li>Sắp xếp tất cả bounding box theo confidence score giảm dần.</li>
+                        <li>Chọn box có score cao nhất, đưa vào danh sách kết quả (keep list).</li>
+                        <li>Loại bỏ box đó khỏi danh sách ban đầu.</li>
+                        <li>Với mỗi box còn lại, tính IoU với box vừa chọn. Nếu \(\text{IoU} > \text{threshold}\), loại bỏ box đó.</li>
+                        <li>Lặp lại bước 2–4 cho đến khi không còn box nào trong danh sách ban đầu.</li>
+                    </ol>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 6:</strong> NMS: trước (trái, nhiều box trùng) và sau (phải, chỉ giữ box tốt nhất).</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/NMS.jpg" alt="">
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+                    <h2>IV. Đánh giá mô hình Object Detection</h2>
+
+                    <!-- <h2>IX. Đánh giá mô hình Object Detection</h2>
+                    <p>Khác với bài toán Classification (chỉ cần Accuracy, Precision, Recall đơn giản), đánh giá Object Detection phức tạp hơn vì phải đánh giá đồng thời cả vị trí và nhãn lớp. Bộ chỉ số chuẩn được dùng phổ biến nhất là <strong>mAP (mean Average Precision)</strong> trên các bộ dữ liệu như PASCAL VOC, COCO.</p>
+
+                    <h3>1. Các khái niệm cơ bản</h3>
+
+                    <p>Với mỗi lớp \(c\), ta xét từng dự đoán và phân loại nó thành:</p>
+                    <ul>
+                        <li><strong>True Positive (TP):</strong> Dự đoán có \(\text{IoU} \geq \text{threshold}\) với một ground truth cùng lớp, và ground truth đó chưa bị dự đoán nào khác "chiếm".</li>
+                        <li><strong>False Positive (FP):</strong> Dự đoán có \(\text{IoU} < \text{threshold}\) với mọi ground truth, hoặc dự đoán trùng vào một ground truth đã được "chiếm" bởi một dự đoán có score cao hơn.</li>
+                        <li><strong>False Negative (FN):</strong> Một ground truth không được dự đoán nào khớp (IoU ≥ threshold) cả.</li>
+                    </ul>
+
+                    <div class="formula">
+                        \[
+                        \text{Precision} = \frac{TP}{TP + FP}, \quad
+                        \text{Recall} = \frac{TP}{TP + FN}
+                        \]
+                    </div>
+
+                    <h3>2. Precision-Recall Curve</h3>
+                    <p>Với mỗi lớp, ta sắp xếp tất cả các dự đoán theo confidence score giảm dần. Với mỗi ngưỡng score \(t\), ta tính Precision và Recall tại ngưỡng đó. Vẽ đường cong Precision theo Recall, ta được <strong>Precision-Recall curve (PR curve)</strong>.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 9:</strong> Precision-Recall curve của một lớp đối tượng.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/PR_Curve.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <h3>3. Average Precision (AP)</h3>
+                    <p><strong>Average Precision (AP)</strong> cho một lớp là diện tích dưới đường cong PR:</p>
+
+                    <div class="formula">
+                        \[
+                        AP = \int_0^1 p(r) \, dr
+                        \]
+                    </div>
+
+                    <p>Trong thực tế, người ta xấp xỉ tích phân này bằng cách lấy mẫu tại 11 điểm recall (0, 0.1, 0.2, …, 1.0) – cách tính cũ của PASCAL VOC:</p>
+
+                    <div class="formula">
+                        \[
+                        AP_{11} = \frac{1}{11} \sum_{r \in \{0, 0.1, \ldots, 1.0\}} p_{\text{interp}}(r)
+                        \]
+                    </div>
+
+                    <p>Với \(p_{\text{interp}}(r) = \max_{\tilde{r} \geq r} p(\tilde{r})\) – precision được "làm phẳng" về bên phải.</p>
+
+                    <p>Từ VOC 2010 trở đi, AP được tính bằng diện tích chính xác dưới đường cong (dùng phương pháp tích phân hình thang hoặc tổng diện tích các hình chữ nhật nhỏ).</p>
+
+                    <h3>4. Mean Average Precision (mAP)</h3>
+                    <p><strong>mAP</strong> là trung bình của AP trên tất cả các lớp:</p>
+
+                    <div class="formula">
+                        \[
+                        mAP = \frac{1}{C} \sum_{c=1}^{C} AP_c
+                        \]
+                    </div>
+
+                    <p>Trong đó \(C\) là số lớp.</p>
+
+                    <h3>5. Các biến thể của mAP</h3>
+                    <table class="comparison">
+                        <thead>
+                            <tr><th>Chỉ số</th><th>Ý nghĩa</th><th>Bộ dữ liệu</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>mAP@0.5</strong></td>
+                                <td>mAP với ngưỡng IoU = 0.5</td>
+                                <td>PASCAL VOC</td>
+                            </tr>
+                            <tr>
+                                <td><strong>mAP@0.75</strong></td>
+                                <td>mAP với ngưỡng IoU = 0.75 (khắt khe hơn về vị trí)</td>
+                                <td>COCO</td>
+                            </tr>
+                            <tr>
+                                <td><strong>mAP@[.5:.95]</strong></td>
+                                <td>Trung bình của mAP tại 10 ngưỡng IoU từ 0.5 đến 0.95 (bước 0.05)</td>
+                                <td>COCO (chỉ số chính)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AP<sub>S</sub>, AP<sub>M</sub>, AP<sub>L</sub></strong></td>
+                                <td>AP cho đối tượng nhỏ / vừa / lớn (theo diện tích)</td>
+                                <td>COCO</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>7. Vài lưu ý khi so sánh các mô hình</h3>
+                    <ul>
+                        <li><strong>COCO mAP thường thấp hơn VOC mAP</strong> vì COCO dùng ngưỡng IoU khắt khe hơn (0.5:0.95).</li>
+                        <li><strong>FPS (Frames Per Second)</strong> cũng rất quan trọng trong ứng dụng thực tế – nhiều mô hình có mAP cao nhưng quá chậm để chạy real-time.</li>
+                        <li><strong>Kích thước mô hình (số tham số, FLOPs)</strong> ảnh hưởng đến khả năng triển khai trên thiết bị edge.</li>
+                        <li><strong>AP theo kích thước đối tượng</strong> (AP<sub>S</sub>, AP<sub>M</sub>, AP<sub>L</sub>) quan trọng khi bài toán có nhiều đối tượng nhỏ (như phát hiện người từ drone).</li>
+                    </ul> -->
+
+
+
+
+
+
+
+                    <h2>V. Kết luận</h2>
+                    <p>Object Detection là bài toán kết hợp giữa localization (định vị) và classification (phân loại). Từ bài toán đơn giản với một đối tượng, đến bài toán nhiều đối tượng, chúng ta đã đi qua các bước tiến hoá của lĩnh vực này:</p>
+
+                    <ul>
+                        <li>Sliding Window là ý tưởng ngây thơ đầu tiên: quét mọi vị trí, mọi tỉ lệ → quá chậm, không thực tế.</li>
+                        <li>Selective Search cải tiến bằng cách dùng đặc trưng thị giác (màu, kết cấu, kích thước, độ khít) để gợi ý khoảng 2000 vùng có khả năng chứa đối tượng.</li>
+                        <li>R-CNN là mô hình deep learning đầu tiên cho Object Detection: kết hợp Selective Search + CNN + SVM + Bounding Box Regression. Độ chính xác cao nhưng cực kỳ chậm.</li>
+                        <li>IoU là thước đo mức độ chồng lấn giữa hai bounding box, được dùng cả trong huấn luyện lẫn đánh giá.</li>
+                        <li>NMS là thuật toán hậu xử lý giúp loại bỏ các bounding box trùng lặp, giữ lại box tốt nhất cho mỗi đối tượng.</li>
+                        <li>mAP là chỉ số chuẩn để đánh giá mô hình Object Detection, được tính từ diện tích dưới đường cong Precision-Recall cho từng lớp rồi lấy trung bình.</li>
+                    </ul>
+
+                    <p>Những kiến thức này là nền tảng để tiếp cận các kiến trúc hiện đại hơn như Fast R-CNN, Faster R-CNN, YOLO, SSD, RetinaNet, DETR… 
+                        Mặc dù các kiến trúc mới đã thay thế nhiều thành phần thủ công (như Selective Search được thay bằng Region Proposal Network, 
+                        SVM được thay bằng softmax), nhưng <em>tư duy cốt lõi</em> – region proposal, IoU, NMS, mAP – vẫn hiện diện xuyên suốt trong mọi hệ thống Object Detection hiện đại.</p>
+
+                    <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="cnn.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>CNN – Convolutional Neural Networks</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="cnn.html">← Previous: CNN</a>
+                        <a href="fast_rcnn.html">Next: Fast R-CNN →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+</body>
+</html>
