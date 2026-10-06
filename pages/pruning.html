@@ -20,8 +20,14 @@
             overflow-x: auto;
         }
     </style>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="Cắt tỉa mô hình (Pruning) - Kỹ thuật tối ưu cho Deep Learning - Hung Blog" />
+    <meta property="og:type" content="article" />
 </head>
 <body class="article-page">
+    <div id="reading-progress"></div>
     <nav class="navbar">
         <div class="nav-left">
             <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
@@ -174,7 +180,18 @@ print(torch.sum(layer.weight == 0))   # Đếm số trọng số đã bị cắt
                     <a href="bn_dropout_reg.html">← Previous: BN, Dropout, Reg</a>
                     <a href="quantization.html">Next: Lượng tử hóa →</a>
                 </div>
-            </article>
+            
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+</article>
         </div>
     </main>
 
@@ -182,5 +199,7 @@ print(torch.sum(layer.weight == 0))   # Đếm số trọng số đã bị cắt
         <p>© 2026 nghung-Blog. All rights reserved.</p>
     </footer>
     <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
 </body>
 </html>

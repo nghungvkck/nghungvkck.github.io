@@ -8,8 +8,14 @@
     <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="Random Forest - Định nghĩa và Nguyên tắc hoạt động - Hung Blog" />
+    <meta property="og:type" content="article" />
 </head>
 <body class="article-page">
+    <div id="reading-progress"></div>
     <nav class="navbar">
         <div class="nav-left">
             <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
@@ -186,7 +192,18 @@
                     <a href="ensemble-learning.html">← Previous: Ensemble Learning</a>
                     <a href="gradient-boosting.html">Next: Gradient Boosting →</a>
                 </div>
-            </article>
+            
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+</article>
         </div>
     </main>
 
@@ -194,5 +211,7 @@
         <p>© 2026 nghung-Blog. All rights reserved.</p>
     </footer>
     <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
 </body>
 </html>

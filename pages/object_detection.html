@@ -79,8 +79,14 @@
             margin-bottom: 16px;
         }
     </style>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="Object Detection - Hung Blog" />
+    <meta property="og:type" content="article" />
 </head>
 <body class="article-page">
+    <div id="reading-progress"></div>
     <nav class="navbar">
         <div class="nav-left">
             <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
@@ -588,7 +594,18 @@
                         <a href="fast_rcnn.html">Next: Fast R-CNN →</a>
                     </div>
                 </div>
-            </article>
+            
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+</article>
         </div>
     </main>
 
@@ -596,5 +613,7 @@
         <p>© 2026 nghung-Blog. All rights reserved.</p>
     </footer>
     <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
 </body>
 </html>

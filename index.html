@@ -6,8 +6,14 @@
     <title>nghung-Blog</title>
     <link rel="stylesheet" href="css/style.css?v=20260522-1" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+
+    <script src="js/features.js" defer></script>
+
+    <meta property="og:title" content="nghung-Blog" />
+    <meta property="og:type" content="website" />
 </head>
 <body>
+    <div id="reading-progress"></div>
     <nav class="navbar">
         <div class="nav-left">
             <a href="index.html" class="brand-mark" aria-label="nghung Blog">
@@ -19,9 +25,11 @@
                 <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
                 <a href="https://github.com/nghungvkck">GitHub</a>
                 <a href="https://www.youtube.com/@hungnguyen-wh4tb">Youtube</a>
+                <a href="cv.pdf" download style="color: var(--accent, #0056b3); font-weight: bold;">CV</a>
             </div>
         </div>
         <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn" aria-label="Chuyển giao diện sáng tối">🌙</button>
             <div class="dropdown">
                 <div class="dropdown-content">
                     <a href="#machine-learning">Machine Learning</a>
@@ -37,6 +45,19 @@
     </section>
 
     <main class="posts">
+
+        <div class="search-filter-container">
+            <input type="text" id="search-input" placeholder="Tìm kiếm bài viết..." aria-label="Tìm kiếm">
+            <div class="tags-filter">
+                <button class="tag-btn active" data-tag="all">Tất cả</button>
+                <button class="tag-btn" data-tag="ML">Machine Learning</button>
+                <button class="tag-btn" data-tag="DL">Deep Learning</button>
+                <button class="tag-btn" data-tag="CV">Computer Vision</button>
+                <button class="tag-btn" data-tag="DB">Database</button>
+                <button class="tag-btn" data-tag="Other">Khác</button>
+            </div>
+        </div>
+
         <section id="machine-learning" class="post-section">
             <div class="section-heading">
                 <h2>Chủ đề học máy</h2>
@@ -200,5 +221,7 @@
         <a href="about.html" class="home-footer-link">About me</a>
         <p class="home-footer-credit">Developed by <a href="#">Hưng</a></p>
     </footer>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
 </body>
 </html>

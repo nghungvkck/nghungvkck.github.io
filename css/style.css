@@ -567,3 +567,185 @@ body {
         margin-bottom: 14px;
     }
 }
+/* =========================================
+   NEW FEATURES (Dark Mode, Progress, Scroll)
+   ========================================= */
+
+/* Reading Progress Bar */
+#reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background-color: var(--accent, #0056b3);
+    width: 0%;
+    z-index: 9999;
+    transition: width 0.1s ease-out;
+}
+
+/* Scroll to Top Button */
+#scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#scroll-to-top:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --text: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --border: #333333;
+    --accent: #66b2ff;
+}
+
+body.dark-mode .post-content h2,
+body.dark-mode .post-content h3 {
+    color: #ffffff;
+}
+
+body.dark-mode .navbar {
+    background: rgba(30, 30, 30, 0.85);
+}
+
+body.dark-mode .card {
+    background: var(--card);
+    border-color: var(--border);
+}
+
+body.dark-mode .card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .article-toc .active {
+    color: var(--accent);
+    background: rgba(102, 178, 255, 0.1);
+    border-color: var(--accent);
+}
+
+body.dark-mode .dropdown-btn, 
+body.dark-mode .dropdown-content {
+    background: var(--card);
+    border-color: var(--border);
+}
+
+body.dark-mode .dropdown-content a:hover {
+    background-color: #2a2a2a;
+}
+
+/* Search & Filter */
+.search-filter-container {
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+    padding: 0 5vw;
+}
+
+#search-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#search-input:focus {
+    border-color: var(--accent);
+}
+
+.tags-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tag-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.tag-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.tag-btn.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+}
+
+body.dark-mode .tag-btn.active {
+    background: var(--accent);
+    color: #121212;
+    border-color: var(--accent);
+}
+
+/* Fixes for text colors in Dark Mode */
+body.dark-mode {
+    --muted: #a0a0a0;
+    --line: #333333;
+}
+
+body.dark-mode .card-content p,
+body.dark-mode .section-heading p {
+    color: #b0b0b0;
+}
+
+body.dark-mode .card-content h3 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .section-heading h2 {
+    color: #ffffff;
+}
+
+body.dark-mode .post-date {
+    color: #888888;
+}
+
+body.dark-mode .search-filter-container input {
+    color: #e0e0e0;
+}
+body.dark-mode .search-filter-container input::placeholder {
+    color: #888888;
+}

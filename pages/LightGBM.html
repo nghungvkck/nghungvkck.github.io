@@ -20,8 +20,14 @@
             overflow-x: auto;
         }
     </style>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="LightGBM - Gradient Boosting siêu tốc và tiết kiệm bộ nhớ - Hung Blog" />
+    <meta property="og:type" content="article" />
 </head>
 <body class="article-page">
+    <div id="reading-progress"></div>
     <nav class="navbar">
         <div class="nav-left">
             <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
@@ -264,7 +270,18 @@ print("MSE:", mean_squared_error(y_test, y_pred))</code></pre>
                     <a href="xgboost.html">← Previous: XGBoost</a>
                     <a href="catboost.html">Next: CatBoost →</a>
                 </div>
-            </article>
+            
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+</article>
         </div>
     </main>
 
@@ -272,5 +289,7 @@ print("MSE:", mean_squared_error(y_test, y_pred))</code></pre>
         <p>© 2026 nghung-Blog. All rights reserved.</p>
     </footer>
     <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
 </body>
 </html>

@@ -42,8 +42,14 @@
             background-color: #f2f2f2;
         }
     </style>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="Hướng dẫn học SQL cơ bản - Hung Blog" />
+    <meta property="og:type" content="article" />
 </head>
 <body class="article-page">
+    <div id="reading-progress"></div>
     <nav class="navbar">
         <div class="nav-left">
             <h2 class="logo">nghung-Blog</h2>
@@ -52,6 +58,7 @@
             <a href="#">Bài tập</a>
         </div>
         <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn" aria-label="Chuyển giao diện sáng tối">🌙</button>
             <input class="search" placeholder="Tìm kiếm bài học..." />
             <button class="login">Vào học</button>
         </div>
@@ -251,7 +258,18 @@
             <div class="post-navigation" style="display: flex; justify-content: space-between; gap: 15px; margin-top: 30px;">
                 <a href="../index.html" style="padding: 10px 20px; background-color: #f5f5f5; border-radius: 5px; text-decoration: none; color: #333; flex: 1; text-align: left;">← Quay lại trang chủ</a>
             </div>
-        </article>
+        
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+</article>
         </div>
     </main>
 
@@ -259,5 +277,7 @@
         <p>© 2026 nghung-Blog. Kiến thức là sức mạnh.</p>
     </footer>
     <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
 </body>
 </html>
