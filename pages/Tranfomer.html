@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transformer Architecture - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .matrix {
+            font-family: monospace;
+            text-align: center;
+            background: #f8f4ec;
+            padding: 10px;
+            display: inline-block;
+            margin: 10px auto;
+        }
+        .highlight-box {
+            background: #f8fbff;
+            border: 1px solid #dce9ff;
+            border-radius: 10px;
+            padding: 18px;
+            margin: 20px 0;
+        }
+        .note-box {
+            background-color: #fff9e6;
+            border-left: 5px solid #f0b400;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .warn-box {
+            background-color: #fff0f0;
+            border-left: 5px solid #d9534f;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        table.comparison {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.comparison th, table.comparison td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table.comparison th {
+            background: #f4f4f4;
+        }
+
+        /* ==== Căn đều 2 bên cho nội dung bài viết ==== */
+        .post-content p,
+        .post-content li,
+        .post-content .note-box p,
+        .post-content .warn-box p,
+        .post-content .highlight-box p {
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+        }
+        .post-content p {
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+        pre.ascii-diagram {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="Transformer Architecture - Hung Blog" />
+    <meta property="og:type" content="article" />
+</head>
+<body class="article-page">
+    <div id="reading-progress"></div>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>Transformer Architecture: Kiến trúc đứng sau mọi LLM hiện đại</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 4/10/2026</span>
+                        <span>Chuyên mục: Deep Learning</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#transformer</span>
+                        <span>#attention</span>
+                        <span>#llm</span>
+                        <span>#self-attention</span>
+                        <span>#nlp</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <p>Transformer là kiến trúc đứng sau mọi large language model (LLM) hiện đại. Nó nhận một chuỗi token làm đầu vào và sinh ra một chuỗi token làm đầu ra, sử dụng <em>attention</em> để hiểu mối quan hệ giữa các từ với nhau. Khi nghe "transformer", ta thấy có vẻ phức tạp — nhưng nếu tách nhỏ ra từng phần, mỗi thành phần đều đơn giản. Sự phức tạp đến từ cách chúng được xếp chồng lên nhau, chứ không phải từ bất kỳ mảnh nào quá khó.</p>
+
+                    <h2>I. Tại sao cần Transformer?</h2>
+                    <p>Trước khi transformer ra đời, các mô hình xử lý ngôn ngữ (như RNN, LSTM) xử lý từng từ theo thứ tự tuần tự — giống như đọc một câu từ trái sang phải, mỗi lần một từ. Cách tiếp cận này có hai nhược điểm lớn:</p>
+                    <ul>
+                        <li>Vấn đề 1 — quên thông tin xa (long-range forgetting): khi câu càng dài, mô hình bắt đầu quên các từ xuất hiện trước đó. Đến từ thứ 50, ký ức về từ thứ 1 đã rất mờ nhạt. Điều này khiến mô hình khó nắm bắt mối quan hệ giữa các phần xa nhau trong câu.</li>
+                        <li>Vấn đề 2 — chậm (slowness): vì các từ được xử lý lần lượt, từ thứ 2 phải chờ từ thứ 1 xử lý xong, từ thứ 3 phải chờ từ thứ 2, v.v. Điều này khiến quá trình huấn luyện cực kỳ chậm, đặc biệt với dữ liệu lớn.</li>
+                    </ul>
+
+                    <p>Transformer ra đời để giải quyết cả hai vấn đề: nó xử lý <em>tất cả token đầu vào cùng lúc</em> (song song), cho phép mỗi token "nhìn" trực tiếp mọi token khác. Kết nối tầm xa không còn là vấn đề lớn. Nhờ song song hóa, huấn luyện nhanh hơn rất nhiều.</p>
+
+                    <h2>II. Hai nửa của kiến trúc</h2>
+                    <p>Transformer nguyên bản có hai nửa chính:</p>
+                    <ul>
+                        <li>Encoder (bộ mã hóa): đọc và hiểu đầu vào.</li>
+                        <li>Decoder (bộ giải mã): sinh ra đầu ra.</li>
+                    </ul>
+
+                    <p>Hãy hình dung như một cuộc trò chuyện giữa <em>người đọc</em> và <em>người viết</em>. Người đọc (encoder) đọc tài liệu cẩn thận và tạo ra ghi chú chi tiết. Người viết (decoder) dùng những ghi chú đó để viết tài liệu mới. Người đọc tập trung vào <em>hiểu</em>, người viết tập trung vào <em>tạo ra</em>. Hai nửa này phối hợp với nhau để biến một chuỗi đầu vào thành một chuỗi đầu ra có ý nghĩa.</p>
+
+                    <h2>III. Tokenization, Embedding và Positional Encoding</h2>
+                    <p>Trước khi dữ liệu vào encoder/decoder, nó phải trải qua ba bước tiền xử lý quan trọng.</p>
+
+                    <h3>1. Tokenization — Biến chữ thành token</h3>
+                    <p>Mô hình không hiểu chữ, chỉ hiểu số. Bước đầu tiên là tách văn bản thành các token nhỏ — có thể là một từ, một phần của từ, hoặc thậm chí một ký tự. Ví dụ: <em>"i love learning"</em> → 3 token: <code>"i"</code>, <code>"love"</code>, <code>"learning"</code>.</p>
+
+                    <h3>2. Embedding — Biến token thành vector</h3>
+                    <p>Mỗi token được chuyển thành một vector số gọi là <em>embedding</em> — giống như "dấu vân tay số" của từ. Các từ có nghĩa tương tự sẽ có embedding gần nhau. Ví dụ: <code>"happy"</code> và <code>"joyful"</code> có embedding rất giống nhau, còn <code>"happy"</code> và <code>"car"</code> có embedding rất khác nhau.</p>
+
+                    <h3>3. Positional Encoding — Thêm thông tin thứ tự</h3>
+                    <p>Vì encoder xử lý <em>tất cả token cùng lúc</em>, mô hình không biết từ nào đứng trước, từ nào đứng sau. Câu <em>"i love ai"</em> và <em>"ai love i"</em> sẽ trông giống hệt nhau nếu thiếu thông tin vị trí. Positional encoding giải quyết bằng cách cộng thêm một vector vị trí vào mỗi embedding. Từ thứ 1 nhận tín hiệu vị trí khác từ thứ 2, v.v.</p>
+                    <p>Sau bước này, mỗi token mang một vector duy nhất mã hóa cả ý nghĩa lẫn vị trí của nó trong câu.</p>
+
+                    <h2>IV. Attention Mechanism và Multi-Head Attention</h2>
+
+                    <h3>1. Attention — Trái tim của Transformer</h3>
+                    <p>Attention cho phép mỗi từ nhìn vào mọi từ khác trong câu và quyết định mức độ tập trung vào từng từ. Ví dụ câu: <em>"the cat sat on the mat because it was tired."</em> Khi xử lý từ <code>"it"</code>, mô hình cần biết <code>"it"</code> ám chỉ gì — con mèo hay cái thảm? Attention giúp mô hình tập trung nhiều hơn vào <code>"cat"</code> (vì phù hợp ngữ cảnh hơn) và ít hơn vào <code>"mat"</code>.</p>
+
+                    <h3>2. Cách Attention hoạt động — Q, K, V</h3>
+                    <p>Vector từ (embedding) được chuyển thành ba vector:</p>
+                    <table class="comparison">
+                        <tr><th>Thành phần</th><th>Ý nghĩa</th></tr>
+                        <tr><td>Query (Q)</td><td>Từ này đang <em>tìm kiếm</em> điều gì?</td></tr>
+                        <tr><td>Key (K)</td><td>Từ này <em>có thể cung cấp</em> điều gì?</td></tr>
+                        <tr><td>Value (V)</td><td><em>Thông tin thực sự</em> mà từ này mang</td></tr>
+                    </table>
+
+                    <p>Quy trình:</p>
+                    <ol>
+                        <li>Mỗi từ dùng query của mình so sánh với key của mọi từ khác bằng tích vô hướng (dot product) → tạo ra attention scores (điểm liên quan).</li>
+                        <li>Chia scores cho √dₖ để giữ chúng trong khoảng ổn định (scaled dot-product).</li>
+                        <li>Chuẩn hóa bằng softmax → biến thành xác suất cộng lại bằng 1.</li>
+                        <li>Tính tổng có trọng số của các value theo xác suất đó.</li>
+                    </ol>
+
+                    <div class="formula">
+                        \[
+                        \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+                        \]
+                    </div>
+
+                    <p>Kết quả: mỗi từ giờ mang không chỉ thông tin của bản thân mà cả thông tin từ những từ liên quan nhất. Từ <code>"it"</code> giờ mang tín hiệu mạnh từ <code>"cat"</code>.</p>
+
+                    <h3>3. Multi-Head Attention — Nhiều góc nhìn song song</h3>
+                    <p>Transformer không chạy attention chỉ một lần. Nó chạy nhiều lần song song, mỗi lần từ một góc nhìn khác — gọi là multi-head attention.</p>
+
+                    <div class="note-box">
+                        <p>Ví dụ: như một <em>nhóm biên tập viên</em> cùng xem một bài viết. Một người kiểm tra ngữ pháp, một người kiểm tra sự thật, một người kiểm tra mạch văn. Mỗi người nhìn cùng văn bản nhưng tập trung vào khía cạnh khác nhau. Tổng hợp lại → đánh giá toàn diện.</p>
+                    </div>
+
+                    <p>Mỗi head tập trung vào một loại quan hệ khác nhau: một head quan hệ chủ ngữ – động từ, head khác tính từ bổ nghĩa cho danh từ nào, v.v.</p>
+
+                    <pre class="ascii-diagram">
+              Input
+                |
+  -------------------------------
+  |      |      |      |        |
+Head 1 Head 2 Head 3 ...     Head N   (chạy song song)
+  |      |      |      |        |
+  -------------------------------
+                |
+            Combined
+                |
+              Output</pre>
+
+                    <p>Đầu ra của tất cả head được ghép lại để cho mô hình hiểu biết phong phú về văn bản.</p>
+
+                    <h2>V. Feed-Forward Networks, Residual Connections và Layer Normalization</h2>
+
+                    <h3>1. Feed-Forward Network (FFN) — Bước tinh chỉnh</h3>
+                    <p>Sau attention, đầu ra đi qua mạng feed-forward. Nếu attention là về <em>hiểu quan hệ giữa các từ</em>, thì FFN là về <em>đào sâu hiểu biết từng từ riêng lẻ</em>. Nó nhận biểu diễn đã được làm giàu từ attention và xử lý tiếp — làm sắc nét tín hiệu, loại bỏ nhiễu. Mỗi từ đi qua cùng một FFN độc lập.</p>
+
+                    <div class="highlight-box">
+                        <p>Hình 1: Mạng FNN.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/FNN.jpg" alt="">
+                        </div>
+                    </div>
+
+                    <h3>2. Residual Connection (Skip Connection) — Giữ lại thông tin gốc</h3>
+                    <p>Sau mỗi sub-layer (attention hoặc FFN), đầu vào ban đầu của sub-layer được cộng lại vào đầu ra.</p>
+
+                    <div class="highlight-box">
+                        <p>Ví dụ: như <em>ghi chép trong lớp học</em>. Dù giáo viên thêm thông tin mới, ta vẫn giữ ghi chú gốc và kết hợp thông tin mới vào.</p>
+                    </div>
+
+                    <div class="formula">
+                        \[
+                        \text{output} = \text{sub-layer}(\text{input}) + \text{input}
+                        \]
+                    </div>
+
+                    <p>Điều này ngăn mô hình mất thông tin quan trọng khi dữ liệu đi qua nhiều tầng.</p>
+
+                    <h3>3. Layer Normalization — Ổn định số liệu</h3>
+                    <p>Sau mỗi residual connection, các con số được chuẩn hóa — điều chỉnh để giữ trong khoảng ổn định. Điều này ngăn số trở nên quá lớn hoặc quá nhỏ khi đi qua nhiều tầng, giúp quá trình huấn luyện ổn định và mượt mà.</p>
+
+                    <h2>VI. Encoder và Decoder hoạt động như thế nào?</h2>
+
+                    <h3>1. Encoder — Đọc và hiểu</h3>
+                    <p>Mỗi tầng encoder có hai thành phần:</p>
+                    <ul>
+                        <li>Self-attention: mỗi từ nhìn vào mọi từ khác trong đầu vào để hiểu quan hệ.</li>
+                        <li>Feed-forward network: tinh chỉnh biểu diễn của từng từ một cách độc lập.</li>
+                    </ul>
+                    <p>Cả hai đều được theo sau bởi residual connection + layer normalization.</p>
+
+                    <p>Ví dụ với câu "i love learning":</p>
+                    <ul>
+                        <li>Tầng 1: self-attention cho mỗi từ nhìn mọi từ khác. <code>"love"</code> nhận ra <code>"i"</code> là chủ ngữ, <code>"learning"</code> là tân ngữ. FFN tinh chỉnh hiểu biết này.</li>
+                        <li>Tầng 2: kết nối trở nên phong phú hơn. <code>"love"</code> không chỉ biết <code>"i"</code> và <code>"learning"</code> riêng lẻ — nó bắt đầu hiểu ý nghĩa kết hợp của cả cụm <em>"i love learning"</em> như một suy nghĩ hoàn chỉnh.</li>
+                        <li>Đến tầng 6: mỗi từ mang biểu diễn sâu sắc, nhận biết ngữ cảnh. <code>"learning"</code> không còn chỉ là định nghĩa từ điển — nó mã hóa sự thật rằng đây là thứ <code>"i"</code> yêu thích, trong đúng câu này.</li>
+                    </ul>
+                    <p>Sau tất cả tầng encoder, ta có hiểu biết phong phú về đầu vào, được truyền sang decoder.</p>
+
+                    <h3>2. Decoder — Sinh đầu ra từng token</h3>
+                    <p>Mỗi tầng decoder có ba thành phần:</p>
+                    <ul>
+                        <li>Masked self-attention: mỗi từ đầu ra nhìn vào các từ đầu ra <em>trước đó</em>, nhưng <em>không nhìn về tương lai</em>. Khi sinh văn bản, các từ tương lai chưa tồn tại. Từ <code>"love"</code> có thể nhìn <code>"i"</code> nhưng không nhìn <code>"learning"</code> vì <code>"learning"</code> chưa được sinh ra. Hạn chế này gọi là causal masking.</li>
+                        <li>Cross-attention: đây là cầu nối giữa decoder và encoder. Mỗi từ đầu ra nhìn vào đầu ra của encoder để kéo thông tin liên quan từ đầu vào. Ở đây query đến từ decoder, còn key và value đến từ encoder. Đây chính là điểm khác biệt so với self-attention — và là cầu nối giữa <em>hiểu đầu vào</em> và <em>sinh đầu ra</em>.</li>
+                        <li>Feed-forward network: bước tinh chỉnh giống encoder.</li>
+                    </ul>
+                    <p>Cả ba đều theo sau bởi residual connection + layer normalization.</p>
+
+                    <h3>3. Decoder chọn từ tiếp theo như thế nào?</h3>
+                    <p>Sau khi đầu ra đi qua tất cả tầng decoder, nó vẫn là vector số — chưa phải từ. Decoder xử lý tiếp:</p>
+                    <ol>
+                        <li>Linear layer: chuyển vector thành điểm số cho mọi từ trong từ vựng. Nếu từ vựng có 50.000 từ → 50.000 điểm.</li>
+                        <li>Softmax: chuyển điểm thành xác suất (0–1, tổng bằng 1).</li>
+                        <li>Chọn từ: mô hình chọn từ tiếp theo dựa trên xác suất. Trong thực tế dùng nhiều chiến lược — temperature, top-k, top-p sampling — để điều khiển độ sáng tạo/tập trung. Đơn giản nhất là chọn từ có xác suất cao nhất.</li>
+                    </ol>
+
+                    <p>Ví dụ dịch "i love learning" sang tiếng Pháp, khi đã sinh <code>"j'"</code>:</p>
+                    <div class="formula">
+                        <pre style="margin:0; background:transparent;">
+"adore":  0.72
+"aime":   0.15
+"mange":  0.01
+... (50.000 từ, đa số xác suất rất nhỏ)</pre>
+                    </div>
+                    <p>Mô hình chọn <code>"adore"</code> vì xác suất cao nhất.</p>
+
+                    <h2>VII. Dữ liệu chảy qua toàn bộ kiến trúc</h2>
+                    <p>Lấy ví dụ dịch <em>"i love learning"</em> sang tiếng Pháp.</p>
+
+                    <h3>Giai đoạn Encoder</h3>
+                    <ol>
+                        <li>Tokenize: <code>"i love learning"</code> → 3 token: <code>"i"</code>, <code>"love"</code>, <code>"learning"</code>.</li>
+                        <li>Embed: mỗi token → vector số (embedding).</li>
+                        <li>Add position: positional encoding được cộng vào, để mô hình biết <code>"i"</code> ở vị trí 1, <code>"love"</code> vị trí 2, <code>"learning"</code> vị trí 3.</li>
+                        <li>Qua 6 tầng encoder: trong mỗi tầng, self-attention cho mọi từ nhìn mọi từ khác, FFN tinh chỉnh hiểu biết, residual + layer norm giữ ổn định.</li>
+                        <li>Kết quả: sau 6 tầng, encoder tạo ra biểu diễn phong phú của đầu vào. Mỗi từ mang thông tin ngữ cảnh sâu sắc. Biểu diễn này được truyền sang decoder.</li>
+                    </ol>
+
+                    <h3>Giai đoạn Decoder</h3>
+                    <p>Decoder sinh bản dịch tiếng Pháp từng từ một.</p>
+                    <ul>
+                        <li>Sinh <code>"j'"</code> (từ thứ 1): decoder bắt đầu với token đặc biệt <code>"start"</code>. Masked self-attention không có gì để nhìn lại (đây là token đầu). Cross-attention nhìn vào đầu ra encoder để hiểu đầu vào tiếng Anh. Qua linear + softmax → chọn <code>"j'"</code> là từ đầu tiên khả dĩ nhất.</li>
+                        <li>Sinh <code>"adore"</code> (từ thứ 2): decoder có <code>["start", "j'"]</code>. Masked self-attention nhìn <code>"start"</code> và <code>"j'"</code> để hiểu đã sinh gì. Cross-attention nhìn lại encoder để kéo thông tin từ đầu vào tiếng Anh. Linear + softmax → chọn <code>"adore"</code>.</li>
+                        <li>Sinh <code>"apprendre"</code> (từ thứ 3): decoder có <code>["start", "j'", "adore"]</code>. Masked self-attention nhìn cả ba token trước. Cross-attention kết nối encoder. Chọn <code>"apprendre"</code>.</li>
+                        <li>Sinh token <code>"end"</code>: decoder sinh token đặc biệt <code>"end"</code> — báo hiệu bản dịch hoàn tất.</li>
+                    </ul>
+                    <p>Kết quả cuối cùng: <code>"j'adore apprendre"</code> — nghĩa là <em>"i love learning"</em> trong tiếng Pháp.</p>
+
+                    <h2>VIII. Ba biến thể của Transformer</h2>
+                    <p>Transformer nguyên bản dùng cả encoder và decoder. Nhưng không phải lúc nào cũng cần cả hai. Điều này tạo ra ba biến thể:</p>
+
+                    <table class="comparison">
+                        <tr>
+                            <th>Biến thể</th>
+                            <th>Ví dụ</th>
+                            <th>Đặc điểm</th>
+                            <th>Ứng dụng</th>
+                        </tr>
+                        <tr>
+                            <td>Encoder-Only</td>
+                            <td>BERT</td>
+                            <td>Chỉ dùng encoder. Đọc và hiểu đầu vào nhưng không sinh văn bản mới.</td>
+                            <td>Phân loại email spam, phân tích cảm xúc, tìm câu trả lời trong văn bản cho trước.</td>
+                        </tr>
+                        <tr>
+                            <td>Decoder-Only</td>
+                            <td>GPT</td>
+                            <td>Chỉ dùng decoder. Sinh văn bản từng token một. Mỗi token nhìn mọi token trước nhưng không nhìn tương lai.</td>
+                            <td>Sinh văn bản, trả lời câu hỏi, viết code, hội thoại. Đây là biến thể đứng sau hầu hết LLM hiện đại.</td>
+                        </tr>
+                        <tr>
+                            <td>Encoder-Decoder</td>
+                            <td>T5, Transformer nguyên bản</td>
+                            <td>Dùng cả hai phần. Encoder hiểu đầu vào, decoder sinh đầu ra dựa trên hiểu biết đó.</td>
+                            <td>Dịch máy, tóm tắt, và các tác vụ biến đổi văn bản này thành văn bản khác.</td>
+                        </tr>
+                    </table>
+
+                    <p>→ Chọn biến thể phù hợp tùy use case.</p>
+
+                    <h2>IX. Tại sao Transformer mạnh mẽ đến vậy?</h2>
+                    <p>Sau khi đã giải mã toàn bộ kiến trúc, đây là lý do transformer thay đổi mọi thứ:</p>
+
+                    <ul>
+                        <li>Xử lý song song (parallel processing): encoder xử lý mọi token đầu vào cùng lúc thay vì từng cái một. Ngay cả decoder cũng chạy song song trong huấn luyện. Điều này khiến huấn luyện <em>nhanh hơn nhiều</em> và cho phép học từ <em>lượng dữ liệu khổng lồ</em>.</li>
+                        <li>Không còn quên tầm xa (no more long-range forgetting): nhờ attention, mỗi từ có thể <em>nhìn trực tiếp</em> mọi từ khác. Từ thứ 1 dễ truy cập như từ thứ 1000 — vấn đề bộ nhớ tầm xa của mô hình cũ về cơ bản được giải quyết.</li>
+                        <li>Khả năng mở rộng (scalability): bằng cách thêm <em>nhiều tầng hơn, nhiều attention head hơn, nhiều dữ liệu hơn</em>, mô hình càng tốt hơn. Đây là lý do ta có các mô hình <em>hàng tỷ tham số</em> ngày nay. <em>Tham số</em> là các con số bên trong mô hình mà nó học trong huấn luyện.</li>
+                        <li>Đa năng (versatility): cùng một kiến trúc xử lý được <em>dịch máy, hỏi đáp, sinh văn bản, viết code, tóm tắt</em>, v.v. — một thiết kế, vô số ứng dụng.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p>Kết luận: transformer là <em>kiến trúc duy nhất đứng sau toàn bộ cuộc cách mạng AI hiện đại</em>. Nó cho phép ta làm những việc phức tạp một cách rất đơn giản.</p>
+                    </div>
+
+                    <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="object_detection.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                Object Detection: bài toán nhận diện đối tượng
+                            </a>
+                            <a href="cnn.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                CNN – Convolutional Neural Networks
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                Trang chủ
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="cnn.html">← Previous: CNN</a>
+                        <a href="object_detection.html">Next: Object Detection →</a>
+                    </div>
+                </div>
+
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+</article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
+</body>
+</html>

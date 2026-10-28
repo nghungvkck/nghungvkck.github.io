@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YOLO-PL: Helmet wearing detection algorithm based on improved YOLOv4</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .highlight-box {
+            background: #f8fbff;
+            border: 1px solid #dce9ff;
+            border-radius: 10px;
+            padding: 18px;
+            margin: 20px 0;
+        }
+        .note-box {
+            background-color: #fff9e6;
+            border-left: 5px solid #f0b400;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .warn-box {
+            background-color: #fff0f0;
+            border-left: 5px solid #d9534f;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        table.comparison {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.comparison th, table.comparison td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table.comparison th {
+            background: #f4f4f4;
+        }
+        .post-content p,
+        .post-content li,
+        .post-content .note-box p,
+        .post-content .warn-box p,
+        .post-content .highlight-box p {
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+        }
+        .post-content p {
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+    </style>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="YOLO-PL: Helmet wearing detection algorithm based on improved YOLOv4g" />
+    <meta property="og:type" content="article" />
+</head>
+<body class="article-page">
+    <div id="reading-progress"></div>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>YOLO-PL: Helmet wearing detection algorithm based on improved YOLOv4</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 18/10/2026</span>
+                        <span>Chuyên mục: Object Detection</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#yolo-pl</span>
+                        <span>#helmet-detection</span>
+                        <span>#small-object</span>
+                        <span>#lightweight</span>
+                        <span>#e-pan</span>
+                        <span>#dcspx</span>
+                        <span>#l-vovn</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+
+                    <!-- ================= PHẦN 1: GIỚI THIỆU NGẮN ================= -->
+                    <h2>I. GIỚI THIỆU</h2>
+
+                    <p>Phát hiện mũ bảo hộ là bài toán quan trọng trong giám sát an toàn lao động tại công trường xây dựng, nơi 67.95% tai nạn xảy ra do công nhân không đội mũ. Bài báo <em>"YOLO-PL: Helmet wearing detection algorithm based on improved YOLOv4"</em> của Haibin Li và cộng sự (Đại học Yanshan, Trung Quốc, đăng trên <em>Digital Signal Processing</em> 144, 2024) đề xuất một thuật toán phát hiện mũ bảo hộ nhẹ và chính xác, dựa trên cải tiến YOLOv4. Bài viết này tập trung phân tích kiến trúc đề xuất – phần đóng góp cốt lõi của bài báo.</p>
+
+                    <!-- ================= PHẦN 2: VẤN ĐỀ ================= -->
+                    <h2>II. VẤN ĐỀ ĐẶT RA</h2>
+
+                    <p>Các thuật toán phát hiện mũ bảo hộ hiện có gặp ba thách thức chính trong thực tế:</p>
+
+                    <ul>
+                        <li>Đối tượng nhỏ: Camera thường đặt xa công nhân, vùng ảnh chứa mũ chỉ chiếm dưới 0.05 diện tích ảnh. Các tầng convolution sâu làm mất dần thông tin chi tiết của vật thể nhỏ.</li>
+                        <li>Bối cảnh phức tạp và che khuất: Công trường có nhiều vật liệu, máy móc gây nhiễu; công nhân thường bị che khuất khi làm việc, khiến thông tin đối tượng không đầy đủ.</li>
+                        <li>Chi phí triển khai: Các mô hình chính xác như Faster R-CNN quá chậm (0.2s/ảnh); các mô hình một giai đoạn như YOLOv4 có số tham số lớn (61 MB) và FLOPs cao, khó triển khai trên thiết bị biên.</li>
+                    </ul>
+
+                    <div class="note-box">
+                        <p>Mục tiêu của bài báo: Thiết kế một mô hình vừa tăng độ chính xác cho đối tượng nhỏ, vừa giảm mạnh số tham số và FLOPs so với YOLOv4, trong khi vẫn giữ được khả năng phát hiện ổn định trên nhiều bộ dữ liệu.</p>
+                    </div>
+
+                    <!-- ================= PHẦN 3: KIẾN TRÚC ĐỀ XUẤT (TRỌNG TÂM) ================= -->
+                    <h2>III. KIẾN TRÚC ĐỀ XUẤT</h2>
+
+                    <p>Kiến trúc được phát triển theo hai giai đoạn: YOLO-P (tăng độ chính xác) và YOLO-PL (nhẹ hóa YOLO-P). Sơ đồ tổng quát dựa trên YOLOv4 với backbone CSPDarkNet53, neck PANet và ba detection head P3, P4, P5.</p>
+
+                    <div class="highlight-box">
+                        <p>Hình 1: Sơ đồ tổng quát YOLOv4 – nền tảng để phát triển YOLO-P và YOLO-PL.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/yolov4-schematic.png" alt="YOLOv4 Schematic">
+                        </div>
+                    </div>
+
+                    <h3>1. YOLO-P: Cải tiến cấu trúc cho đối tượng nhỏ</h3>
+
+                    <h4>a) Thay đổi cấu trúc mạng và detection head</h4>
+
+                    <p>YOLOv4 dùng ba head ở P3, P4, P5. Vì mũ bảo hộ là vật thể nhỏ, thông tin chi tiết nằm ở tầng nông (P2). Bài báo thực hiện ba thay đổi:</p>
+
+                    <ul>
+                        <li>Thêm fusion từ tầng P2 – tầng có độ phân giải cao nhất, chứa nhiều chi tiết vật thể nhỏ (đường đỏ trong Hình 2).</li>
+                        <li>Loại bỏ detection head P5 – tầng dành cho vật thể lớn – để giảm tham số; đặc trưng P5 được upsampling trực tiếp để hợp nhất với các tầng dưới.</li>
+                        <li>Tái phân bổ anchor: thay vì chia đều, gán số anchor cho P4, P3, P2 lần lượt là 4, 3, 2 – tập trung vào đối tượng nhỏ mà không tăng FLOPs.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p>Hình 2: Cải tiến cấu trúc mạng: thêm tầng P2 và loại bỏ P5 (đường màu đỏ).</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/network-structure-improvement.png" alt="Network Structure Improvement">
+                        </div>
+                    </div>
+
+                    <p>Cấu trúc này được gọi là ASHWD (Adaptive Safety Helmet Wearing Detection), giúp tăng AP50 +2.34% và AP75 +6.99% so với YOLOv4 gốc.</p>
+
+                    <h4>b) E-PAN – Enhanced Path Aggregation Network</h4>
+
+                    <p>Dựa trên PANet, bài báo đề xuất E-PAN với hai cải tiến:</p>
+
+                    <ul>
+                        <li>Proximity Upsampling: tích hợp thông tin từ scale cao hơn để lọc nhiễu nền phức tạp, làm nổi bật foreground (vùng chứa mũ).</li>
+                        <li>Residual connections giữa các scale bằng nhau: hợp nhất nhiều đặc trưng hơn, tăng khả năng biểu diễn của feature map mà không tốn nhiều chi phí tính toán.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p>Hình 3: So sánh (a) PANet gốc và (b) E-PAN đề xuất.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/e-pan-comparison.png" alt="E-PAN Comparison">
+                        </div>
+                    </div>
+
+                    <h3>2. YOLO-PL: Nhẹ hóa mô hình</h3>
+
+                    <p>Để giảm tham số và FLOPs mà vẫn giữ hiệu năng của YOLO-P, bài báo thực hiện bốn thay đổi:</p>
+
+                    <h4>a) DCSPX – Dilated Convolution Cross Stage Partial</h4>
+
+                    <p>Thay thế module SPP bằng cấu trúc DCSP2, dùng dilated convolution (tích chập giãn nở) ở các tầng sâu để mở rộng receptive field mà không tăng tham số. Dilated convolution chỉ áp dụng ở tầng sâu nhằm tránh mất thông tin cục bộ – điều bất lợi cho dự đoán mức pixel. Việc thay thế này cho phép loại bỏ SPP và các khối convolution trước/sau nó.</p>
+
+                    <div class="highlight-box">
+                        <p>Hình 4: Cấu trúc DCSPX (trái) và DRes unit (phải).</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/dcspx-structure.png" alt="DCSPX Structure">
+                        </div>
+                    </div>
+
+                    <h4>b) L-VoVN – Lightweight VoVNet</h4>
+
+                    <p>Dựa trên VoVNet (dùng cấu trúc OSA – One-Shot Aggregation), bài báo thêm cấu trúc CSP để trích xuất thông tin gradient phong phú hơn và tăng chiều rộng convolution 3×3. Theo tính toán trong bài báo, L-VoVN giảm tới 80.6% tham số so với khối convolution trong PANet gốc của YOLOv4:</p>
+
+                    <div class="formula">
+                        \[
+                        P_Y = 232C^2 \quad \text{(PANet gốc)} \qquad P = 45C^2 \quad \text{(L-VoVN)}
+                        \]
+                    </div>
+
+                    <div class="highlight-box">
+                        <p>Hình 5: Phân tích thiết kế L-VoVN: (a) Convolution trong YOLOv4, (b) VoVNet (OSA), (c) L-VoVN đề xuất.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/l-vovn-analysis.png" alt="L-VoVN Analysis">
+                        </div>
+                    </div>
+
+                    <h4>c) MP Down-sampling – Max-Pooling</h4>
+
+                    <p>Thay thế một số lớp convolution 3×3 dùng để down-sampling bằng max-pooling kết hợp concatenation. Cách này giảm gần 50% Params và FLOPs, đồng thời tăng độ bất biến với dịch chuyển/xoay ảnh và giảm nguy cơ overfitting.</p>
+
+                    <div class="highlight-box">
+                        <p>Hình 6: Cấu trúc down-sampling nhẹ MP thay thế convolution 3×3.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/mp-downsampling.png" alt="MP Downsampling">
+                        </div>
+                    </div>
+
+                    <h4>d) Swish Activation Function</h4>
+
+                    <p>Thay LeakyReLU bằng Swish – hàm kích hoạt mượt, tránh bão hòa gradient và có đạo hàm luôn dương:</p>
+
+                    <div class="formula">
+                        \[
+                        \mathrm{Swish}(x) = x \cdot \sigma(\beta x)
+                        \]
+                    </div>
+
+                    <div class="highlight-box">
+                        <p>Hình 7: So sánh hàm kích hoạt Swish (beta=1) và LeakyReLU.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/swish-activation.png" alt="Swish vs LeakyReLU">
+                        </div>
+                    </div>
+
+                    <!-- ================= PHẦN 4: KẾT QUẢ ================= -->
+                    <h2>IV. KẾT QUẢ THÍ NGHIỆM</h2>
+
+                    <p>Thí nghiệm trên ba bộ dữ liệu: SHWD mở rộng (8031 ảnh), SHD (Kaggle, 5000 ảnh) và MHD (3052 ảnh), ở độ phân giải 416×416. Kết quả so sánh trên SHWD:</p>
+
+                    <table class="comparison">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>AP50 (%)</th>
+                                <th>AP75 (%)</th>
+                                <th>Recall (%)</th>
+                                <th>Params (MB)</th>
+                                <th>BFLOPs</th>
+                                <th>FPS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>YOLOv4</td>
+                                <td>91.40</td>
+                                <td>51.35</td>
+                                <td>92.28</td>
+                                <td>61.15</td>
+                                <td>9.57</td>
+                                <td>94.3</td>
+                            </tr>
+                            <tr>
+                                <td>YOLOv5L</td>
+                                <td>91.50</td>
+                                <td>53.86</td>
+                                <td>91.85</td>
+                                <td>46.54</td>
+                                <td>6.09</td>
+                                <td>101.6</td>
+                            </tr>
+                            <tr>
+                                <td>YOLOv7</td>
+                                <td>92.48</td>
+                                <td>60.00</td>
+                                <td>90.00</td>
+                                <td>34.74</td>
+                                <td>3.62</td>
+                                <td>104.2</td>
+                            </tr>
+                            <tr>
+                                <td>YOLO-PL (Ours)</td>
+                                <td>94.23</td>
+                                <td>59.00</td>
+                                <td>94.26</td>
+                                <td>29.14</td>
+                                <td>3.21</td>
+                                <td>98.9</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note-box">
+                        <p>Nhận xét chính:</p>
+                        <ul>
+                            <li>YOLO-PL đạt AP50 (94.23%) và Recall (94.26%) cao nhất, vượt YOLOv4, YOLOv5L và YOLOv7.</li>
+                            <li>AP75 (59.00%) thấp hơn YOLOv7 (60.00%) một chút, nhưng Recall của YOLOv7 chỉ 90% – nghĩa là bỏ sót nhiều.</li>
+                            <li>Params chỉ 29.14 MB – giảm khoảng một nửa so với YOLOv4 (61.15 MB).</li>
+                            <li>FPS 98.9, nhanh hơn YOLOv4 4.9%; BFLOPs giảm còn 3.21 so với 9.57 của YOLOv4.</li>
+                        </ul>
+                    </div>
+
+                    <p>Trên bộ SHD và MHD, YOLO-PL cũng vượt YOLOv4 về AP50 và Recall, cho thấy khả năng tổng quát hóa tốt. Ablation cho thấy:</p>
+
+                    <ul>
+                        <li>ASHWD (thêm P2, bỏ P5, tái phân bổ anchor) đóng góp lớn nhất: AP50 +2.34%, AP75 +6.99%.</li>
+                        <li>E-PAN tăng nhẹ độ chính xác (AP50 +0.25%, AP75 +0.30%) và đặc biệt hiệu quả ở tầng nông.</li>
+                        <li>Chuỗi DCSPX → L-VoVN → MP giảm mạnh FLOPs (64.66 → 43.67) và Params (46.42 → 29.44 MB); Swish bù lại độ chính xác (AP50 94.23%).</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p>Hình 10: Kết quả phát hiện trên SHWD mở rộng. Hàng trên: YOLOv4, giữa: YOLOv7, dưới: YOLO-PL.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-pl/detection-results-shwd.png" alt="Detection Results SHWD">
+                        </div>
+                    </div>
+
+                    <p>Về mặt hình ảnh, YOLO-PL bỏ sót ít đối tượng hơn hẳn YOLOv4 (5 missed) và YOLOv7 (2 missed); đặc biệt phát hiện được các mũ nhỏ bị che khuất hoặc nằm ở vùng ánh sáng phản chiếu mà các mô hình khác bỏ qua.</p>
+
+                    <!-- ================= PHẦN 5: HẠN CHẾ ================= -->
+                    <h2>V. HẠN CHẾ</h2>
+
+                    <div class="warn-box">
+                        <p>Hạn chế của YOLO-PL:</p>
+                        <ul>
+                            <li>AP75 thấp hơn YOLOv7: Việc tăng cường thông tin từ tầng nông giúp phát hiện nhiều mũ nhỏ hơn nhưng cũng mang lại nhiễu, ảnh hưởng đến độ chính xác định vị (AP75 = 59.00% so với 60.00% của YOLOv7).</li>
+                            <li>Tốc độ chưa tối ưu: Mặc dù nhanh hơn YOLOv4 (98.9 FPS so với 94.3), YOLO-PL vẫn chậm hơn YOLOv5L (101.6 FPS) và YOLOv7 (104.2 FPS) do các kết nối phức tạp của E-PAN.</li>
+                            <li>Chưa khai thác đặc điểm riêng của mũ: Bài báo chưa tận dụng các đặc trưng hình dạng/màu sắc đặc thù của mũ bảo hộ để cải thiện phát hiện trong bối cảnh phức tạp.</li>
+                            <li>Chưa kết hợp image augmentation: Các kỹ thuật tăng cường dữ liệu có thể giúp cải thiện thêm độ chính xác nhưng chưa được thử nghiệm.</li>
+                            <li>Chưa tối ưu cho thiết bị tài nguyên rất hạn chế: Mặc dù đã nhẹ hơn nhiều, vẫn cần nghiên cứu thêm các chiến lược lightweight để phù hợp với thiết bị biên yếu hơn nữa.</li>
+                        </ul>
+                    </div>
+
+                    <p>Nhìn chung, YOLO-PL là một giải pháp cân bằng tốt giữa độ chính xác và chi phí triển khai cho bài toán phát hiện mũ bảo hộ, đồng thời mở ra hướng phát triển tiếp theo về tối ưu định vị và khai thác đặc trưng chuyên biệt của đối tượng.</p>
+
+                    <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="object_detection.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Object Detection</strong>
+                            </a>
+                            <a href="image_segmentation.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Image Segmentation</strong>
+                            </a>
+                            <a href="cnn.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>CNN – Convolutional Neural Networks</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="object_detection.html">← Previous: Object Detection</a>
+                        <a href="image_segmentation.html">Next: Image Segmentation chi tiết →</a>
+                    </div>
+                </div>
+            
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
+</body>
+</html>

@@ -269,7 +269,7 @@
 
                     <p>Selective Search không học (không có tham số được tối ưu bằng gradient descent) – nó là một thuật toán thị giác máy tính cổ điển kết hợp màu sắc, kết cấu, và hình học. Đây chính là "region proposer" được dùng trong phiên bản R-CNN đầu tiên.</p>
 
-                    <h2>III. R-CNN (Region-based Convolutional Neural Network)</h2>
+                    <h3>c. R-CNN (Region-based Convolutional Neural Network)</h3>
                     <p><strong>Thuật toán R-CNN</strong> – một bước ngoặt lớn của Object Detection, 
                         khi lần đầu tiên áp dụng thành công CNN để giải quyết bài toán phát hiên vật thể</p>
                     <div class="highlight-box">
@@ -451,13 +451,7 @@
 
 
 
-
-
-
-
                     <h2>IV. Đánh giá mô hình Object Detection</h2>
-
-                    <!-- <h2>IX. Đánh giá mô hình Object Detection</h2>
                     <p>Khác với bài toán Classification (chỉ cần Accuracy, Precision, Recall đơn giản), đánh giá Object Detection phức tạp hơn vì phải đánh giá đồng thời cả vị trí và nhãn lớp. Bộ chỉ số chuẩn được dùng phổ biến nhất là <strong>mAP (mean Average Precision)</strong> trên các bộ dữ liệu như PASCAL VOC, COCO.</p>
 
                     <h3>1. Các khái niệm cơ bản</h3>
@@ -515,51 +509,6 @@
                         mAP = \frac{1}{C} \sum_{c=1}^{C} AP_c
                         \]
                     </div>
-
-                    <p>Trong đó \(C\) là số lớp.</p>
-
-                    <h3>5. Các biến thể của mAP</h3>
-                    <table class="comparison">
-                        <thead>
-                            <tr><th>Chỉ số</th><th>Ý nghĩa</th><th>Bộ dữ liệu</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>mAP@0.5</strong></td>
-                                <td>mAP với ngưỡng IoU = 0.5</td>
-                                <td>PASCAL VOC</td>
-                            </tr>
-                            <tr>
-                                <td><strong>mAP@0.75</strong></td>
-                                <td>mAP với ngưỡng IoU = 0.75 (khắt khe hơn về vị trí)</td>
-                                <td>COCO</td>
-                            </tr>
-                            <tr>
-                                <td><strong>mAP@[.5:.95]</strong></td>
-                                <td>Trung bình của mAP tại 10 ngưỡng IoU từ 0.5 đến 0.95 (bước 0.05)</td>
-                                <td>COCO (chỉ số chính)</td>
-                            </tr>
-                            <tr>
-                                <td><strong>AP<sub>S</sub>, AP<sub>M</sub>, AP<sub>L</sub></strong></td>
-                                <td>AP cho đối tượng nhỏ / vừa / lớn (theo diện tích)</td>
-                                <td>COCO</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h3>7. Vài lưu ý khi so sánh các mô hình</h3>
-                    <ul>
-                        <li><strong>COCO mAP thường thấp hơn VOC mAP</strong> vì COCO dùng ngưỡng IoU khắt khe hơn (0.5:0.95).</li>
-                        <li><strong>FPS (Frames Per Second)</strong> cũng rất quan trọng trong ứng dụng thực tế – nhiều mô hình có mAP cao nhưng quá chậm để chạy real-time.</li>
-                        <li><strong>Kích thước mô hình (số tham số, FLOPs)</strong> ảnh hưởng đến khả năng triển khai trên thiết bị edge.</li>
-                        <li><strong>AP theo kích thước đối tượng</strong> (AP<sub>S</sub>, AP<sub>M</sub>, AP<sub>L</sub>) quan trọng khi bài toán có nhiều đối tượng nhỏ (như phát hiện người từ drone).</li>
-                    </ul> -->
-
-
-
-
-
-
 
                     <h2>V. Kết luận</h2>
                     <p>Object Detection là bài toán kết hợp giữa localization (định vị) và classification (phân loại). Từ bài toán đơn giản với một đối tượng, đến bài toán nhiều đối tượng, chúng ta đã đi qua các bước tiến hoá của lĩnh vực này:</p>
