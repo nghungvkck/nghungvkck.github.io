@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YOLO - Kiến trúc Object Detection một giai đoạn - Hung Blog</title>
+    <link rel="stylesheet" href="../css/style.css?v=20260522-1" />
+    <link rel="stylesheet" href="../css/article.css?v=20260522-1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        .formula {
+            background: rgba(255, 253, 248, 0.82);
+            border-left: 3px solid #9f1f1f;
+            padding: 18px 20px;
+            margin: 26px 0;
+            overflow-x: auto;
+        }
+        .matrix {
+            font-family: monospace;
+            text-align: center;
+            background: #f8f4ec;
+            padding: 10px;
+            display: inline-block;
+            margin: 10px auto;
+        }
+        .highlight-box {
+            background: #f8fbff;
+            border: 1px solid #dce9ff;
+            border-radius: 10px;
+            padding: 18px;
+            margin: 20px 0;
+        }
+        .note-box {
+            background-color: #fff9e6;
+            border-left: 5px solid #f0b400;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .warn-box {
+            background-color: #fff0f0;
+            border-left: 5px solid #d9534f;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        table.comparison {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.comparison th, table.comparison td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table.comparison th {
+            background: #f4f4f4;
+        }
+
+        /* ==== Căn đều 2 bên cho nội dung bài viết ==== */
+        .post-content p,
+        .post-content li,
+        .post-content .note-box p,
+        .post-content .warn-box p,
+        .post-content .highlight-box p {
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+        }
+        .post-content p {
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+    </style>
+
+    <script src="../js/features.js" defer></script>
+
+    <meta property="og:title" content="YOLO - Kiến trúc Object Detection một giai đoạn - Hung Blog" />
+    <meta property="og:type" content="article" />
+</head>
+<body class="article-page">
+    <div id="reading-progress"></div>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../index.html" class="brand-mark" aria-label="nghung Blog">
+                <span class="brand-ring"></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#machine-learning">Books</a>
+                <a href="https://www.facebook.com/nguyen.hung.577643/">Facebook</a>
+                <a href="https://github.com/nghungvkck">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="blog-post">
+        <div class="article-layout">
+            <aside class="article-sidebar">
+                <h3 class="article-toc-title">Mục lục</h3>
+                <nav class="article-toc"></nav>
+            </aside>
+
+            <article class="post-container">
+                <header class="post-header">
+                    <h1>YOLO: Kiến trúc Object Detection một giai đoạn</h1>
+                    <div class="post-meta">
+                        <span>Ngày đăng: 4/10/2026</span>
+                        <span>Chuyên mục: Deep Learning</span>
+                    </div>
+                    <div class="post-tags">
+                        <span>#object-detection</span>
+                        <span>#yolo</span>
+                        <span>#darknet</span>
+                        <span>#anchor-box</span>
+                        <span>#computer-vision</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <h2>I. Giới thiệu chung</h2>
+                    <p>Trong những năm gần đây, <strong>Object Detection</strong> là một trong những đề tài rất hot của deep learning bởi khả năng ứng dụng cao, dữ liệu dễ chuẩn bị và kết quả ứng dụng cực kì đa dạng. Các thuật toán mới như YOLO, SSD có tốc độ khá nhanh và độ chính xác cao, giúp Object Detection có thể thực hiện được các tác vụ dường như là real-time, thậm chí nhanh hơn cả con người mà độ chính xác không giảm. Các mô hình cũng trở nên nhẹ hơn nên có thể hoạt động trên các thiết bị IoT để tạo nên các thiết bị thông minh.</p>
+
+                    <p>Một thuật toán Object Detection có thể tạo ra những ứng dụng rất đa dạng như: đếm số lượng vật thể, thanh toán tiền tại quầy hàng, chấm công tự động, phát hiện vật thể nguy hiểm như súng, dao… Có thể nói dường như bất kì lĩnh vực nào cũng đều có thể ứng dụng được Object Detection.</p>
+
+                    <h3>1. Mạng YOLO là gì?</h3>
+                    <p>YOLO nghe khá giống slogan "You only live once" phải không? Nhưng YOLO trong Object Detection có nghĩa là <strong>"You Only Look Once"</strong> – tức là chúng ta chỉ cần nhìn một lần là có thể phát hiện ra vật thể. Rất nhanh và mạnh phải không nào?</p>
+
+                    <p>Thật vậy, về độ chính xác thì YOLO có thể không phải là thuật toán tốt nhất, nhưng nó là thuật toán nhanh nhất trong các lớp mô hình Object Detection. Nó có thể đạt được tốc độ gần như real-time mà độ chính xác không quá giảm so với các model thuộc top đầu.</p>
+
+                    <p>YOLO là thuật toán Object Detection nên mục tiêu của mô hình không chỉ là dự báo nhãn cho vật thể như các bài toán classification, mà nó còn xác định location của vật thể. Do đó YOLO có thể phát hiện được nhiều vật thể có nhãn khác nhau trong một bức ảnh thay vì chỉ phân loại duy nhất một nhãn cho một bức ảnh.</p>
+
+                    <h3>2. Yêu cầu</h3>
+                    <p>Trước khi đọc bài viết này, chúng ta cần nắm vững lý thuyết:</p>
+                    <ul>
+                        <li><strong>Nguyên lý hoạt động của mạng nơ-ron tích chập (CNN):</strong> Đây là mạng nơ-ron áp dụng các layer Convolutional kết hợp với Maxpooling để giúp trích xuất đặc trưng của ảnh tốt hơn.</li>
+                        <li><strong>Khái niệm về bounding box, anchor box:</strong> Bounding box là khung hình bao quanh vật thể. Anchor box là những khung hình có kích thước xác định trước, có tác dụng dự đoán bounding box.</li>
+                        <li><strong>Feature map:</strong> Là một khối output mà ta sẽ chia nó thành một lưới ô vuông và áp dụng tìm kiếm và phát hiện vật thể trên từng cell.</li>
+                        <li><strong>Non-max suppression:</strong> Phương pháp giúp giảm thiểu nhiều bounding box overlap nhau về một bounding box có xác suất lớn nhất.</li>
+                    </ul>
+
+                    <h2>II. Kiến trúc mạng YOLO</h2>
+                    <p>Cũng tương tự như thuật toán SSD, kiến trúc YOLO bao gồm: <strong>base network</strong> là các mạng convolution làm nhiệm vụ trích xuất đặc trưng. Phần phía sau là những <strong>Extra Layers</strong> được áp dụng để phát hiện vật thể trên feature map của base network.</p>
+
+                    <p>Base network của YOLO sử dụng chủ yếu là các convolutional layer và các fully connected layer. Các kiến trúc YOLO cũng khá đa dạng và có thể tùy biến thành các version cho nhiều input shape khác nhau.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 1:</strong> Sơ đồ kiến trúc mạng YOLO. Thành phần Darknet Architecture được gọi là base network có tác dụng trích xuất đặc trưng. Output của base network là một feature map có kích thước \(7 \times 7 \times 1024\) sẽ được sử dụng làm input cho các Extra layers có tác dụng dự đoán nhãn và tọa độ bounding box của vật thể.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-architecture.png" alt="YOLO Architecture">
+                        </div>
+                    </div>
+
+                    <p>Trong YOLO version 3, tác giả áp dụng một mạng feature extractor là <strong>Darknet-53</strong>. Mạng này gồm 53 convolutional layers kết nối liên tiếp, mỗi layer được theo sau bởi một batch normalization và một activation Leaky ReLU. Để giảm kích thước của output sau mỗi convolution layer, tác giả down-sample bằng các filter với kích thước là 2. Mẹo này có tác dụng giảm thiểu số lượng tham số cho mô hình.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 2:</strong> Các layer trong mạng Darknet-53.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/darknet-53.png" alt="Darknet-53">
+                        </div>
+                    </div>
+
+                    <p>Các bức ảnh khi được đưa vào mô hình sẽ được scale để về chung một kích thước phù hợp với input shape của mô hình và sau đó được gom lại thành batch đưa vào huấn luyện.</p>
+
+                    <p>Hiện tại YOLO đang hỗ trợ 2 đầu vào chính là \(416 \times 416\) và \(608 \times 608\). Mỗi một đầu vào sẽ có một thiết kế các layer riêng phù hợp với shape của input. Sau khi đi qua các layer convolutional thì shape giảm dần theo cấp số nhân là 2. Cuối cùng ta thu được một feature map có kích thước tương đối nhỏ để dự báo vật thể trên từng ô của feature map.</p>
+
+                    <p>Kích thước của feature map sẽ phụ thuộc vào đầu vào. Đối với input \(416 \times 416\) thì feature map có các kích thước là \(13 \times 13\), \(26 \times 26\) và \(52 \times 52\). Và khi input là \(608 \times 608\) sẽ tạo ra feature map \(19 \times 19\), \(38 \times 38\), \(76 \times 76\).</p>
+
+                    <h2>III. Output của YOLO</h2>
+                    <p>Output của mô hình YOLO là một vector bao gồm các thành phần:</p>
+
+                    <div class="formula">
+                        \[
+                        y^T = \left[ p_0, \underbrace{\langle t_x, t_y, t_w, t_h \rangle}_{\text{bounding box}}, \underbrace{\langle p_1, p_2, \ldots, p_c \rangle}_{\text{scores of c classes}} \right]
+                        \]
+                    </div>
+
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li>\(p_0\) là xác suất dự báo vật thể xuất hiện trong bounding box.</li>
+                        <li>\(\langle t_x, t_y, t_w, t_h \rangle\) giúp xác định bounding box. Trong đó \(t_x, t_y\) là tọa độ tâm và \(t_w, t_h\) là kích thước rộng, dài của bounding box.</li>
+                        <li>\(\langle p_1, p_2, \ldots, p_c \rangle\) là vector phân phối xác suất dự báo của các classes.</li>
+                    </ul>
+
+                    <p>Việc hiểu output khá là quan trọng để chúng ta cấu hình tham số chuẩn xác khi huấn luyện model qua các open source như darknet. Như vậy output sẽ được xác định theo số lượng classes theo công thức \((n\_class + 5)\).</p>
+
+                    <div class="formula">
+                        \[
+                        (n\_class + 5) \times 3 = 85 \times 3 = 255
+                        \]
+                    </div>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 3:</strong> Kiến trúc một output của model YOLO. Hình ảnh gốc là một feature map kích thước \(13 \times 13\). Trên mỗi một cell của feature map chúng ta lựa chọn ra 3 anchor boxes với kích thước khác nhau lần lượt là Box 1, Box 2, Box 3 sao cho tâm của các anchor boxes trùng với cell. Khi đó output của YOLO là một vector concatenate của 3 bounding boxes.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-output.png" alt="YOLO Output">
+                        </div>
+                    </div>
+
+                    <h2>IV. Dự báo trên nhiều feature map</h2>
+                    <p>Cũng tương tự như SSD, YOLOv3 dự báo trên nhiều feature map. Những feature map ban đầu có kích thước nhỏ giúp dự báo được các object kích thước lớn. Những feature map sau có kích thước lớn hơn trong khi anchor box được giữ cố định kích thước nên sẽ giúp dự báo các vật thể kích thước nhỏ.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 4:</strong> Các feature maps của mạng YOLOv3 với input shape là \(416 \times 416\), output là 3 feature maps có kích thước lần lượt là \(13 \times 13\), \(26 \times 26\) và \(52 \times 52\).</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-multi-feature-map.png" alt="YOLO Multi Feature Map">
+                        </div>
+                    </div>
+
+                    <p>Trên mỗi một cell của các feature map chúng ta sẽ áp dụng 3 anchor box để dự đoán vật thể. Như vậy số lượng các anchor box khác nhau trong một mô hình YOLO sẽ là 9 (3 feature map × 3 anchor box).</p>
+
+                    <p>Đồng thời trên một feature map hình vuông \(S \times S\), mô hình YOLOv3 sinh ra một số lượng anchor box là: \(S \times S \times 3\). Như vậy số lượng anchor boxes trên một bức ảnh sẽ là:</p>
+
+                    <div class="formula">
+                        \[
+                        (13 \times 13 + 26 \times 26 + 52 \times 52) \times 3 = 10647 \text{ (anchor boxes)}
+                        \]
+                    </div>
+
+                    <p>Đây là một số lượng rất lớn và là nguyên nhân khiến quá trình huấn luyện mô hình YOLO vô cùng chậm bởi chúng ta cần dự báo đồng thời nhãn và bounding box trên đồng thời 10647 bounding boxes.</p>
+
+                    <div class="note-box">
+                        <p><strong>Một số lưu ý khi huấn luyện YOLO:</strong></p>
+                        <ul>
+                            <li>Khi huấn luyện YOLO sẽ cần phải có RAM dung lượng lớn hơn để save được 10647 bounding boxes như trong kiến trúc này.</li>
+                            <li>Không thể thiết lập các batch_size quá lớn như trong các mô hình classification vì rất dễ Out of memory. Package darknet của YOLO đã chia nhỏ một batch thành các subdivisions cho vừa với RAM.</li>
+                            <li>Thời gian xử lý của một step trên YOLO lâu hơn rất rất nhiều lần so với các mô hình classification. Do đó nên thiết lập steps giới hạn huấn luyện cho YOLO nhỏ. Đối với các tác vụ nhận diện dưới 5 classes, dưới 5000 steps là có thể thu được nghiệm tạm chấp nhận được. Các mô hình có nhiều classes hơn có thể tăng số lượng steps theo cấp số nhân tùy bạn.</li>
+                        </ul>
+                    </div>
+
+                    <h2>V. Anchor box</h2>
+                    <p>Để tìm được bounding box cho vật thể, YOLO sẽ cần các anchor box làm cơ sở ước lượng. Những anchor box này sẽ được xác định trước và sẽ bao quanh vật thể một cách tương đối chính xác. Sau này thuật toán regression bounding box sẽ tinh chỉnh lại anchor box để tạo ra bounding box dự đoán cho vật thể. Trong một mô hình YOLO:</p>
+
+                    <ul>
+                        <li>Mỗi một vật thể trong hình ảnh huấn luyện được phân bố về một anchor box. Trong trường hợp có từ 2 anchor boxes trở lên cùng bao quanh vật thể thì ta sẽ xác định anchor box mà có IoU với ground truth bounding box là cao nhất.</li>
+                        <li>Mỗi một vật thể trong hình ảnh huấn luyện được phân bố về một cell trên feature map mà chứa điểm mid-point của vật thể. Chẳng hạn như hình chú chó trong hình 3 sẽ được phân về cho cell màu đỏ vì điểm mid-point của ảnh chú chó rơi vào đúng cell này. Từ cell ta sẽ xác định các anchor boxes bao quanh hình ảnh chú chó.</li>
+                    </ul>
+
+                    <p>Như vậy khi xác định một vật thể ta sẽ cần xác định 2 thành phần gắn liền với nó là <strong>(cell, anchor box)</strong>. Không chỉ riêng mình cell hoặc chỉ mình anchor box.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 5:</strong> Xác định anchor box cho một vật thể. Từ Cell i ta xác định được 3 anchor boxes viền xanh như trong hình. Cả 3 anchor boxes này đều giao nhau với bounding box của vật thể. Tuy nhiên chỉ anchor box có đường viền dày nhất màu xanh được lựa chọn làm anchor box cho vật thể bởi nó có IoU so với ground truth bounding box là cao nhất.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-anchor-box.png" alt="YOLO Anchor Box">
+                        </div>
+                    </div>
+
+                    <p>Một số trường hợp 2 vật thể bị trùng mid-point, mặc dù rất hiếm khi xảy ra, thuật toán sẽ rất khó xác định được class cho chúng.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 6:</strong> Khi 2 vật thể người và xe trùng mid-point và cùng thuộc một cell. Thuật toán sẽ cần thêm những lượt tiebreak để quyết định đâu là class cho cell.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-tiebreak.png" alt="YOLO Tiebreak">
+                        </div>
+                    </div>
+
+                    <h2>VI. Hàm loss function</h2>
+                    <p>Cũng tương tự như SSD, hàm loss function của YOLO chia thành 2 phần: \(L_{loc}\) và \(L_{cls}\).</p>
+
+                    <div class="formula">
+                        \[
+                        L_{loc} = \lambda_{coord} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{obj} \left[ (x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2 + (w_i - \hat{w}_i)^2 + (h_i - \hat{h}_i)^2 \right]
+                        \]
+                    </div>
+
+                    <div class="formula">
+                        \[
+                        L_{cls} = \underbrace{\sum_{i=0}^{S^2} \sum_{j=0}^{B} \left( \mathbb{1}_{ij}^{obj} + \lambda_{noobj} (1 - \mathbb{1}_{ij}^{obj}) \right) (C_{ij} - \hat{C}_{ij})^2}_{\text{cell contain object}} + \underbrace{\sum_{i=0}^{S^2} \sum_{c \in C} \mathbb{1}_{i}^{obj} (p_i(c) - \hat{p}_i(c))^2}_{\text{probability distribution classes}}
+                        \]
+                    </div>
+
+                    <div class="formula">
+                        \[
+                        L = L_{loc} + L_{cls}
+                        \]
+                    </div>
+
+                    <p>Trong đó:</p>
+                    <ul>
+                        <li>\(\mathbb{1}_{i}^{obj}\): Hàm indicator có giá trị \(0, 1\) nhằm xác định xem cell \(i\) có chứa vật thể hay không. Bằng 1 nếu chứa vật thể và 0 nếu không chứa.</li>
+                        <li>\(\mathbb{1}_{ij}^{obj}\): Cho biết bounding box thứ \(j\) của cell \(i\) có phải là bounding box của vật thể được dự đoán hay không.</li>
+                        <li>\(C_{ij}\): Điểm tin cậy của ô \(i, j\): \(P(\text{contain object}) \times \text{IoU}(\text{predict bbox}, \text{ground truth bbox})\).</li>
+                        <li>\(\hat{C}_{ij}\): Điểm tự tin dự đoán.</li>
+                        <li>\(C\): Tập hợp tất cả các lớp.</li>
+                        <li>\(p_i(c)\): Xác suất có điều kiện, có hay không ô \(i\) có chứa một đối tượng của lớp \(c \in C\).</li>
+                        <li>\(\hat{p}_i(c)\): Xác suất có điều kiện dự đoán.</li>
+                    </ul>
+
+                    <p>Có thể ban đầu công thức trên khá khó hiểu với người bắt đầu. Chúng ta hãy hiểu đơn giản hóa mục đích của chúng:</p>
+                    <ul>
+                        <li>\(L_{loc}\) là hàm mất mát của bounding box dự báo so với thực tế.</li>
+                        <li>\(L_{cls}\) là hàm mất mát của phân phối xác suất. Trong đó tổng đầu tiên là mất mát của dự đoán có vật thể trong cell hay không, và tổng thứ hai là mất mát của phân phối xác suất nếu có vật thể trong cell.</li>
+                    </ul>
+
+                    <p>Ngoài ra để điều chỉnh phạt loss function trong trường hợp dự đoán sai bounding box, ta thông qua hệ số điều chỉnh \(\lambda_{coord}\) và \(\lambda_{noobj}\).</p>
+
+                    <h2>VII. Dự báo bounding box</h2>
+                    <p>Để dự báo bounding box cho một vật thể, chúng ta dựa trên một phép biến đổi từ anchor box và cell.</p>
+
+                    <p>YOLOv2 và YOLOv3 dự đoán bounding box sao cho nó sẽ không lệch khỏi vị trí trung tâm quá nhiều. Nếu bounding box dự đoán có thể đặt vào bất kỳ phần nào của hình ảnh, như trong mạng regional proposal network, việc huấn luyện mô hình có thể trở nên không ổn định.</p>
+
+                    <p>Cho một anchor box có kích thước \((p_w, p_h)\) và cell có tọa độ \((c_x, c_y)\). Mô hình dự đoán các offset \((t_x, t_y, t_w, t_h)\). Bounding box dự đoán \((b_x, b_y)\) và \((b_w, b_h)\) được tính như sau:</p>
+
+                    <div class="formula">
+                        \[
+                        b_x = \sigma(t_x) + c_x, \qquad b_y = \sigma(t_y) + c_y
+                        \]
+                        \[
+                        b_w = p_w e^{t_w}, \qquad b_h = p_h e^{t_h}
+                        \]
+                    </div>
+
+                    <p>Ngoài ra do các tọa độ đã được hiệu chỉnh theo width và height của bức ảnh nên luôn có giá trị nằm trong ngưỡng \([0, 1]\). Do đó khi áp dụng hàm sigmoid giúp ta giới hạn được tọa độ không vượt quá xa các ngưỡng này.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 7:</strong> Công thức ước lượng bounding box từ anchor box. Hình chữ nhật nét đứt bên ngoài là anchor box có kích thước là \((p_w, p_h)\).</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-bbox-formula.png" alt="YOLO Bounding Box Formula">
+                        </div>
+                    </div>
+
+                    <h2>VIII. Non-max suppression</h2>
+                    <p>Do thuật toán YOLO dự báo ra rất nhiều bounding box trên một bức ảnh nên đối với những cell có vị trí gần nhau, khả năng các khung hình bị overlap là rất cao. Trong trường hợp đó YOLO sẽ cần đến Non-max suppression để giảm bớt số lượng các khung hình được sinh ra một cách đáng kể.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Hình 8:</strong> Non-max suppression. Từ 3 bounding box ban đầu cùng bao quanh chiếc xe đã giảm xuống còn một bounding box cuối cùng.</p>
+                        <div style="display: flex; justify-content: center;">
+                            <img src="../images/yolo-nms.png" alt="YOLO NMS">
+                        </div>
+                    </div>
+
+                    <p>Các bước của Non-max suppression:</p>
+                    <ol>
+                        <li><strong>Bước 1:</strong> Đầu tiên chúng ta sẽ tìm cách giảm bớt số lượng các bounding box bằng cách lọc bỏ toàn bộ những bounding box có xác suất chứa vật thể nhỏ hơn một ngưỡng threshold nào đó, thường là 0.5.</li>
+                        <li><strong>Bước 2:</strong> Đối với các bounding box giao nhau, Non-max suppression sẽ lựa chọn ra một bounding box có xác suất chứa vật thể là lớn nhất. Sau đó tính toán chỉ số giao thoa IoU với các bounding box còn lại. Nếu chỉ số này lớn hơn ngưỡng threshold thì điều đó chứng tỏ 2 bounding boxes đang overlap nhau rất cao. Ta sẽ xóa các bounding box có xác suất thấp hơn và giữ lại bounding box có xác suất cao nhất. Cuối cùng, ta thu được một bounding box duy nhất cho một vật thể.</li>
+                    </ol>
+
+                    <h2>IX. Tổng kết</h2>
+                    <p>Như vậy qua bài viết này chúng ta đã hiểu được nguyên lý hoạt động mạng YOLO theo một cách khái quát nhất. Đây là một thuật toán rất phức tạp và bên trong nó có rất nhiều các xử lý tính toán mà không đơn giản để chúng ta hiểu hết được toàn bộ chúng.</p>
+
+                    <p>Những kiến thức cốt lõi cần nhớ về YOLO:</p>
+                    <ul>
+                        <li><strong>Base network (Darknet):</strong> Trích xuất đặc trưng từ ảnh, tạo ra feature map.</li>
+                        <li><strong>Chia feature map thành lưới \(S \times S\):</strong> Mỗi cell dự đoán \(B\) bounding box và \(C\) xác suất lớp.</li>
+                        <li><strong>Output vector:</strong> \((n\_class + 5) \times 3\) cho mỗi cell (với 3 anchor box).</li>
+                        <li><strong>Anchor box:</strong> Mỗi vật thể được gán cho cell chứa mid-point và anchor box có IoU cao nhất với ground truth.</li>
+                        <li><strong>Dự báo bounding box:</strong> Dùng hàm sigmoid cho tọa độ tâm và hàm exp cho kích thước.</li>
+                        <li><strong>Loss function:</strong> Kết hợp \(L_{loc}\) (bounding box) và \(L_{cls}\) (classification + confidence).</li>
+                        <li><strong>Non-max suppression:</strong> Loại bỏ các bounding box trùng lặp, giữ lại box tốt nhất.</li>
+                    </ul>
+
+                    <p>Nếu bạn đọc muốn tìm hiểu thật sâu, tôi khuyến nghị các bạn đọc lại các bài báo gốc về YOLO. Trong bài viết tôi cố gắng trình bày mọi kiến thức theo cách dễ hiểu nhất. Tôi hi vọng rằng sẽ giúp ích cho bạn trong việc hiểu được mô hình YOLO hoạt động như thế nào.</p>
+
+                    <div style="background-color: #f6fbf7; border-left: 5px solid #4caf50; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="margin-top: 0; color: #2e7d32;">Bài viết liên quan</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <a href="object_detection.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Object Detection: bài toán nhận diện đối tượng</strong>
+                            </a>
+                            <a href="cnn.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>CNN – Convolutional Neural Networks</strong>
+                            </a>
+                            <a href="../index.html" style="text-decoration: none; color: #2e7d32; border: 1px solid #4caf50; padding: 15px; border-radius: 5px; text-align: center;">
+                                <strong>Trang chủ</strong>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post-navigation">
+                        <a href="object_detection.html">← Previous: Object Detection</a>
+                        <a href="fast_rcnn.html">Next: Fast R-CNN →</a>
+                    </div>
+                </div>
+
+                <div class="comments-section" style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+                    <h3>Bình luận</h3>
+                    <script src="https://utteranc.es/client.js"
+                            repo="nghungvkck/nghungvkck.github.io"
+                            issue-term="pathname"
+                            theme="github-light"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 30px; background-color: #f5f5f5; margin-top: 50px;">
+        <p>© 2026 nghung-Blog. All rights reserved.</p>
+    </footer>
+    <script src="../js/article.js?v=20260522-1"></script>
+
+    <button id="scroll-to-top" aria-label="Lên đầu trang">↑</button>
+</body>
+</html>
